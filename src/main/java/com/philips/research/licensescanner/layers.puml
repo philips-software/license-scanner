@@ -1,0 +1,46 @@
+@startuml
+
+title
+    Application layering
+end title
+
+left to right direction
+
+package controller {
+    class FooResource
+    note right
+        REST API
+        implementation
+    end note
+}
+
+package core {
+    interface LicenseService
+    FooResource -l-> LicenseService
+
+    package domain {
+        class LicenseInteractor
+        note bottom
+            Use Case implementations
+        end note
+        LicenseService <|.. LicenseInteractor
+
+        class DomainClass
+        LicenseInteractor ..> DomainClass
+    }
+
+    interface LicenseStore
+    LicenseInteractor -> LicenseStore
+}
+
+package persistence {
+    class LicenseDatabase
+    note right
+        Database
+        code
+    end note
+    LicenseStore <|.u. LicenseDatabase
+    LicenseDatabase ..> DomainClass
+}
+
+@enduml
