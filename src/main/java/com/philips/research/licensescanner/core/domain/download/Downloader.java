@@ -32,7 +32,7 @@ public class Downloader {
         registry.put(vcs, handler);
     }
 
-    Path download(DownloadLocation location) {
+    public Path download(DownloadLocation location) {
         final var handler = validHandler(location.getVcsTool());
         final var directory = newDirectory();
 

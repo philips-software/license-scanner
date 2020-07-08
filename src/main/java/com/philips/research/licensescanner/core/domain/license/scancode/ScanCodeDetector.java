@@ -20,7 +20,7 @@ public class ScanCodeDetector implements Detector {
         //TODO Should first extract any archives?
         new ShellCommand("scancode")
                 .setDirectory(directory.toFile())
-                .execute("-clp", "-n2", "--timeout=300", "--only-findings", "--strip-root", "--ignore", RESULT_FILE, "--json-pp", RESULT_FILE, ".");
+                .execute("--license", "-n2", "--timeout=300", "--only-findings", "--strip-root", "--ignore", RESULT_FILE, "--json-pp", RESULT_FILE, ".");
         try {
             final var scanResult = MAPPER.readValue(directory.resolve(RESULT_FILE).toFile(), ScanCodeJson.class);
             final var licenses = scanResult.getLicense();

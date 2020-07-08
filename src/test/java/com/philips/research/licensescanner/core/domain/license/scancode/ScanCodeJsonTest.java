@@ -29,6 +29,13 @@ class ScanCodeJsonTest {
     }
 
     @Test
+    void defaultsUnknownSpdxIdentifiers() {
+        final var license = new LicenseJson("key", "");
+
+        assertThat(license.getSpdxIdentifier()).isEqualTo("Unknown");
+    }
+
+    @Test
     void supportsLicenseCombinations() {
         final var scan = new ScanCodeJson(List.of(
                 new FileJson(List.of(LICENSE_1, LICENSE_2), LICENSE_1.key + " AND " + LICENSE_2.key)

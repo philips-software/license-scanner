@@ -7,6 +7,9 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import java.nio.file.Path;
 
+/**
+ * Configuration read from properties file.
+ */
 @Validated
 @ConfigurationProperties(prefix = "service")
 public class ApplicationConfiguration {

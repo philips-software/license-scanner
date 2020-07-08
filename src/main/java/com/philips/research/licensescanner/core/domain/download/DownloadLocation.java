@@ -22,7 +22,7 @@ public class DownloadLocation {
         this.subPath = subPath;
     }
 
-    static DownloadLocation parse(String specification) {
+    static public DownloadLocation parse(String specification) {
         final var pattern = Pattern.compile("^(\\w+)\\+([^\\s@#]+)(@([^\\s#]+))?(#(\\S+))?$");
         final var matcher = pattern.matcher(specification);
 

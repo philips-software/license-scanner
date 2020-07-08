@@ -2,6 +2,7 @@ package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ class FileJson {
 
     Collection<String> getLicenses() {
         final Map<String, String> dictionary = new HashMap<>();
-        licenses.forEach(lic -> dictionary.put(lic.key, lic.spdx));
+        licenses.forEach(lic -> dictionary.put(lic.key, lic.getSpdxIdentifier()));
 
         return expressions.stream()
                 .map(str -> {
@@ -82,6 +83,10 @@ class LicenseJson {
     LicenseJson(String key, String spdx) {
         this.key = key;
         this.spdx = spdx;
+    }
+
+    public String getSpdxIdentifier() {
+        return StringUtils.isEmpty(spdx) ? "Unknown" : spdx;
     }
 }
 
