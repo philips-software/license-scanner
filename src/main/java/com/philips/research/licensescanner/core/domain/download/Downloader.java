@@ -1,5 +1,9 @@
 package com.philips.research.licensescanner.core.domain.download;
 
+import com.philips.research.licensescanner.ApplicationConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,13 +17,15 @@ interface VcsHandler {
     void download(Path directory, DownloadLocation location);
 }
 
+@Component
 public class Downloader {
     private final Path baseDirectory;
 
     private final Map<String, VcsHandler> registry = new HashMap<>();
 
-    public Downloader(Path baseDirectory) {
-        this.baseDirectory = baseDirectory;
+    @Autowired
+    public Downloader(ApplicationConfiguration configuration) {
+        this.baseDirectory = configuration.getTempDir();
     }
 
     void register(String vcs, VcsHandler handler) {

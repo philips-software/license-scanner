@@ -1,5 +1,6 @@
-package com.philips.research.licensescanner.core.domain.license;
+package com.philips.research.licensescanner.core.domain.license.scancode;
 
+import com.philips.research.licensescanner.core.domain.license.Detector;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -7,7 +8,7 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ScanCodeDetectorTest {
-    private final ScanCodeDetector detector = new ScanCodeDetector();
+    private final Detector detector = new ScanCodeDetector();
 
     @Test
     void scansDirectory() {

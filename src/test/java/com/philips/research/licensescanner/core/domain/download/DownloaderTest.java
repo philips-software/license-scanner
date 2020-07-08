@@ -1,5 +1,6 @@
 package com.philips.research.licensescanner.core.domain.download;
 
+import com.philips.research.licensescanner.ApplicationConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,19 +19,20 @@ class DownloaderTest {
     private static final String TOOL = "tool";
     private static final DownloadLocation LOCATION = DownloadLocation.parse(TOOL + "+https://example.com");
 
-    private static Path tempDir;
+    private static ApplicationConfiguration configuration;
 
     private final VcsHandler mockHandler = mock(VcsHandler.class);
-    private final Downloader downloader = new Downloader(tempDir);
+    private final Downloader downloader = new Downloader(configuration);
 
     @BeforeAll()
     static void beforeAll() throws IOException {
-        tempDir = Files.createTempDirectory("test");
+        configuration = new ApplicationConfiguration();
+        configuration.setTempDir(Files.createTempDirectory("test"));
     }
 
     @AfterAll
     static void afterAll() throws IOException {
-        FileSystemUtils.deleteRecursively(tempDir);
+        FileSystemUtils.deleteRecursively(configuration.getTempDir());
     }
 
     @BeforeEach
@@ -51,17 +53,7 @@ class DownloaderTest {
     void downloadsForToolFromLocationToDirectory() {
         var directory = downloader.download(LOCATION);
 
-        assertThat(directory.getParent()).isEqualTo(tempDir);
+        assertThat(directory.getParent()).isEqualTo(configuration.getTempDir());
         verify(mockHandler).download(any(Path.class), eq(LOCATION));
-    }
-
-    @Test
-    void throws_workingDirectoryDoesNotExist() {
-        final var downloader = new Downloader(Path.of("not_a_path"));
-        downloader.register(TOOL, mockHandler);
-
-        assertThatThrownBy(() -> downloader.download(LOCATION))
-                .isInstanceOf(DownloadException.class)
-                .hasMessageContaining("working directory");
     }
 }

@@ -1,4 +1,4 @@
-package com.philips.research.licensescanner.core.domain.license;
+package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

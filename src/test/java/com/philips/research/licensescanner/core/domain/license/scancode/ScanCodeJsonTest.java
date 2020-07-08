@@ -1,4 +1,4 @@
-package com.philips.research.licensescanner.core.domain.license;
+package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,16 +1,22 @@
-package com.philips.research.licensescanner.core.domain.license;
+package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.philips.research.licensescanner.core.command.ShellCommand;
+import com.philips.research.licensescanner.core.domain.license.Copyright;
+import com.philips.research.licensescanner.core.domain.license.Detector;
+import com.philips.research.licensescanner.core.domain.license.DetectorException;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-public class ScanCodeDetector {
+@Component
+public class ScanCodeDetector implements Detector {
     private static final String RESULT_FILE = "scancode.json";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    Copyright scan(Path directory) {
+    @Override
+    public Copyright scan(Path directory) {
         //TODO Should first extract any archives?
         new ShellCommand("scancode")
                 .setDirectory(directory.toFile())
