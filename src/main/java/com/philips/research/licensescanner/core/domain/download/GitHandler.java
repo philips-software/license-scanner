@@ -25,13 +25,13 @@ public class GitHandler implements VcsHandler {
     private void checkoutBranchOrTag(Path directory, URI repository, String branchOrTag) {
         new ShellCommand("git")
                 .setDirectory(directory.toFile())
-                .execute("clone", "--depth=1", repository, "--branch", branchOrTag, "--single-branch", ".");
+                .execute("clone", "--depth=1", repository, "--branch", branchOrTag, directory);
     }
 
     private void checkoutCommit(Path directory, URI repository, String commitHash) {
         new ShellCommand("git")
                 .setDirectory(directory.toFile())
-                .execute("clone", repository, ".")
+                .execute("clone", repository, directory)
                 .execute("checkout", commitHash);
     }
 }

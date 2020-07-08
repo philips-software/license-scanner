@@ -72,7 +72,9 @@ public class ShellCommand {
     private Process invoke(Iterable<Object> args) throws IOException, InterruptedException {
         var process = new ProcessBuilder()
                 .directory(directory)
-                .command(invocationArguments(args)).start();
+                .inheritIO()
+                .command(invocationArguments(args))
+                .start();
         if (!process.waitFor(timeout.toSeconds(), TimeUnit.SECONDS)) {
             process.destroyForcibly();
             throw new ShellException("Aborted '" + command + "' after " + timeout.toSeconds() + " seconds");
