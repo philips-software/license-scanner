@@ -1,0 +1,2 @@
+This is a completely irrelevant file.
+It is only here to keep the license scanner busy.

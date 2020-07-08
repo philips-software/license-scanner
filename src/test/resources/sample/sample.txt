@@ -1,0 +1,5 @@
+Copyright 2020 The Author
+License: Beerware
+License: My-own-text
+SPDX-License-Identifier: Not clear
+SPDX-License-Identifier: (BSD-3-Clause-Clear AND BSD-2-Clause)
