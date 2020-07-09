@@ -1,7 +1,7 @@
 package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.core.LicenseService;
-import com.philips.research.licensescanner.core.domain.download.DownloadLocation;
+import com.philips.research.licensescanner.core.domain.download.VcsUri;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -31,17 +32,18 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public Optional<String> licenseFor(String packageId, String version, String vcsId) {
+    public Optional<LicenseInfo> licenseFor(String origin, String pkg, String version) {
         return Optional.empty();
     }
 
     @Override
-    public void scanLicense(String packageId, String version, String vcsId) {
-        final var location = DownloadLocation.parse(vcsId);
+    public void scanLicense(String origin, String packageId, String version, URI vcsUri) {
+        LOG.info("Scan license for {}:{} {} from {}", origin, packageId, version, vcsUri);
+        final var location = VcsUri.from(vcsUri);
         final var path = downloader.download(location);
         final var copyright = detector.scan(path);
         deleteDirectory(path);
-        LOG.info("Detected license for {} {} at {} is {}", packageId, version, vcsId, copyright.license);
+        LOG.info("Detected license for {}:{} {} is {}", origin, packageId, version, copyright.license);
     }
 
     private void deleteDirectory(Path path) {

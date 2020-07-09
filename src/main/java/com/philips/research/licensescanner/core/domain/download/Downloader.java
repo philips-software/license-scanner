@@ -14,7 +14,7 @@ import java.util.Map;
  * Version control handler API.
  */
 interface VcsHandler {
-    void download(Path directory, DownloadLocation location);
+    void download(Path directory, VcsUri location);
 }
 
 @Component
@@ -32,7 +32,7 @@ public class Downloader {
         registry.put(vcs, handler);
     }
 
-    public Path download(DownloadLocation location) {
+    public Path download(VcsUri location) {
         final var handler = validHandler(location.getVcsTool());
         final var directory = newDirectory();
 

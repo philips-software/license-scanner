@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -17,7 +18,7 @@ import static org.mockito.Mockito.*;
 
 class DownloaderTest {
     private static final String TOOL = "tool";
-    private static final DownloadLocation LOCATION = DownloadLocation.parse(TOOL + "+https://example.com");
+    private static final VcsUri LOCATION = VcsUri.from(URI.create(TOOL + "+https://example.com"));
 
     private static ApplicationConfiguration configuration;
 
@@ -42,7 +43,7 @@ class DownloaderTest {
 
     @Test
     void throws_downloadForUnknownVcsTool() {
-        final var unknown = DownloadLocation.parse("unknown+/location");
+        final var unknown = VcsUri.from(URI.create("unknown+/location"));
 
         assertThatThrownBy(() -> downloader.download(unknown))
                 .isInstanceOf(DownloadException.class)

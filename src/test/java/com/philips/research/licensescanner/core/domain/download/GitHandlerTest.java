@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -33,14 +34,14 @@ class GitHandlerTest {
 
     @Test
     void checksOutByTag() throws IOException {
-        handler.download(tempDir, DownloadLocation.parse("git+https://github.com/git/git.git@v2.15.0"));
+        handler.download(tempDir, VcsUri.from(URI.create("git+https://github.com/git/git.git@v2.15.0")));
 
         assertHash("cb5918aa0d50f50e83787f65c2ddc3dcb10159fe");
     }
 
     @Test
     void checksOutByCommit() throws IOException {
-        handler.download(tempDir, DownloadLocation.parse("git+https://github.com/git/git.git@4a0fcf9f760c9774be77f51e1e88a7499b53d2e2"));
+        handler.download(tempDir, VcsUri.from(URI.create("git+https://github.com/git/git.git@4a0fcf9f760c9774be77f51e1e88a7499b53d2e2")));
 
         assertHash("4a0fcf9f760c9774be77f51e1e88a7499b53d2e2");
     }

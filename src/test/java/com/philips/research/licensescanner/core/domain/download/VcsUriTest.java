@@ -7,10 +7,10 @@ import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DownloadLocationTest {
+class VcsUriTest {
     @Test
     void parsesPlainLocation() {
-        var location = DownloadLocation.parse("git+https://example.com/blah@revision");
+        var location = VcsUri.from(URI.create("git+https://example.com/blah@revision"));
 
         assertThat(location.getVcsTool()).isEqualTo("git");
         assertThat(location.getRepositoryUrl()).isEqualTo(URI.create("https://example.com/blah"));
@@ -20,7 +20,7 @@ class DownloadLocationTest {
 
     @Test
     void parsesLocationWithoutRevision() {
-        var location = DownloadLocation.parse("git+https://example.com/blah#sub/path");
+        var location = VcsUri.from(URI.create("git+https://example.com/blah#sub/path"));
 
         assertThat(location.getRevision()).isEmpty();
         assertThat(location.getSubPath()).contains(new File("sub/path"));
@@ -28,7 +28,7 @@ class DownloadLocationTest {
 
     @Test
     void parsesFullLocation() {
-        var location = DownloadLocation.parse("git+https://example.com/blah@revision#sub/path");
+        var location = VcsUri.from(URI.create("git+https://example.com/blah@revision#sub/path"));
 
         assertThat(location.getRevision()).contains("revision");
         assertThat(location.getSubPath()).contains(new File("sub/path"));
@@ -36,12 +36,12 @@ class DownloadLocationTest {
 
     @Test
     void formatsLocationAsString() {
-        var plain = "tool+ssh://example.com@version";
-        var withPath = "tool+ssh://example.com@version#path";
-        var withoutRevision = "tool+ssh://example.com#path";
+        var plain = URI.create("tool+ssh://example.com@version");
+        var withPath = URI.create("tool+ssh://example.com@version#path");
+        var withoutRevision = URI.create("tool+ssh://example.com#path");
 
-        assertThat(DownloadLocation.parse(plain).toString()).isEqualTo(plain);
-        assertThat(DownloadLocation.parse(withPath).toString()).isEqualTo(withPath);
-        assertThat(DownloadLocation.parse(withoutRevision).toString()).isEqualTo(withoutRevision);
+        assertThat(VcsUri.from(plain).toString()).isEqualTo(plain.toString());
+        assertThat(VcsUri.from(withPath).toString()).isEqualTo(withPath.toString());
+        assertThat(VcsUri.from(withoutRevision).toString()).isEqualTo(withoutRevision.toString());
     }
 }

@@ -12,7 +12,7 @@ import java.nio.file.Path;
  */
 public class GitHandler implements VcsHandler {
     @Override
-    public void download(Path directory, DownloadLocation location) {
+    public void download(Path directory, VcsUri location) {
         final var revision = location.getRevision().orElse("master");
 
         try {
