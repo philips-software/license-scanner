@@ -1,8 +1,8 @@
 package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.core.LicenseService;
-import com.philips.research.licensescanner.core.domain.download.VcsUri;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
+import com.philips.research.licensescanner.core.domain.download.VcsUri;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

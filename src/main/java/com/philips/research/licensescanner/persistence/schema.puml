@@ -1,0 +1,23 @@
+@startuml
+
+' Config ERD diagram
+hide circle
+skinparam linetype ortho
+
+entity packages {
+    *id: integer <<generated>>
+    ---
+    origin: varchar
+    package: varchar
+    version: varchar
+}
+
+entity scans {
+    package_id: integer
+    created: timestamp
+    vcs_uri: varchar
+    license: varchar
+}
+
+packages ||--o{ scans
+@enduml

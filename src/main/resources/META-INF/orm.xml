@@ -1,0 +1,13 @@
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" version="2.0">
+    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Package"/>
+    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Scan">
+        <attributes>
+            <basic name="vcsUri" access="FIELD">
+                <column name="vcs_uri"/>
+            </basic>
+            <many-to-one name="pkg" target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
+                <join-column name="package_id"/>
+            </many-to-one>
+        </attributes>
+    </mapped-superclass>
+</entity-mappings>
