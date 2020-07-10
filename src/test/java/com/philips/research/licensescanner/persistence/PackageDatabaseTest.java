@@ -1,11 +1,14 @@
 package com.philips.research.licensescanner.persistence;
 
+import com.philips.research.licensescanner.core.domain.download.VcsUri;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,6 +19,8 @@ class PackageDatabaseTest {
     private static final String ORIGIN = "Origin";
     private static final String NAME = "Name";
     private static final String VERSION = "Version";
+    private static final String LICENSE = "License";
+    private static final VcsUri VCS_URI = VcsUri.from(URI.create("git+http://example.com"));
 
     @Autowired
     PackageDatabase database;
@@ -38,5 +43,15 @@ class PackageDatabaseTest {
         final var pkg = database.findPackage(ORIGIN, NAME, VERSION).get();
 
         assertThat(expected).isEqualTo(pkg);
+    }
+
+    @Test
+    void createsScans() {
+        final var pkg = database.createPackage(ORIGIN, NAME, VERSION);
+        final var expected = database.createScan(pkg, LICENSE, VCS_URI);
+
+        final var latest = database.latestScan(pkg);
+
+        assertThat(latest.getLicense()).isEqualTo(expected.getLicense());
     }
 }

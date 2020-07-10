@@ -7,7 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity(name = "packages")
-public class PackageEntity extends Package {
+class PackageEntity extends Package {
     @Id
     @GeneratedValue
     long id;
@@ -16,7 +16,7 @@ public class PackageEntity extends Package {
         super(null, null, null);
     }
 
-    public PackageEntity(String origin, String name, String version) {
+    PackageEntity(String origin, String name, String version) {
         super(origin, name, version);
     }
 }

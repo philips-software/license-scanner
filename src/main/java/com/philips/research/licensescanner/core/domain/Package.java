@@ -3,9 +3,9 @@ package com.philips.research.licensescanner.core.domain;
 import java.util.Objects;
 
 public class Package {
+    private final String origin;
     private final String name;
     private final String version;
-    public String origin;
 
     public Package(String origin, String name, String version) {
         this.origin = origin;

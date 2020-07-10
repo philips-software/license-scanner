@@ -2,6 +2,7 @@ package com.philips.research.licensescanner.core;
 
 import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
+import com.philips.research.licensescanner.core.domain.download.VcsUri;
 
 import java.util.Optional;
 
@@ -10,5 +11,7 @@ public interface PackageStore {
 
     Optional<Package> findPackage(String origin, String pkg, String version);
 
-    void createScan(Scan scan);
+    Scan createScan(Package pkg, String license, VcsUri vcsUri);
+
+    Scan latestScan(Package pkg);
 }

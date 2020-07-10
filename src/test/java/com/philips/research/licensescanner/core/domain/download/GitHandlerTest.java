@@ -34,15 +34,15 @@ class GitHandlerTest {
 
     @Test
     void checksOutByTag() throws IOException {
-        handler.download(tempDir, VcsUri.from(URI.create("git+https://github.com/git/git.git@v2.15.0")));
+        handler.download(tempDir, VcsUri.from(URI.create("git+https://github.com/excalith/git-cheats.git@v1.0.0")));
 
-        assertHash("cb5918aa0d50f50e83787f65c2ddc3dcb10159fe");
+        assertHash("61b307521005e98474243b8546a62a56e8e561b2");
     }
 
     @Test
     void checksOutByCommit() throws IOException {
-        handler.download(tempDir, VcsUri.from(URI.create("git+https://github.com/git/git.git@4a0fcf9f760c9774be77f51e1e88a7499b53d2e2")));
+        handler.download(tempDir, VcsUri.from(URI.create("git+https://github.com/excalith/git-cheats.git@4c9d714")));
 
-        assertHash("4a0fcf9f760c9774be77f51e1e88a7499b53d2e2");
+        assertHash("4c9d7140896202504e76c79e499177d7f5414755");
     }
 }

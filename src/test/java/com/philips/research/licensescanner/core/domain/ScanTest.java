@@ -12,26 +12,12 @@ class ScanTest {
     private static final String LICENSE = "License";
     private static final VcsUri VCS_URI = VcsUri.from(URI.create("git+ssh://example.come"));
 
-    private final Scan scan = new Scan(PACKAGE);
+    private final Scan scan = new Scan(PACKAGE, LICENSE, VCS_URI);
 
     @Test
     void createsInstance() {
         assertThat(scan.getPackage()).isEqualTo(PACKAGE);
-        assertThat(scan.getLicense()).isEmpty();
-        assertThat(scan.getVcsUri()).isEmpty();
-    }
-
-    @Test
-    void updatesLicense() {
-        scan.setLicense(LICENSE);
-
         assertThat(scan.getLicense()).contains(LICENSE);
-    }
-
-    @Test
-    void updatesVcsUri() {
-        scan.setVcsUri(VCS_URI);
-
         assertThat(scan.getVcsUri()).contains(VCS_URI);
     }
 }

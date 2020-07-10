@@ -11,7 +11,7 @@ import java.nio.file.Path;
  * Configuration read from properties file.
  */
 @Validated
-@ConfigurationProperties(prefix = "service")
+@ConfigurationProperties(prefix = "licenses")
 public class ApplicationConfiguration {
     @NotNull
     private Path tempDir;

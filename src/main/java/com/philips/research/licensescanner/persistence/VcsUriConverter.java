@@ -7,7 +7,8 @@ import javax.persistence.Converter;
 import java.net.URI;
 
 @Converter(autoApply = true)
-public class VcsUriConverter implements AttributeConverter<VcsUri, String> {
+@SuppressWarnings("unused")
+class VcsUriConverter implements AttributeConverter<VcsUri, String> {
     @Override
     public String convertToDatabaseColumn(VcsUri vcsUri) {
         return vcsUri.toString();

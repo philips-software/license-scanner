@@ -6,12 +6,13 @@ import java.util.Optional;
 
 public class Scan {
     private final Package pkg;
+    private final String license;
+    private final VcsUri vcsUri;
 
-    private String license;
-    private VcsUri vcsUri;
-
-    public Scan(Package pkg) {
+    public Scan(Package pkg, String license, VcsUri vcsUri) {
         this.pkg = pkg;
+        this.license = license;
+        this.vcsUri = vcsUri;
     }
 
     public Package getPackage() {
@@ -22,17 +23,7 @@ public class Scan {
         return Optional.ofNullable(license);
     }
 
-    public Scan setLicense(String license) {
-        this.license = license;
-        return this;
-    }
-
     public Optional<VcsUri> getVcsUri() {
         return Optional.ofNullable(vcsUri);
-    }
-
-    public Scan setVcsUri(VcsUri vcsUri) {
-        this.vcsUri = vcsUri;
-        return this;
     }
 }

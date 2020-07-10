@@ -2,22 +2,23 @@ package com.philips.research.licensescanner.persistence;
 
 import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
+import com.philips.research.licensescanner.core.domain.download.VcsUri;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity(name = "scans")
-public class ScanEntity extends Scan {
+class ScanEntity extends Scan {
     @Id
     @GeneratedValue
     private long id;
 
     public ScanEntity() {
-        this(null);
+        this(null, null, null);
     }
 
-    public ScanEntity(Package aPackage) {
-        super(aPackage);
+    ScanEntity(Package pkg, String license, VcsUri vcsUri) {
+        super(pkg, license, vcsUri);
     }
 }
