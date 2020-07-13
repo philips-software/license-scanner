@@ -13,5 +13,5 @@ public interface PackageStore {
 
     Scan createScan(Package pkg, String license, VcsUri vcsUri);
 
-    Scan latestScan(Package pkg);
+    Optional<Scan> latestScan(Package pkg);
 }

@@ -7,10 +7,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity(name = "packages")
-class PackageEntity extends Package {
+public class PackageEntity extends Package {
     @Id
     @GeneratedValue
-    long id;
+    public Long id;
 
     public PackageEntity() {
         super(null, null, null);

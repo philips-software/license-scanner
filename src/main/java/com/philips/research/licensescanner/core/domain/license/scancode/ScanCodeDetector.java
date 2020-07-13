@@ -9,18 +9,22 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
 
 @Component
 public class ScanCodeDetector implements Detector {
     private static final String RESULT_FILE = "scancode.json";
+    private static final Duration MAX_DURATION = Duration.ofMinutes(10);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     public Copyright scan(Path directory) {
         //TODO Should first extract any archives?
-        new ShellCommand("scancode")
+        new ShellCommand("/usr/local/bin/scancode")
                 .setDirectory(directory.toFile())
-                .execute("--license", "-n2", "--timeout=300", "--only-findings", "--strip-root", "--ignore", RESULT_FILE, "--json-pp", RESULT_FILE, ".");
+                .setTimeout(MAX_DURATION)
+                .execute("--license", "-n2", "--verbose", "--timeout=" + MAX_DURATION.toSeconds(), "--only-findings",
+                        "--strip-root", "--ignore", "test*", "--ignore", RESULT_FILE, "--json-pp", RESULT_FILE, ".");
         try {
             final var scanResult = MAPPER.readValue(directory.resolve(RESULT_FILE).toFile(), ScanCodeJson.class);
             final var licenses = scanResult.getLicense();

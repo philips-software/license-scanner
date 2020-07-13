@@ -1,5 +1,6 @@
 package com.philips.research.licensescanner.core.domain.download;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -44,4 +45,12 @@ class VcsUriTest {
         assertThat(VcsUri.from(withPath).toString()).isEqualTo(withPath.toString());
         assertThat(VcsUri.from(withoutRevision).toString()).isEqualTo(withoutRevision.toString());
     }
+
+    @Test
+    void implementsEquality() {
+        EqualsVerifier.forClass(VcsUri.class)
+                .withNonnullFields("vcsTool", "repositoryUrl")
+                .verify();
+    }
 }
+

@@ -11,21 +11,21 @@ public interface LicenseService {
      * Provides license per package.
      *
      * @param origin  Package manager
-     * @param pkg     Package identifier
+     * @param name    Package identifier
      * @param version Package version name
      * @return License information if the package is known.
      */
-    Optional<LicenseInfo> licenseFor(String origin, String pkg, String version);
+    Optional<LicenseInfo> licenseFor(String origin, String name, String version);
 
     /**
      * Queues package for scanning.
      *
-     * @param origin    Package manager
-     * @param packageId Package identifier
-     * @param version   Package version name
-     * @param vcsId     Version control coordinates
+     * @param origin  Package manager
+     * @param name    Package identifier
+     * @param version Package version name
+     * @param vcsId   Version control coordinates
      */
-    void scanLicense(String origin, String packageId, String version, URI vcsId);
+    void scanLicense(String origin, String name, String version, URI vcsId);
 
     /**
      * @return All current scanning errors.
@@ -47,8 +47,8 @@ public interface LicenseService {
         public final String version;
         public final String message;
 
-        public ErrorReport(String packageId, String version, String message) {
-            this.packageId = packageId;
+        public ErrorReport(String name, String version, String message) {
+            this.packageId = name;
             this.version = version;
             this.message = message;
         }

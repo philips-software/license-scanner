@@ -4,6 +4,9 @@ import com.philips.research.licensescanner.core.domain.download.VcsUri;
 
 import java.util.Optional;
 
+/**
+ * Result of a license scan for a package.
+ */
 public class Scan {
     private final Package pkg;
     private final String license;

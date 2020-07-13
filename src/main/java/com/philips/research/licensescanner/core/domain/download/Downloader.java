@@ -26,6 +26,8 @@ public class Downloader {
     @Autowired
     public Downloader(ApplicationConfiguration configuration) {
         this.baseDirectory = configuration.getTempDir();
+
+        register("git", new GitHandler());
     }
 
     void register(String vcs, VcsHandler handler) {

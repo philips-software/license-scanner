@@ -26,18 +26,19 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public Optional<Package> findPackage(String origin, String name, String version) {
-        return packageRepository.findByOriginAndNameAndVersion(origin, name, version);
+        return packageRepository.findByOriginAndNameAndVersion(origin, name, version).map(pkg -> pkg);
     }
 
     @Override
     public Scan createScan(Package pkg, String license, VcsUri vcsUri) {
-        final var entity = new ScanEntity(pkg, license, vcsUri);
+        final var entity = new ScanEntity((PackageEntity) pkg, license, vcsUri);
         return scanRepository.save(entity);
     }
 
     @Override
-    public Scan latestScan(Package pkg) {
-        return scanRepository.findAll().iterator().next();
+    public Optional<Scan> latestScan(Package pkg) {
+        //TODO Just a temp placeholder
+        return Optional.empty();
     }
 }
 

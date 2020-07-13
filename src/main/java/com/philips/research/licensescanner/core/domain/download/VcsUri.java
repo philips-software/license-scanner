@@ -2,6 +2,7 @@ package com.philips.research.licensescanner.core.domain.download;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -9,7 +10,7 @@ import java.util.regex.Pattern;
  * Represents a version control location specification in the format:
  * &lt;vcs_tool>+&lt;transport>://&lt;host_name>[/&lt;path_to_repository>][@&lt;revision_tag_or_branch>][#&lt;sub_path>]
  */
-public class VcsUri {
+public final class VcsUri {
     private final String vcsTool;
     private final URI repositoryUrl;
     private final String revision;
@@ -51,6 +52,26 @@ public class VcsUri {
 
     public Optional<File> getSubPath() {
         return Optional.ofNullable(subPath);
+    }
+
+    public URI toUri() {
+        return URI.create(toString());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof VcsUri)) return false;
+        VcsUri vcsUri = (VcsUri) o;
+        return vcsTool.equals(vcsUri.vcsTool) &&
+                repositoryUrl.equals(vcsUri.repositoryUrl) &&
+                Objects.equals(revision, vcsUri.revision) &&
+                Objects.equals(subPath, vcsUri.subPath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vcsTool, repositoryUrl, revision, subPath);
     }
 
     @Override

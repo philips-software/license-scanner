@@ -26,7 +26,10 @@ class PackageDatabaseTest {
     PackageDatabase database;
 
     @Autowired
-    PackageRepository repo;
+    PackageRepository packageRepository;
+
+    @Autowired
+    ScanRepository scanRepository;
 
     @Test
     void createsPackages() {
@@ -36,7 +39,7 @@ class PackageDatabaseTest {
         database.createPackage(ORIGIN, NAME, "1");
         database.createPackage(ORIGIN, NAME, "2");
 
-        for (PackageEntity packageEntity : repo.findAll()) {
+        for (PackageEntity packageEntity : packageRepository.findAll()) {
             System.out.println("Found: " + packageEntity);
         }
 
@@ -48,10 +51,16 @@ class PackageDatabaseTest {
     @Test
     void createsScans() {
         final var pkg = database.createPackage(ORIGIN, NAME, VERSION);
-        final var expected = database.createScan(pkg, LICENSE, VCS_URI);
+        final var expected = (ScanEntity) database.createScan(pkg, LICENSE, VCS_URI);
 
-        final var latest = database.latestScan(pkg);
+        final var scan = scanRepository.findById(expected.id);
+        assertThat(scan).isNotNull();
 
-        assertThat(latest.getLicense()).isEqualTo(expected.getLicense());
+        packageRepository.save((PackageEntity) pkg);
+        scanRepository.save(expected);
+
+//        final var latest = database.latestScan(pkg).get();
+//
+//        assertThat(latest.getLicense()).isEqualTo(expected.getLicense());
     }
 }

@@ -1,54 +1,89 @@
 package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.core.LicenseService;
+import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
 import com.philips.research.licensescanner.core.domain.download.VcsUri;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * License detection use cases implementation.
  */
 @Service
+@Transactional
 public class LicenseInteractor implements LicenseService {
     private static final Logger LOG = LoggerFactory.getLogger(LicenseInteractor.class);
 
+    private final PackageStore store;
     private final Downloader downloader;
     private final Detector detector;
+    private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
     @Autowired
-    public LicenseInteractor(Downloader downloader, Detector detector) {
+    public LicenseInteractor(PackageStore store, Downloader downloader, Detector detector) {
+        this.store = store;
         this.downloader = downloader;
         this.detector = detector;
     }
 
     @Override
-    public Optional<LicenseInfo> licenseFor(String origin, String pkg, String version) {
-        return Optional.empty();
+    public Optional<LicenseInfo> licenseFor(String origin, String name, String version) {
+        return store.findPackage(origin, name, version)
+                .flatMap(store::latestScan)
+                .map(this::toLicenseInfo);
+    }
+
+    private LicenseInfo toLicenseInfo(Scan scan) {
+        final var license = scan.getLicense().orElse(null);
+        final var vcsUri = scan.getVcsUri().map(VcsUri::toUri).orElse(null);
+        return new LicenseInfo(license, vcsUri);
     }
 
     @Override
-    public void scanLicense(String origin, String packageId, String version, URI vcsUri) {
-        LOG.info("Scan license for {}:{} {} from {}", origin, packageId, version, vcsUri);
+    @Async("licenseDetectionExecutor")
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void scanLicense(String origin, String name, String version, URI vcsUri) {
         final var location = VcsUri.from(vcsUri);
-        final var path = downloader.download(location);
-        final var copyright = detector.scan(path);
-        deleteDirectory(path);
-        LOG.info("Detected license for {}:{} {} is {}", origin, packageId, version, copyright.license);
+
+        Path path = null;
+        try {
+            LOG.info("Scan license for {}:{} {} from {}", origin, name, version, vcsUri);
+            final var pkg = getOrCreatePackage(origin, name, version);
+            path = downloader.download(location);
+            final var copyright = detector.scan(path);
+            store.createScan(pkg, copyright.license, location);
+            LOG.info("Detected license for {}:{} {} is {}", origin, name, version, copyright.license);
+        } catch (Exception e) {
+            LOG.error("Scanning failed", e);
+        } finally {
+            deleteDirectory(path);
+        }
+    }
+
+    private Package getOrCreatePackage(String origin, String name, String version) {
+        return store.findPackage(origin, name, version).orElseGet(() -> store.createPackage(origin, name, version));
     }
 
     private void deleteDirectory(Path path) {
         try {
-            FileSystemUtils.deleteRecursively(path);
+            if (path != null) {
+                FileSystemUtils.deleteRecursively(path);
+            }
         } catch (IOException e) {
             LOG.warn("Failed to (fully) remove directory {}", path);
         }

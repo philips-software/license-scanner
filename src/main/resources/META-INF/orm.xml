@@ -5,7 +5,8 @@
             <basic name="vcsUri" access="FIELD">
                 <column name="vcs_uri"/>
             </basic>
-            <many-to-one name="pkg" target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
+            <many-to-one name="pkg" access="FIELD"
+                         target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
                 <join-column name="package_id"/>
             </many-to-one>
         </attributes>

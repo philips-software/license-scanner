@@ -2,6 +2,9 @@ package com.philips.research.licensescanner.core.domain;
 
 import java.util.Objects;
 
+/**
+ * A (potential) external dependency of a product.
+ */
 public class Package {
     private final String origin;
     private final String name;
