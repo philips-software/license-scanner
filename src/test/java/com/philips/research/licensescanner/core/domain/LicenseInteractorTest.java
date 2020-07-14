@@ -3,7 +3,6 @@ package com.philips.research.licensescanner.core.domain;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
-import com.philips.research.licensescanner.core.domain.download.VcsUri;
 import com.philips.research.licensescanner.core.domain.license.Copyright;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import org.junit.jupiter.api.AfterEach;
@@ -25,9 +24,9 @@ class LicenseInteractorTest {
     private static final String NAME = "Package";
     private static final String VERSION = "Version";
     private static final String LICENSE = "License";
-    private static final VcsUri VCS_URI = VcsUri.from(URI.create("git+git://example.com"));
+    private static final URI LOCATION = URI.create("git+git://example.com");
     private static final Package PACKAGE = new Package(ORIGIN, NAME, VERSION);
-    private static final Scan SCAN = new Scan(PACKAGE, LICENSE, VCS_URI);
+    private static final Scan SCAN = new Scan(PACKAGE, LICENSE, LOCATION);
     private static final Path WORK_DIR = Path.of("not", "for", "real");
 
     private final Downloader downloader = mock(Downloader.class);
@@ -68,7 +67,7 @@ class LicenseInteractorTest {
             @SuppressWarnings("OptionalGetWithoutIsPresent") final var info = service.licenseFor(ORIGIN, NAME, VERSION).get();
 
             assertThat(info.license).isEqualTo(LICENSE);
-            assertThat(info.vcsUri).isEqualTo(VCS_URI.toUri());
+            assertThat(info.location).isEqualTo(LOCATION);
         }
     }
 
@@ -88,13 +87,13 @@ class LicenseInteractorTest {
 
         @Test
         void downloadsAndScansPackage() throws Exception {
-            when(downloader.download(VCS_URI)).thenReturn(directory);
+            when(downloader.download(LOCATION)).thenReturn(directory);
             when(detector.scan(directory)).thenReturn(new Copyright(LICENSE));
 
-            service.scanLicense(ORIGIN, NAME, VERSION, VCS_URI.toUri());
+            service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 
             verify(detector).scan(directory);
-            verify(store).createScan(PACKAGE, LICENSE, VCS_URI);
+            verify(store).createScan(PACKAGE, LICENSE, LOCATION);
             assertThat(directory.toFile()).doesNotExist();
         }
     }

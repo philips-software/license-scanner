@@ -1,7 +1,6 @@
 package com.philips.research.licensescanner.core.domain;
 
-import com.philips.research.licensescanner.core.domain.download.VcsUri;
-
+import java.net.URI;
 import java.util.Optional;
 
 /**
@@ -10,12 +9,12 @@ import java.util.Optional;
 public class Scan {
     private final Package pkg;
     private final String license;
-    private final VcsUri vcsUri;
+    private final URI location;
 
-    public Scan(Package pkg, String license, VcsUri vcsUri) {
+    public Scan(Package pkg, String license, URI location) {
         this.pkg = pkg;
         this.license = license;
-        this.vcsUri = vcsUri;
+        this.location = location;
     }
 
     public Package getPackage() {
@@ -26,7 +25,7 @@ public class Scan {
         return Optional.ofNullable(license);
     }
 
-    public Optional<VcsUri> getVcsUri() {
-        return Optional.ofNullable(vcsUri);
+    public Optional<URI> getVcsUri() {
+        return Optional.ofNullable(location);
     }
 }

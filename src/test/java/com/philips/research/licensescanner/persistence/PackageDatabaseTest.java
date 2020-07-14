@@ -1,6 +1,5 @@
 package com.philips.research.licensescanner.persistence;
 
-import com.philips.research.licensescanner.core.domain.download.VcsUri;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ class PackageDatabaseTest {
     private static final String NAME = "Name";
     private static final String VERSION = "Version";
     private static final String LICENSE = "License";
-    private static final VcsUri VCS_URI = VcsUri.from(URI.create("git+http://example.com"));
+    private static final URI LOCATION = URI.create("git+http://example.com");
 
     @Autowired
     PackageDatabase database;
@@ -51,7 +50,7 @@ class PackageDatabaseTest {
     @Test
     void createsScans() {
         final var pkg = database.createPackage(ORIGIN, NAME, VERSION);
-        final var expected = (ScanEntity) database.createScan(pkg, LICENSE, VCS_URI);
+        final var expected = (ScanEntity) database.createScan(pkg, LICENSE, LOCATION);
 
         final var scan = scanRepository.findById(expected.id);
         assertThat(scan).isNotNull();

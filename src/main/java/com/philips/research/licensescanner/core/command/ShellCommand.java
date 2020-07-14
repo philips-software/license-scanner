@@ -58,7 +58,7 @@ public class ShellCommand {
      */
     public void execute(Iterable<Object> args) {
         try {
-            LOG.info("Run {} {}", command, args);
+            LOG.info("Invoke {} {}", command, args);
 
             Process process = invoke(args);
             assertSuccessStatus(process);

@@ -19,8 +19,10 @@ public class ScanCodeDetector implements Detector {
 
     @Override
     public Copyright scan(Path directory) {
-        //TODO Should first extract any archives?
-        new ShellCommand("/usr/local/bin/scancode")
+
+        new ShellCommand("extractcode").setDirectory(directory.toFile())
+                .execute("--verbose", ".");
+        new ShellCommand("scancode")
                 .setDirectory(directory.toFile())
                 .setTimeout(MAX_DURATION)
                 .execute("--license", "-n2", "--verbose", "--timeout=" + MAX_DURATION.toSeconds(), "--only-findings",

@@ -34,11 +34,11 @@ public interface LicenseService {
 
     class LicenseInfo {
         public final String license;
-        public final URI vcsUri;
+        public final URI location;
 
-        public LicenseInfo(String license, URI vcsUri) {
+        public LicenseInfo(String license, URI location) {
             this.license = license;
-            this.vcsUri = vcsUri;
+            this.location = location;
         }
     }
 

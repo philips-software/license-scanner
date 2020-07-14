@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 
 class DownloaderTest {
     private static final String TOOL = "tool";
-    private static final VcsUri LOCATION = VcsUri.from(URI.create(TOOL + "+https://example.com"));
+    private static final URI LOCATION = URI.create("https://example.com@version");
 
     private static ApplicationConfiguration configuration;
 
@@ -43,7 +43,7 @@ class DownloaderTest {
 
     @Test
     void throws_downloadForUnknownVcsTool() {
-        final var unknown = VcsUri.from(URI.create("unknown+http://unknown.org"));
+        final var unknown = URI.create("unknown+http://unknown.org");
 
         assertThatThrownBy(() -> downloader.download(unknown))
                 .isInstanceOf(DownloadException.class)
@@ -52,7 +52,8 @@ class DownloaderTest {
 
     @Test
     void downloadsForToolFromLocationToDirectory() {
-        var directory = downloader.download(LOCATION);
+        final var location = URI.create(TOOL + "+" + LOCATION.toString() + "#path/to/whatever");
+        final var directory = downloader.download(location);
 
         assertThat(directory.getParent()).isEqualTo(configuration.getTempDir());
         verify(mockHandler).download(any(Path.class), eq(LOCATION));

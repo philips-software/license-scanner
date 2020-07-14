@@ -3,9 +3,9 @@ package com.philips.research.licensescanner.persistence;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
-import com.philips.research.licensescanner.core.domain.download.VcsUri;
 import org.springframework.stereotype.Repository;
 
+import java.net.URI;
 import java.util.Optional;
 
 @Repository
@@ -30,8 +30,8 @@ public class PackageDatabase implements PackageStore {
     }
 
     @Override
-    public Scan createScan(Package pkg, String license, VcsUri vcsUri) {
-        final var entity = new ScanEntity((PackageEntity) pkg, license, vcsUri);
+    public Scan createScan(Package pkg, String license, URI location) {
+        final var entity = new ScanEntity((PackageEntity) pkg, license, location);
         return scanRepository.save(entity);
     }
 

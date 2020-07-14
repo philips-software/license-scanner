@@ -3,7 +3,6 @@ package com.philips.research.licensescanner.core.domain;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
-import com.philips.research.licensescanner.core.domain.download.VcsUri;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,19 +46,17 @@ public class LicenseInteractor implements LicenseService {
 
     private LicenseInfo toLicenseInfo(Scan scan) {
         final var license = scan.getLicense().orElse(null);
-        final var vcsUri = scan.getVcsUri().map(VcsUri::toUri).orElse(null);
+        final var vcsUri = scan.getVcsUri().orElse(null);
         return new LicenseInfo(license, vcsUri);
     }
 
     @Override
     @Async("licenseDetectionExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void scanLicense(String origin, String name, String version, URI vcsUri) {
-        final var location = VcsUri.from(vcsUri);
-
+    public void scanLicense(String origin, String name, String version, URI location) {
         Path path = null;
         try {
-            LOG.info("Scan license for {}:{} {} from {}", origin, name, version, vcsUri);
+            LOG.info("Scan license for {}:{} {} from {}", origin, name, version, location);
             final var pkg = getOrCreatePackage(origin, name, version);
             path = downloader.download(location);
             final var copyright = detector.scan(path);
@@ -79,6 +76,7 @@ public class LicenseInteractor implements LicenseService {
     private void deleteDirectory(Path path) {
         try {
             if (path != null) {
+                LOG.info("Removing working directory {}", path);
                 FileSystemUtils.deleteRecursively(path);
             }
         } catch (IOException e) {

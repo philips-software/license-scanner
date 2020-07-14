@@ -12,6 +12,12 @@ Supported license scanners:
 - ScanCode 3.0.x and 3.1.x
 
 ## Configuration
+ScanCode Toolkit requires to be invoked on Linux and OSX using the 
+installation path (see [documuntation](https://scancode-toolkit.readthedocs.io/en/latest/cli-reference/synopsis.html)).
+When not installed using pip or running on Windows, make sure `extractcode` and 
+`scancode` can be accessed through a script, without providing the installation 
+path.
+
 Package source code gets downloaded to a temporary directory for scanning.
 The base directory is the `TMPDIR` directory, and can be changed by setting 
 the `LICENSE_DIR` environment variable.

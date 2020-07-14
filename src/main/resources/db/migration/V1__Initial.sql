@@ -11,9 +11,9 @@ CREATE TABLE scans
     id         BIGINT       NOT NULL,
     package_id BIGINT       NOT NULL,
     created    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    vcs_uri    VARCHAR(100) NOT NULL,
-    license    VARCHAR(200),
-    error      VARCHAR(500),
+    location   VARCHAR(255) NOT NULL,
+    license    VARCHAR(255),
+    error      VARCHAR(255),
     FOREIGN KEY (package_id) REFERENCES packages (id)
 );
 

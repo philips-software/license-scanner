@@ -19,29 +19,43 @@ public class GitHandler implements VcsHandler {
     private final ShellCommand git = new ShellCommand("git").setTimeout(Duration.ofMinutes(5));
 
     @Override
-    public void download(Path directory, VcsUri location) {
-        final var revision = location.getRevision().orElse("master");
+    public void download(Path directory, URI location) {
+        var path = location.getSchemeSpecificPart();
+        var revision = "";
+        final var pos = path.indexOf('@');
+        if (pos >= 0) {
+            revision = path.substring(pos + 1);
+            path = path.substring(0, pos);
+        }
+        final var uri = URI.create(location.getScheme() + ':' + path);
+
         git.setDirectory(directory.toFile());
 
+        checkout(directory, uri, revision);
+    }
+
+    private void checkout(Path target, URI repository, String revision) {
         try {
-            checkoutBranchOrTag(directory, location.getRepository(), revision);
+            checkoutBranchOrTag(target, repository, revision);
         } catch (DownloadException e) {
             LOG.info("Checkout by branch/tag failed; attempting checkout by commit");
-            checkoutCommit(directory, location.getRepository(), revision);
+            checkoutCommit(target, repository, revision);
         }
     }
 
-    private void checkoutBranchOrTag(Path directory, URI repository, String branchOrTag) {
+    private void checkoutBranchOrTag(Path target, URI repository, String branchOrTag) {
         try {
-            git.execute("clone", "--depth=1", repository, "--branch", branchOrTag, directory);
+            LOG.info("Checkout branch/tag '{}' from {} to {}", branchOrTag, repository, target);
+            git.execute("clone", "--depth=1", repository, "--branch", branchOrTag, target);
         } catch (ShellException e) {
             throw new DownloadException("Checkout by branch/tag failed", e);
         }
     }
 
-    private void checkoutCommit(Path directory, URI repository, String commitHash) {
+    private void checkoutCommit(Path target, URI repository, String commitHash) {
         try {
-            git.execute("clone", repository, directory).execute("checkout", commitHash);
+            LOG.info("Checkout commit '{}' from {} to {}", commitHash, repository, target);
+            git.execute("clone", repository, target).execute("checkout", commitHash);
         } catch (ShellException e) {
             throw new DownloadException("Checkout by commit failed", e);
         }
