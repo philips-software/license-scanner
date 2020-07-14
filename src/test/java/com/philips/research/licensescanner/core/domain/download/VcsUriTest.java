@@ -14,7 +14,7 @@ class VcsUriTest {
         var location = VcsUri.from(URI.create("git+https://example.com/blah@revision"));
 
         assertThat(location.getVcsTool()).isEqualTo("git");
-        assertThat(location.getRepositoryUrl()).isEqualTo(URI.create("https://example.com/blah"));
+        assertThat(location.getRepository()).isEqualTo(URI.create("https://example.com/blah"));
         assertThat(location.getRevision()).contains("revision");
         assertThat(location.getSubPath()).isEmpty();
     }
@@ -49,7 +49,7 @@ class VcsUriTest {
     @Test
     void implementsEquality() {
         EqualsVerifier.forClass(VcsUri.class)
-                .withNonnullFields("vcsTool", "repositoryUrl")
+                .withNonnullFields("vcsTool", "repository")
                 .verify();
     }
 }

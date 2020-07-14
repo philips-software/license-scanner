@@ -24,10 +24,10 @@ public class GitHandler implements VcsHandler {
         git.setDirectory(directory.toFile());
 
         try {
-            checkoutBranchOrTag(directory, location.getRepositoryUrl(), revision);
+            checkoutBranchOrTag(directory, location.getRepository(), revision);
         } catch (DownloadException e) {
             LOG.info("Checkout by branch/tag failed; attempting checkout by commit");
-            checkoutCommit(directory, location.getRepositoryUrl(), revision);
+            checkoutCommit(directory, location.getRepository(), revision);
         }
     }
 

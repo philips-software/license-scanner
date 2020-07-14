@@ -4,7 +4,6 @@ import java.io.File;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 /**
  * Represents a version control location specification in the format:
@@ -12,38 +11,50 @@ import java.util.regex.Pattern;
  */
 public final class VcsUri {
     private final String vcsTool;
-    private final URI repositoryUrl;
+    private final URI repository;
     private final String revision;
     private final File subPath;
 
-    VcsUri(String vcsTool, URI repositoryUrl, String revision, File subPath) {
+    VcsUri(String vcsTool, URI repository, String revision, File subPath) {
         this.vcsTool = vcsTool;
-        this.repositoryUrl = repositoryUrl;
+        this.repository = repository;
         this.revision = revision;
         this.subPath = subPath;
     }
 
-    static public VcsUri from(URI specification) {
-        final var pattern = Pattern.compile("^(\\w+)\\+([^\\s@#]+)(@([^\\s#]+))?(#(\\S+))?$");
-        final var matcher = pattern.matcher(specification.toString());
+    static public VcsUri from(URI uri) {
+        try {
+            var tool = "";
+            var scheme = uri.getScheme();
+            final var plusOffset = scheme.indexOf('+');
+            if (plusOffset >= 0) {
+                tool = scheme.substring(0, plusOffset);
+                scheme = scheme.substring(plusOffset + 1);
+            }
 
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException("Not a valid download location: " + specification);
+            var version = (String) null;
+            var part = uri.getSchemeSpecificPart();
+            final var versionPos = part.indexOf('@');
+            if (versionPos >= 0) {
+                version = part.substring(versionPos + 1);
+                part = part.substring(0, versionPos);
+            }
+            final URI repository = URI.create(scheme + ':' + part);
+
+            var path = uri.getFragment();
+
+            return new VcsUri(tool, repository, version, (path != null) ? new File(path) : null);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Not a valid download location: " + uri, e);
         }
-        final var tool = matcher.group(1);
-        final var url = matcher.group(2);
-        final var version = matcher.group(4);
-        final var path = matcher.group(6);
-
-        return new VcsUri(tool, URI.create(url), version, (path != null) ? new File(path) : null);
     }
 
     public String getVcsTool() {
         return vcsTool;
     }
 
-    public URI getRepositoryUrl() {
-        return repositoryUrl;
+    public URI getRepository() {
+        return repository;
     }
 
     public Optional<String> getRevision() {
@@ -64,19 +75,19 @@ public final class VcsUri {
         if (!(o instanceof VcsUri)) return false;
         VcsUri vcsUri = (VcsUri) o;
         return vcsTool.equals(vcsUri.vcsTool) &&
-                repositoryUrl.equals(vcsUri.repositoryUrl) &&
+                repository.equals(vcsUri.repository) &&
                 Objects.equals(revision, vcsUri.revision) &&
                 Objects.equals(subPath, vcsUri.subPath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(vcsTool, repositoryUrl, revision, subPath);
+        return Objects.hash(vcsTool, repository, revision, subPath);
     }
 
     @Override
     public String toString() {
-        var location = vcsTool + "+" + repositoryUrl;
+        var location = vcsTool + "+" + repository;
         if (revision != null) {
             location += "@" + revision;
         }

@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * License detection use cases implementation.
@@ -32,7 +30,6 @@ public class LicenseInteractor implements LicenseService {
     private final PackageStore store;
     private final Downloader downloader;
     private final Detector detector;
-    private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
     @Autowired
     public LicenseInteractor(PackageStore store, Downloader downloader, Detector detector) {

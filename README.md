@@ -21,3 +21,5 @@ The most important current limitations are:
 
 - The service stores licenses in a H2 database to avoid integration with an 
 external database.
+- An in-memory thread pool queues scans that does not persist upon a server 
+restart.

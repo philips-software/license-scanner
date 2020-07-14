@@ -43,7 +43,7 @@ class DownloaderTest {
 
     @Test
     void throws_downloadForUnknownVcsTool() {
-        final var unknown = VcsUri.from(URI.create("unknown+/location"));
+        final var unknown = VcsUri.from(URI.create("unknown+http://unknown.org"));
 
         assertThatThrownBy(() -> downloader.download(unknown))
                 .isInstanceOf(DownloadException.class)
