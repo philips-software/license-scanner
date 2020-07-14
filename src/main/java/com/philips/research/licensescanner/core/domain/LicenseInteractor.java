@@ -59,6 +59,7 @@ public class LicenseInteractor implements LicenseService {
             LOG.info("Scan license for {}:{} {} from {}", origin, name, version, location);
             final var pkg = getOrCreatePackage(origin, name, version);
             path = downloader.download(location);
+            //TODO Check hash after download
             final var copyright = detector.scan(path);
             store.createScan(pkg, copyright.license, location);
             LOG.info("Detected license for {}:{} {} is {}", origin, name, version, copyright.license);

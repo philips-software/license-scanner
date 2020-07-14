@@ -8,10 +8,13 @@ import java.util.concurrent.Executor;
 
 @Configuration
 public class CoreConfiguration {
+    private static final int SCAN_PROCESSES = 3;
+
     @Bean(name = "licenseDetectionExecutor")
     public Executor threadPoolTaskExecutor() {
         final var executor = new ThreadPoolTaskExecutor();
-        executor.setMaxPoolSize(3);
+        executor.setMaxPoolSize(SCAN_PROCESSES);
+        executor.setCorePoolSize(SCAN_PROCESSES);
         return executor;
     }
 }

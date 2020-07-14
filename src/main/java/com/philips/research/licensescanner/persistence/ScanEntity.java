@@ -8,10 +8,10 @@ import javax.persistence.Id;
 import java.net.URI;
 
 @Entity(name = "scans")
-public class ScanEntity extends Scan {
+class ScanEntity extends Scan {
     @Id
     @GeneratedValue
-    public Long id;
+    private Long id;
 
     public ScanEntity() {
         this(null, null, null);

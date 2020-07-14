@@ -65,7 +65,7 @@ public class ShellCommand {
         } catch (IOException e) {
             throw new ShellException("Command '" + command + "' not found", e);
         } catch (InterruptedException e) {
-            throw new ShellException("Waiting to command '" + command + "' was interrupted", e);
+            throw new ShellException("Waiting for '" + command + "' was interrupted", e);
         }
     }
 

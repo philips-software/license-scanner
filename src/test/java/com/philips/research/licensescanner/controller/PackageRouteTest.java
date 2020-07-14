@@ -32,8 +32,10 @@ class PackageRouteTest {
     private static final URI VCS_URI = URI.create("git+ssh://example.com@1234");
     private static final String LICENSE = "MIT OR Apache-2.0";
     private static final String PACKAGE_URL = "/package/{origin}/{pkg}/{version}";
+
     @MockBean
     LicenseService service;
+
     @Autowired
     private MockMvc mockMvc;
 

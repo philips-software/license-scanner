@@ -34,7 +34,5 @@ class ScanCodeDetectorTest {
         final var result = detector.scan(tempDir);
 
         assertThat(result.license).isNotEmpty();
-        //TODO Just debugging ...
-        System.out.println("License: " + result.license);
     }
 }

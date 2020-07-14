@@ -37,8 +37,7 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public Optional<Scan> latestScan(Package pkg) {
-        //TODO Just a temp placeholder
-        return Optional.empty();
+        return scanRepository.findTopByPkgAndLicenseNotNullOrderByIdDesc((PackageEntity) pkg).map(scan -> scan);
     }
 }
 
