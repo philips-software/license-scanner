@@ -18,45 +18,49 @@ public class PackageRoute {
         this.service = service;
     }
 
-    @GetMapping("{origin}/{pkg}/{version}")
-    ScanInfoJson getPackage(@PathVariable String origin, @PathVariable String pkg, @PathVariable String version) {
-        final var license = service.licenseFor(origin, pkg, version)
+    @GetMapping("{namespace}/{name}/{version}")
+    ScanInfoJson getPackage(@PathVariable String namespace, @PathVariable String name, @PathVariable String version) {
+        final var license = service.licenseFor(namespace, name, version)
                 .orElseThrow(() -> new ResourceNotFoundException("package"));
 
-        return withLicenseInfo(new ScanInfoJson(origin, pkg, version), license);
+        return withLicenseInfo(new ScanInfoJson(namespace, name, version), license);
     }
 
     @GetMapping
-    SearchResultJson findPackages(@RequestParam String origin, @RequestParam("package") String pkg, @RequestParam("version") String version) {
+    SearchResultJson findPackages(@RequestParam String namespace, @RequestParam String name, @RequestParam String version) {
+        //TODO Query for provided parameters
         return null;
     }
 
-    @PostMapping("{origin}/{pkg}/{version}")
-    ScanInfoJson scanPackage(@PathVariable String origin, @PathVariable String pkg, @PathVariable String version,
+    @PostMapping("{namespace}/{name}/{version}")
+    ScanInfoJson scanPackage(@PathVariable String namespace, @PathVariable String name, @PathVariable(required = false) String version,
                              @Valid @RequestBody ScanRequestJson info,
                              @RequestParam(name = "force", required = false) boolean force) {
-        final var response = new ScanInfoJson(origin, pkg, version);
+        final var response = new ScanInfoJson(namespace, name, version);
 
         if (!force) {
-            final var license = service.licenseFor(origin, pkg, version);
+            final var license = service.licenseFor(namespace, name, version);
             if (license.isPresent()) {
                 return withLicenseInfo(response, license.get());
             }
         }
 
-        service.scanLicense(origin, pkg, version, info.location);
+        if (info.location != null) {
+            service.scanLicense(namespace, name, version, info.location);
+            response.location = info.location;
+        }
 
-        response.location = info.location;
         return response;
     }
 
-    @PutMapping("{origin}/{pkg}/{version}")
-    void updatePackage(@PathVariable String origin, @PathVariable String pkg, @PathVariable String version, @Valid @RequestBody ScanInfoJson info) {
+    @PutMapping("{namespace}/{name}/{version}")
+    void updatePackage(@PathVariable String namespace, @PathVariable String name, @PathVariable String version, @Valid @RequestBody ScanInfoJson info) {
+        //TODO Manually override scan result
     }
 
-    @DeleteMapping("{orogin}/{pkg}/{version}")
-    void deletePackage(@PathVariable String origin, @PathVariable String pkg, @PathVariable String version) {
-
+    @DeleteMapping("{namespace}/{name}/{version}")
+    void deletePackage(@PathVariable String namespace, @PathVariable String name, @PathVariable(required = false) String version) {
+        //TODO Manually remove scan results
     }
 
     private ScanInfoJson withLicenseInfo(ScanInfoJson response, LicenseService.LicenseInfo lic) {

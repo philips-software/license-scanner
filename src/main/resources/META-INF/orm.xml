@@ -2,6 +2,12 @@
     <mapped-superclass class="com.philips.research.licensescanner.core.domain.Package"/>
     <mapped-superclass class="com.philips.research.licensescanner.core.domain.Scan">
         <attributes>
+            <basic name="license">
+                <lob/>
+            </basic>
+            <basic name="location">
+                <lob/>
+            </basic>
             <many-to-one name="pkg" access="FIELD"
                          target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
                 <join-column name="package_id"/>

@@ -11,8 +11,8 @@ class ScanInfoJson {
     final String namespace;
     final String name;
     final String version;
-    List<String> licenses = new ArrayList<>();
     URI location;
+    List<String> licenses = new ArrayList<>();
 
     public ScanInfoJson(String namespace, String name, String version) {
         this.namespace = namespace;
