@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 @EnableAsync
 @EnableConfigurationProperties(ApplicationConfiguration.class)
-public class LicenseScannerServiceApplication {
+public class LicenseScannerService {
     public static void main(String[] args) {
-        SpringApplication.run(LicenseScannerServiceApplication.class, args);
+        SpringApplication.run(LicenseScannerService.class, args);
     }
 }

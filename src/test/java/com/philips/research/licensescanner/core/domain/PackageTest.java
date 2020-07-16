@@ -7,7 +7,7 @@ class PackageTest {
     @Test
     void implementsEquals() {
         EqualsVerifier.forClass(Package.class)
-                .withNonnullFields("origin", "name", "version")
+                .withNonnullFields("namespace", "name", "version")
                 .verify();
     }
 }

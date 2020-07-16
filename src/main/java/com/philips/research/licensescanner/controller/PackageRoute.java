@@ -44,9 +44,9 @@ public class PackageRoute {
             }
         }
 
-        service.scanLicense(origin, pkg, version, info.vcsUri);
+        service.scanLicense(origin, pkg, version, info.location);
 
-        response.vcsUri = info.vcsUri;
+        response.location = info.location;
         return response;
     }
 
@@ -60,8 +60,8 @@ public class PackageRoute {
     }
 
     private ScanInfoJson withLicenseInfo(ScanInfoJson response, LicenseService.LicenseInfo lic) {
-        response.vcsUri = lic.location;
-        response.license = lic.license;
+        response.location = lic.location;
+        response.licenses = lic.licenses;
         return response;
     }
 }

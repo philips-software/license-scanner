@@ -1,6 +1,7 @@
 package com.philips.research.licensescanner.controller;
 
 import com.philips.research.licensescanner.core.LicenseService;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -26,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class PackageRouteTest {
-    private static final String ORIGIN = "origin";
-    private static final String PACKAGE = "package";
-    private static final String VERSION = "version";
-    private static final URI VCS_URI = URI.create("git+ssh://example.com@1234");
+    private static final String NAMESPACE = "Namespace";
+    private static final String NAME = "Name";
+    private static final String VERSION = "Version";
+    private static final URI LOCATION = URI.create("git+ssh://example.com@1234");
     private static final String LICENSE = "MIT OR Apache-2.0";
     private static final String PACKAGE_URL = "/package/{origin}/{pkg}/{version}";
 
@@ -41,76 +43,76 @@ class PackageRouteTest {
 
     private JSONObject packageInfoJson() throws Exception {
         return new JSONObject()
-                .put("origin", ORIGIN)
-                .put("package", PACKAGE)
+                .put("namespace", NAMESPACE)
+                .put("name", NAME)
                 .put("version", VERSION)
-                .put("vcsUri", VCS_URI);
+                .put("location", LOCATION);
     }
 
     @Test
     void getsExistingScanResult() throws Exception {
-        final var response = packageInfoJson().put("license", LICENSE);
-        when(service.licenseFor(ORIGIN, PACKAGE, VERSION))
-                .thenReturn(Optional.of(new LicenseService.LicenseInfo(LICENSE, VCS_URI)));
+        final var response = packageInfoJson().put("licenses", new JSONArray().put(LICENSE));
+        when(service.licenseFor(NAMESPACE, NAME, VERSION))
+                .thenReturn(Optional.of(new LicenseService.LicenseInfo(LOCATION, List.of(LICENSE))));
 
-        mockMvc.perform(get(PACKAGE_URL, ORIGIN, PACKAGE, VERSION))
+        mockMvc.perform(get(PACKAGE_URL, NAMESPACE, NAME, VERSION))
                 .andExpect(status().isOk())
                 .andExpect(content().json(response.toString(), true));
     }
 
     @Test
     void notFound_getUnknownPackage() throws Exception {
-        when(service.licenseFor(ORIGIN, PACKAGE, VERSION))
+        when(service.licenseFor(NAMESPACE, NAME, VERSION))
                 .thenReturn(Optional.empty());
 
-        mockMvc.perform(get(PACKAGE_URL, ORIGIN, PACKAGE, VERSION))
+        mockMvc.perform(get(PACKAGE_URL, NAMESPACE, NAME, VERSION))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void returnsEarlierScanResult_scannedBefore() throws Exception {
-        final var body = new JSONObject().put("vcsUri", VCS_URI);
+        final var body = new JSONObject().put("location", LOCATION);
         final var response = packageInfoJson()
-                .put("license", LICENSE);
-        when(service.licenseFor(ORIGIN, PACKAGE, VERSION))
-                .thenReturn(Optional.of(new LicenseService.LicenseInfo(LICENSE, VCS_URI)));
+                .put("licenses", new JSONArray().put(LICENSE));
+        when(service.licenseFor(NAMESPACE, NAME, VERSION))
+                .thenReturn(Optional.of(new LicenseService.LicenseInfo(LOCATION, List.of(LICENSE))));
 
-        mockMvc.perform(post(PACKAGE_URL, ORIGIN, PACKAGE, VERSION)
+        mockMvc.perform(post(PACKAGE_URL, NAMESPACE, NAME, VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(response.toString(), true));
 
-        verify(service, never()).scanLicense(ORIGIN, PACKAGE, VERSION, VCS_URI);
+        verify(service, never()).scanLicense(NAMESPACE, NAME, VERSION, LOCATION);
     }
 
     @Test
     void schedulesNewScan_noScanExists() throws Exception {
-        final var body = new JSONObject().put("vcsUri", VCS_URI);
+        final var body = new JSONObject().put("location", LOCATION);
         final var response = packageInfoJson();
 
-        mockMvc.perform(post(PACKAGE_URL, ORIGIN, PACKAGE, VERSION)
+        mockMvc.perform(post(PACKAGE_URL, NAMESPACE, NAME, VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(response.toString()));
 
-        verify(service).scanLicense(ORIGIN, PACKAGE, VERSION, VCS_URI);
+        verify(service).scanLicense(NAMESPACE, NAME, VERSION, LOCATION);
     }
 
     @Test
     void forcesRescanning() throws Exception {
-        final var body = new JSONObject().put("vcsUri", VCS_URI);
+        final var body = new JSONObject().put("location", LOCATION);
         final var response = packageInfoJson();
-        when(service.licenseFor(ORIGIN, PACKAGE, VERSION))
-                .thenReturn(Optional.of(new LicenseService.LicenseInfo(LICENSE, VCS_URI)));
+        when(service.licenseFor(NAMESPACE, NAME, VERSION))
+                .thenReturn(Optional.of(new LicenseService.LicenseInfo(LOCATION, List.of(LICENSE))));
 
-        mockMvc.perform(post(PACKAGE_URL + "?force=yes", ORIGIN, PACKAGE, VERSION)
+        mockMvc.perform(post(PACKAGE_URL + "?force=yes", NAMESPACE, NAME, VERSION)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(response.toString()));
 
-        verify(service).scanLicense(ORIGIN, PACKAGE, VERSION, VCS_URI);
+        verify(service).scanLicense(NAMESPACE, NAME, VERSION, LOCATION);
     }
 }

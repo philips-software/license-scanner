@@ -16,7 +16,7 @@ class PackageEntity extends Package {
         super(null, null, null);
     }
 
-    PackageEntity(String origin, String name, String version) {
-        super(origin, name, version);
+    PackageEntity(String namespace, String name, String version) {
+        super(namespace, name, version);
     }
 }

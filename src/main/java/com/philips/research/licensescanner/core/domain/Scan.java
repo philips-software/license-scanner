@@ -25,7 +25,7 @@ public class Scan {
         return Optional.ofNullable(license);
     }
 
-    public Optional<URI> getVcsUri() {
+    public Optional<URI> getLocation() {
         return Optional.ofNullable(location);
     }
 }

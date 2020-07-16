@@ -6,18 +6,18 @@ import java.util.Objects;
  * A (potential) external dependency of a product.
  */
 public class Package {
-    private final String origin;
+    private final String namespace;
     private final String name;
     private final String version;
 
-    public Package(String origin, String name, String version) {
-        this.origin = origin;
+    public Package(String namespace, String name, String version) {
+        this.namespace = namespace;
         this.name = name;
         this.version = version;
     }
 
-    public String getOrigin() {
-        return origin;
+    public String getNamespace() {
+        return namespace;
     }
 
     public String getName() {
@@ -33,18 +33,18 @@ public class Package {
         if (this == o) return true;
         if (!(o instanceof Package)) return false;
         Package aPackage = (Package) o;
-        return origin.equals(aPackage.origin) &&
+        return namespace.equals(aPackage.namespace) &&
                 name.equals(aPackage.name) &&
                 version.equals(aPackage.version);
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(origin, name, version);
+        return Objects.hash(namespace, name, version);
     }
 
     @Override
     public String toString() {
-        return origin + ":" + name + "-" + version;
+        return namespace + ":" + name + "-" + version;
     }
 }

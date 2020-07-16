@@ -17,6 +17,6 @@ class ScanTest {
     void createsInstance() {
         assertThat(scan.getPackage()).isEqualTo(PACKAGE);
         assertThat(scan.getLicense()).contains(LICENSE);
-        assertThat(scan.getVcsUri()).contains(LOCATION);
+        assertThat(scan.getLocation()).contains(LOCATION);
     }
 }

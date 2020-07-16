@@ -19,14 +19,14 @@ public class PackageDatabase implements PackageStore {
     }
 
     @Override
-    public Package createPackage(String origin, String name, String version) {
-        final var entity = new PackageEntity(origin, name, version);
+    public Package createPackage(String namespace, String name, String version) {
+        final var entity = new PackageEntity(namespace, name, version);
         return packageRepository.save(entity);
     }
 
     @Override
-    public Optional<Package> findPackage(String origin, String name, String version) {
-        return packageRepository.findByOriginAndNameAndVersion(origin, name, version).map(pkg -> pkg);
+    public Optional<Package> findPackage(String namespace, String name, String version) {
+        return packageRepository.findByNamespaceAndNameAndVersion(namespace, name, version).map(pkg -> pkg);
     }
 
     @Override

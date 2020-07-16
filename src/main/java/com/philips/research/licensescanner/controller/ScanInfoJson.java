@@ -1,26 +1,22 @@
 package com.philips.research.licensescanner.controller;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.validation.annotation.Validated;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @Validated
 class ScanInfoJson {
-    @JsonProperty("origin")
-    final String origin;
-    @JsonProperty("package")
-    final String pkg;
-    @JsonProperty("version")
+    final String namespace;
+    final String name;
     final String version;
-    @JsonProperty("license")
-    String license;
-    @JsonProperty("vcsUri")
-    URI vcsUri;
+    List<String> licenses = new ArrayList<>();
+    URI location;
 
-    public ScanInfoJson(String origin, String pkg, String version) {
-        this.origin = origin;
-        this.pkg = pkg;
+    public ScanInfoJson(String namespace, String name, String version) {
+        this.namespace = namespace;
+        this.name = name;
         this.version = version;
     }
 }

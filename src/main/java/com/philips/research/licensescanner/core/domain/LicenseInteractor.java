@@ -16,6 +16,7 @@ import org.springframework.util.FileSystemUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -45,9 +46,9 @@ public class LicenseInteractor implements LicenseService {
     }
 
     private LicenseInfo toLicenseInfo(Scan scan) {
-        final var license = scan.getLicense().orElse(null);
-        final var vcsUri = scan.getVcsUri().orElse(null);
-        return new LicenseInfo(license, vcsUri);
+        final var licenses = scan.getLicense().map(List::of).orElse(List.of());
+        final var location = scan.getLocation().orElse(null);
+        return new LicenseInfo(location, licenses);
     }
 
     @Override

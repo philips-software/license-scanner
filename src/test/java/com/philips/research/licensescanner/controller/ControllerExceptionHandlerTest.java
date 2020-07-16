@@ -39,7 +39,7 @@ class ControllerExceptionHandlerTest {
     @Test
     void handlesBadRequest() throws Exception {
         final var response = new JSONObject()
-                .put("vcsUri", "must not be null");
+                .put("location", "must not be null");
 
         mockMvc.perform(post(PACKAGE_URL, ORIGIN, PACKAGE, VERSION)
                 .contentType(MediaType.APPLICATION_JSON)

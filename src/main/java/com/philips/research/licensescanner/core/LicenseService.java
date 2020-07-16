@@ -1,6 +1,7 @@
 package com.philips.research.licensescanner.core;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -33,11 +34,11 @@ public interface LicenseService {
     Iterable<ErrorReport> scanErrors();
 
     class LicenseInfo {
-        public final String license;
         public final URI location;
+        public final List<String> licenses;
 
-        public LicenseInfo(String license, URI location) {
-            this.license = license;
+        public LicenseInfo(URI location, List<String> licenses) {
+            this.licenses = licenses;
             this.location = location;
         }
     }
