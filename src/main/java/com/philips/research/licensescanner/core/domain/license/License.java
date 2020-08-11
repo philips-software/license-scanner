@@ -2,6 +2,7 @@ package com.philips.research.licensescanner.core.domain.license;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 abstract public class License {
@@ -21,8 +22,24 @@ abstract public class License {
         return new OrLicense(this).or(license);
     }
 
+    @Override
+    public final int hashCode() {
+        return toString().hashCode();
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+        if (!(obj instanceof License)) {
+            return false;
+        }
+        return this.getClass() == obj.getClass()
+                && toString().equals(obj.toString());
+    }
+
     private static class SingleLicense extends License {
         private final String identifier;
+
+        private String exception = null;
 
         SingleLicense(String identifier) {
             this.identifier = identifier;
@@ -30,31 +47,18 @@ abstract public class License {
 
         @Override
         public License with(String exception) {
-            return new ExceptionLicense(this, exception);
-        }
-
-        @Override
-        public String toString() {
-            return identifier;
-        }
-    }
-
-    private static class ExceptionLicense extends SingleLicense {
-        private final String exception;
-
-        ExceptionLicense(SingleLicense license, String exception) {
-            super(license.toString());
+            if (this.exception != null) {
+                throw new LicenseException("Adding a second exception is not allowed");
+            }
             this.exception = exception;
-        }
-
-        @Override
-        public License with(String exception) {
-            throw new LicenseException("Adding a second exception is not allowed");
+            return this;
         }
 
         @Override
         public String toString() {
-            return String.format("%s WITH %s", super.toString(), exception);
+            return (exception != null)
+                    ? String.format("%s WITH %s", identifier, exception)
+                    : identifier;
         }
     }
 
