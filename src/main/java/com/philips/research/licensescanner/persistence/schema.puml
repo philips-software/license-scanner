@@ -7,16 +7,19 @@ skinparam linetype ortho
 entity packages {
     *id: integer <<generated>>
     ---
-    origin: varchar
-    package: varchar
+    namespace: varchar
+    name: varchar
     version: varchar
 }
 
 entity scans {
+    *id: integer <<generated>>
+    ---
     package_id: integer
     created: timestamp
-    vcs_uri: varchar
-    license: varchar
+    location: clob
+    license: clob
+    error: clob
 }
 
 packages ||--o{ scans

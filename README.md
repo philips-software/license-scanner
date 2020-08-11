@@ -38,7 +38,7 @@ the `LICENSE_DIR` environment variable.
 (Checked items are under development.)
 
 Must-have
-- [ ] Fix: List all individually scanned licenses (instead of joining them 
+- [x] Fix: List all individually scanned licenses (instead of joining them 
 with an "AND" operator).
 - [ ] Manual curation of scanned licenses.
 - [ ] Manual resolution of failed scans.
