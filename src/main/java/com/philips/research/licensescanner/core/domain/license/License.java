@@ -2,7 +2,6 @@ package com.philips.research.licensescanner.core.domain.license;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 abstract public class License {

@@ -32,21 +32,21 @@ class LicenseParserTest {
 
     @Test
     void parsesSingleBracketedLicense() {
-        var license = LicenseParser.parse("(" + IDENTIFIER+ ")");
+        var license = LicenseParser.parse("(" + IDENTIFIER + ")");
 
         assertThat(license).contains(License.of(IDENTIFIER));
     }
 
     @Test
     void throws_rogueWithClause() {
-        assertThatThrownBy(()-> LicenseParser.parse("with E"))
+        assertThatThrownBy(() -> LicenseParser.parse("with E"))
                 .isInstanceOf(LicenseException.class)
-        .hasMessageContaining("WITH");
+                .hasMessageContaining("WITH");
     }
 
     @Test
     void throws_doubleWithClause() {
-        assertThatThrownBy(()-> LicenseParser.parse("A with B with C"))
+        assertThatThrownBy(() -> LicenseParser.parse("A with B with C"))
                 .isInstanceOf(LicenseException.class);
     }
 
@@ -73,9 +73,9 @@ class LicenseParserTest {
 
     @Test
     void throws_licensesWithoutLogicalOperator() {
-        assertThatThrownBy(()-> LicenseParser.parse("A B"))
+        assertThatThrownBy(() -> LicenseParser.parse("A B"))
                 .isInstanceOf(LicenseException.class)
-        .hasMessageContaining("logical operator");
+                .hasMessageContaining("logical operator");
     }
 
     @Test
@@ -94,21 +94,21 @@ class LicenseParserTest {
 
     @Test
     void throws_unbalancedOpenBracket() {
-        assertThatThrownBy(()-> LicenseParser.parse("("))
+        assertThatThrownBy(() -> LicenseParser.parse("("))
                 .isInstanceOf(LicenseException.class)
                 .hasMessageContaining("opening bracket");
     }
 
     @Test
     void throws_unbalancedClosingBracket() {
-        assertThatThrownBy(()-> LicenseParser.parse(")"))
+        assertThatThrownBy(() -> LicenseParser.parse(")"))
                 .isInstanceOf(LicenseException.class)
                 .hasMessageContaining("closing bracket");
     }
 
     @Test
     void throws_withClauseFollowedByOpeningBracket() {
-        assertThatThrownBy(()-> LicenseParser.parse("A with (something)"))
+        assertThatThrownBy(() -> LicenseParser.parse("A with (something)"))
                 .isInstanceOf(LicenseException.class)
                 .hasMessageContaining("not expected");
     }

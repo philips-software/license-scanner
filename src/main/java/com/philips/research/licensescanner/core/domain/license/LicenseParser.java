@@ -6,13 +6,10 @@ import java.util.Optional;
  * Parser for SPDX-like license statements containing AND, OR, WITH clauses and braces.
  */
 public class LicenseParser {
-    enum Mode {NONE, WITH, AND, OR}
-
     private StringBuilder buffer = new StringBuilder();
     private License license = null;
     private License latest = null;
     private Mode mode = Mode.NONE;
-
     private LicenseParser() {
     }
 
@@ -112,5 +109,7 @@ public class LicenseParser {
         latest = License.of(name);
         return latest;
     }
+
+    enum Mode {NONE, WITH, AND, OR}
 }
 
