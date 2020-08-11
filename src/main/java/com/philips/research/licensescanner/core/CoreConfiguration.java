@@ -10,6 +10,9 @@ import java.util.concurrent.Executor;
 public class CoreConfiguration {
     private static final int SCAN_PROCESSES = 3;
 
+    /**
+     * @return task scheduler implementation for scanning copyright information for packages
+     */
     @Bean(name = "licenseDetectionExecutor")
     public Executor threadPoolTaskExecutor() {
         final var executor = new ThreadPoolTaskExecutor();

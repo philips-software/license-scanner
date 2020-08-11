@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.net.URI;
 import java.util.Optional;
 
+/**
+ * Spring component implementing the persistence of packages.
+ */
 @Repository
 public class PackageDatabase implements PackageStore {
     private final PackageRepository packageRepository;

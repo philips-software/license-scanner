@@ -7,6 +7,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.net.URI;
 
+/**
+ * JPA entity for persisting a scan.
+ */
 @Entity(name = "scans")
 class ScanEntity extends Scan {
     @Id

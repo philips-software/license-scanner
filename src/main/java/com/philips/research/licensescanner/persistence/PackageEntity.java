@@ -6,6 +6,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+/**
+ * JPA entity for persisting a package.
+ */
 @Entity(name = "packages")
 class PackageEntity extends Package {
     @Id

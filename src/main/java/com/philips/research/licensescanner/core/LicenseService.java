@@ -33,6 +33,9 @@ public interface LicenseService {
      */
     Iterable<ErrorReport> scanErrors();
 
+    /**
+     * Response model for license information.
+     */
     class LicenseInfo {
         public final URI location;
         public final List<String> licenses;
@@ -43,6 +46,9 @@ public interface LicenseService {
         }
     }
 
+    /**
+     * Response model for error information.
+     */
     class ErrorReport {
         public final String packageId;
         public final String version;

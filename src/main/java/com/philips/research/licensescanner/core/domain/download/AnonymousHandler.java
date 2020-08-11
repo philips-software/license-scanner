@@ -12,7 +12,10 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
 
-public class AnonymousHandler implements VcsHandler {
+/**
+ *
+ */
+public class AnonymousHandler implements DownloadHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AnonymousHandler.class);
 
     @Override

@@ -8,7 +8,8 @@ import javax.validation.constraints.NotNull;
 import java.nio.file.Path;
 
 /**
- * Configuration read from properties file.
+ * Spring custom application configuration.
+ * This is used by Spring to populate a configuration object from its many configuration inputs.
  */
 @Validated
 @ConfigurationProperties(prefix = "licenses")

@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 
+/**
+ * Spring component for detecting licenses using the ScanCode Toolkit detector.
+ *
+ * @see <a href="https://github.com/nexB/scancode-toolkit">ScanCode Toolkit</a>
+ */
 @Component
 public class ScanCodeDetector implements Detector {
     private static final String RESULT_FILE = "scancode.json";

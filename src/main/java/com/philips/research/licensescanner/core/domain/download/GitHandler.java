@@ -13,7 +13,7 @@ import java.time.Duration;
  * GIT version control downloader.
  * Expects command line "git" to be installed.
  */
-public class GitHandler implements VcsHandler {
+public class GitHandler implements DownloadHandler {
     public static final Logger LOG = LoggerFactory.getLogger(GitHandler.class);
 
     private final ShellCommand git = new ShellCommand("git").setTimeout(Duration.ofMinutes(5));

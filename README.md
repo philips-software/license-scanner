@@ -1,15 +1,27 @@
 # License Scanner Service
 ## Overview
-The License Scanner Service is a service for scanning licenses from package 
-source code. This is accomplished by first downloading the sources of the
-requested package, and then invoking a license scanner to detect the licenses
-mentioned in the source files.
+The "License Scanner Service" is a backend service for offline scanning and managing
+copyright and license based on package source code. It is used by CI/CD pipelines to 
+obtain curated license information for inclusion in Software Bill of Materials (SBOM) 
+outputs. 
+
+The service exposes a REST API for CI/CD build pipeline tools (like 
+[SPDX-Builder](https://github.com/philips-labs/spdx-builder)) to retrieve available 
+license information and trigger asynchronous scanning of (versions of) packages that 
+were not already scanned. A client API is available for a manually curating licenses
+and addressing scanning errors.
+
+Scanning a package starts by downloading its source code, and then invokes an installed 
+license scanner to extract the license information. (At the moment only [ScanCode
+Toolkit](https://github.com/nexB/scancode-toolkit) is supported, but support for [FOSSology](https://github.com/fossology/fossology) 
+or other scanners should be relatively easy to add.) 
 
 Supported version control systems:
+- Plain web URL download
 - Git 2.24 or higher
 
 Supported license scanners:
-- ScanCode 3.0.x and 3.1.x
+- ScanCode Toolkit 3.0.x and 3.1.x
 
 ## Configuration
 ScanCode Toolkit requires to be invoked on Linux and OSX using the 
@@ -23,22 +35,26 @@ The base directory is the `TMPDIR` directory, and can be changed by setting
 the `LICENSE_DIR` environment variable.
 
 ## TO DO / Limitations
-- Verify checksum for downloaded artifact before scanning.
-- Store scan failures and expose them via API.
-- provide scanning time budget based on number of files.
-- List all individually scanned licenses instead of joining them with an 
-"AND" operator.
-- Detect and return copyright statements.
-- Include SPDX version handling.
-- Include license name, text, and reference URL as dictionary for all non-SPDX 
-references mentioned in the licenses list.
-- Store (any) provided declared license, so manual curation can take it into 
-account.
-- Integrate with FOSSology scanner.
-- (Client and) API for curation of scan results and restarting failed scans.
-- The service stores licenses in a H2 database to avoid integration with an 
-external database. For production this needs to be a more reliable and faster 
-database.
-- An in-memory thread pool queues scans that does not persist upon a server 
-restart. This should be replace by a persistent AMQP queue.
-- Add a security layer to the REST API.
+(Checked items are under development.)
+
+Must-have
+- [ ] Fix: List all individually scanned licenses (instead of joining them 
+with an "AND" operator).
+- [ ] Manual curation of scanned licenses.
+- [ ] Manual resolution of failed scans.
+- [ ] Resolve detected non-SPDX licenses.
+- [ ] User interface for manual curation.
+- [ ] Production-grade database (e.g. Postgres).
+- [ ] Authentication of clients.
+
+Should-have
+- [ ] Support (confirmed) declared non-SPDX custom licenses.
+- [ ] Verify checksum for downloaded artifact before scanning.
+- [ ] Detect and return other copyright statements.
+- [ ] provide scanning time budget based on number of files.
+
+Others
+- [ ] Integrate with FOSSology scanner.
+- [ ] Include SPDX version handling.
+- [ ] Multi-server scanning queue (like AMQP) that persists after restart of 
+individual servers in a load-balanced configuration.

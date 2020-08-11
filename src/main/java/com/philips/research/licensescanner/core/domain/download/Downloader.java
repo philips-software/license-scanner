@@ -16,16 +16,25 @@ import java.util.Map;
 /**
  * Version control handler API.
  */
-interface VcsHandler {
+interface DownloadHandler {
+    /**
+     * Downloads package sources.
+     *
+     * @param directory target directory to store the sources
+     * @param location  download location using the format {@code <transport>://<host_name>[/<path_to_repository>][@<revision_tag_or_branch>][#<sub_path>]}
+     */
     void download(Path directory, URI location);
 }
 
+/**
+ * Spring component delegating download of package source code from a provided URI to registered download handlers.
+ */
 @Component
 public class Downloader {
     private static final Logger LOG = LoggerFactory.getLogger(Downloader.class);
 
     private final Path baseDirectory;
-    private final Map<String, VcsHandler> registry = new HashMap<>();
+    private final Map<String, DownloadHandler> registry = new HashMap<>();
 
     @Autowired
     public Downloader(ApplicationConfiguration configuration) {
@@ -35,10 +44,23 @@ public class Downloader {
         register("git", new GitHandler());
     }
 
-    void register(String vcs, VcsHandler handler) {
-        registry.put(vcs, handler);
+    /**
+     * Registers a download handler for a single tool.
+     *
+     * @param tool    tool identifier
+     * @param handler
+     */
+    void register(String tool, DownloadHandler handler) {
+        registry.put(tool, handler);
     }
 
+    /**
+     * Downloads the source of a package from the provided location.
+     *
+     * @param location download location using the format {@code <vcs_tool>+<transport>://<host_name>[/<path_to_repository>][@<revision_tag_or_branch>][#<sub_path>]}
+     * @return path to the downloaded sources
+     * @throws DownloadException if downloading failed or no handler matches the location.
+     */
     public Path download(URI location) {
         final var handler = validHandler(location.getScheme());
         final var directory = newDirectory();
@@ -49,7 +71,7 @@ public class Downloader {
         return directory;
     }
 
-    private VcsHandler validHandler(String scheme) {
+    private DownloadHandler validHandler(String scheme) {
         final var pos = scheme.indexOf('+');
         final var tool = (pos >= 0) ? scheme.substring(0, pos) : "";
 

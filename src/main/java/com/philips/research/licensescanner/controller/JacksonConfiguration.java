@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Jackson JSON mapping for the REST API.
+ */
 @Configuration
 public class JacksonConfiguration {
     @Bean

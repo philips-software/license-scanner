@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class VcsHandlerTestBase {
+public class DownloadHandlerTestBase {
     protected Path tempDir;
 
     @BeforeEach

@@ -11,15 +11,28 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Converts exceptions on REST requests into status responses.
+ */
 @ControllerAdvice
 @ResponseBody
 public class ControllerExceptionHandler {
+    /**
+     * Handles requested resources that are not availabe on the server.
+     *
+     * @return NOT_FOUND status with a list of resources that were not found.
+     */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
-    public Map<String, String> handleValidationExceptions(ResourceNotFoundException exception) {
+    public Map<String, String> handleNotFoundException(ResourceNotFoundException exception) {
         return Map.of("resource", exception.getResource());
     }
 
+    /**
+     * Handles request parameter validation failures.
+     *
+     * @return BAD_REQUEST with a list of the detected validation failures.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException exception) {
@@ -30,17 +43,5 @@ public class ControllerExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return errors;
-    }
-
-    public static class ResourceNotFoundException extends RuntimeException {
-        private final String resource;
-
-        public ResourceNotFoundException(String resource) {
-            this.resource = resource;
-        }
-
-        public String getResource() {
-            return resource;
-        }
     }
 }

@@ -22,7 +22,7 @@ class DownloaderTest {
 
     private static ApplicationConfiguration configuration;
 
-    private final VcsHandler mockHandler = mock(VcsHandler.class);
+    private final DownloadHandler mockHandler = mock(DownloadHandler.class);
     private final Downloader downloader = new Downloader(configuration);
 
     @BeforeAll()

@@ -9,8 +9,8 @@ import java.nio.file.Files;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class GitHandlerTest extends VcsHandlerTestBase {
-    final VcsHandler handler = new GitHandler();
+class GitHandlerTest extends DownloadHandlerTestBase {
+    final DownloadHandler handler = new GitHandler();
 
     private void assertHash(String s) throws IOException {
         assertThat(Files.readString(tempDir.resolve(".git").resolve("HEAD")))
