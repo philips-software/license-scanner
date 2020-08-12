@@ -93,6 +93,13 @@ class LicenseParserTest {
     }
 
     @Test
+    void parsesNestedBrackets() {
+        var license = LicenseParser.parse("((A) or (B))");
+
+        assertThat(license).contains(License.of("A").or(License.of("B")));
+    }
+
+    @Test
     void throws_unbalancedOpenBracket() {
         assertThatThrownBy(() -> LicenseParser.parse("("))
                 .isInstanceOf(LicenseException.class)

@@ -10,6 +10,7 @@ public class LicenseParser {
     private License license = null;
     private License latest = null;
     private Mode mode = Mode.NONE;
+
     private LicenseParser() {
     }
 
@@ -25,11 +26,7 @@ public class LicenseParser {
             final var ch = text.charAt(i);
             switch (ch) {
                 case '(':
-                    final var pos = text.indexOf(')', i + 1);
-                    if (pos < 0) {
-                        throw new LicenseException("Unbalanced opening bracket found");
-                    }
-                    final var sub = text.substring(i + 1, pos);
+                    final var sub = bracketSubstring(text,i+1);
                     new LicenseParser().decode(sub).ifPresent(lic -> {
                         switch (mode) {
                             case AND:
@@ -45,7 +42,7 @@ public class LicenseParser {
                                 throw new LicenseException("Opening bracket is not expected");
                         }
                     });
-                    i = pos + 1;
+                    i += sub.length() + 1;
                     break;
                 case ')':
                     throw new LicenseException("Unbalanced closing bracket found");
@@ -58,6 +55,22 @@ public class LicenseParser {
         }
         parseToken();
         return Optional.ofNullable(license);
+    }
+
+    private String bracketSubstring(String text, int start) {
+        var nested = 0;
+        for (var i = start; i < text.length(); i++) {
+            final var ch = text.charAt(i);
+            if (ch == '(') {
+                nested++;
+            } else if (ch == ')') {
+                if (nested == 0) {
+                    return text.substring(start, i);
+                }
+                nested--;
+            }
+        }
+        throw new LicenseException("Unbalanced opening bracket found");
     }
 
     private void parseToken() {
