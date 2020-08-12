@@ -54,9 +54,9 @@ class LicenseTest {
             final var two = License.of("B");
             final var three = License.of("C");
 
-            assertThat(one.or(two).toString()).isEqualTo("(A OR B)");
-            assertThat((one.or(two)).or(three).toString()).isEqualTo("(A OR B OR C)");
-            assertThat(one.or(two.or(three)).toString()).isEqualTo("(A OR B OR C)");
+            assertThat(one.or(two).toString()).isEqualTo("A OR B");
+            assertThat((one.or(two)).or(three).toString()).isEqualTo("A OR B OR C");
+            assertThat(one.or(two.or(three)).toString()).isEqualTo("A OR B OR C");
         }
 
         @Test
@@ -65,9 +65,9 @@ class LicenseTest {
             final var two = License.of("B");
             final var three = License.of("C");
 
-            assertThat(one.and(two).toString()).isEqualTo("(A AND B)");
-            assertThat((one.and(two)).and(three).toString()).isEqualTo("(A AND B AND C)");
-            assertThat(one.and(two.and(three)).toString()).isEqualTo("(A AND B AND C)");
+            assertThat(one.and(two).toString()).isEqualTo("A AND B");
+            assertThat((one.and(two)).and(three).toString()).isEqualTo("A AND B AND C");
+            assertThat(one.and(two.and(three)).toString()).isEqualTo("A AND B AND C");
         }
 
         @Test
@@ -86,10 +86,10 @@ class LicenseTest {
             final var two = License.of("B");
             final var three = License.of("C");
 
-            assertThat((one.or(two)).and(three).toString()).isEqualTo("((A OR B) AND C)");
-            assertThat(one.or(two.and(three)).toString()).isEqualTo("((B AND C) OR A)");
-            assertThat((one.and(two)).or(three).toString()).isEqualTo("((A AND B) OR C)");
-            assertThat(one.and(two.or(three)).toString()).isEqualTo("((B OR C) AND A)");
+            assertThat((one.or(two)).and(three).toString()).isEqualTo("(A OR B) AND C");
+            assertThat(one.or(two.and(three)).toString()).isEqualTo("(B AND C) OR A");
+            assertThat((one.and(two)).or(three).toString()).isEqualTo("(A AND B) OR C");
+            assertThat(one.and(two.or(three)).toString()).isEqualTo("(B OR C) AND A");
         }
 
         @Test

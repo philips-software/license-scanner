@@ -120,9 +120,11 @@ abstract public class License {
         @Override
         public String toString() {
             return licenses.stream()
-                    .map(Object::toString)
+                    .map(license -> (license instanceof ComboLicense)
+                            ? String.format("(%s)", license.toString())
+                            : license.toString())
                     .sorted(String::compareToIgnoreCase)
-                    .collect(Collectors.joining(operation, "(", ")"));
+                    .collect(Collectors.joining(operation));
         }
     }
 
