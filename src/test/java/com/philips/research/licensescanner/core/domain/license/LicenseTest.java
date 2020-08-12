@@ -71,6 +71,16 @@ class LicenseTest {
         }
 
         @Test
+        void ignoresDuplicatesInComboLicenses() {
+            final var one = License.of("A");
+            final var two = License.of("B");
+
+            assertThat(one.and(one)).isEqualTo(one);
+            assertThat(one.or(one)).isEqualTo(one);
+            assertThat(one.and(two).and(one)).isEqualTo(one.and(two));
+        }
+
+        @Test
         void combinesComboLicenses() {
             final var one = License.of("A");
             final var two = License.of("B");
@@ -118,6 +128,7 @@ class LicenseTest {
 
             assertThat(license.hashCode()).isNotNull();
             assertThat(license.hashCode()).isNotEqualTo(License.of("Other").hashCode());
+            assertThat(License.of("A").hashCode()).isEqualTo(License.of("a").hashCode());
         }
 
         @Test
@@ -125,6 +136,7 @@ class LicenseTest {
             final var license = License.of(IDENTIFIER);
 
             assertThat(license).isEqualTo(license);
+            assertThat(License.of("A")).isEqualTo(License.of("a"));
             assertThat(license).isNotEqualTo(null);
             assertThat(license).isEqualTo(License.of(IDENTIFIER));
             //noinspection AssertBetweenInconvertibleTypes

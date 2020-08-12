@@ -1,7 +1,7 @@
 package com.philips.research.licensescanner.core.domain.license;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 abstract public class License {
@@ -20,14 +20,14 @@ abstract public class License {
     }
 
     public License and(License license) {
-        if (license instanceof NoLicense) {
+        if (license instanceof NoLicense || this.equals(license)) {
             return this;
         }
         return new AndLicense(this).and(license);
     }
 
     public License or(License license) {
-        if (license instanceof NoLicense) {
+        if (license instanceof NoLicense || this.equals(license)) {
             return this;
         }
         return new OrLicense(this).or(license);
@@ -35,7 +35,7 @@ abstract public class License {
 
     @Override
     public final int hashCode() {
-        return toString().hashCode();
+        return toString().toLowerCase().hashCode();
     }
 
     @Override
@@ -44,7 +44,7 @@ abstract public class License {
             return false;
         }
         return this.getClass() == obj.getClass()
-                && toString().equals(obj.toString());
+                && toString().equalsIgnoreCase(obj.toString());
     }
 
     public boolean isDefined() {
@@ -101,7 +101,7 @@ abstract public class License {
 
     private static class ComboLicense extends License {
         private final String operation;
-        private final List<License> licenses = new ArrayList<>();
+        private final Set<License> licenses = new HashSet<>();
 
         public ComboLicense(String operation, License license) {
             this.operation = String.format(" %s ", operation);
@@ -121,7 +121,7 @@ abstract public class License {
         public String toString() {
             return licenses.stream()
                     .map(Object::toString)
-                    .sorted()
+                    .sorted(String::compareToIgnoreCase)
                     .collect(Collectors.joining(operation, "(", ")"));
         }
     }

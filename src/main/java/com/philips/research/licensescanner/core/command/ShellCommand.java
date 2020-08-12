@@ -18,7 +18,7 @@ public class ShellCommand {
 
     private final String command;
     private File directory = new File(".");
-    private Duration timeout = Duration.ofSeconds(30);
+    private Duration timeout = Duration.ofMinutes(5);
 
     public ShellCommand(String command) {
         this.command = command;
@@ -58,7 +58,7 @@ public class ShellCommand {
      */
     public void execute(Iterable<Object> args) {
         try {
-            LOG.info("Invoke {} {}", command, args);
+            LOG.info("Invoke {} {} from {}", command, args, directory);
 
             Process process = invoke(args);
             assertSuccessStatus(process);
@@ -76,6 +76,7 @@ public class ShellCommand {
                 .command(invocationArguments(args))
                 .start();
         if (!process.waitFor(timeout.toSeconds(), TimeUnit.SECONDS)) {
+            process.descendants().forEach(ProcessHandle::destroyForcibly);
             process.destroyForcibly();
             throw new ShellException("Aborted '" + command + "' after " + timeout.toSeconds() + " seconds");
         }

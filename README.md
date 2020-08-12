@@ -45,9 +45,8 @@ the `LICENSE_DIR` environment variable.
 (Checked items are under development.)
 
 Must-have
-- [x] Join all individually scanned licenses with an "AND" operator.
 - [ ] Manual curation of scanned licenses.
-- [ ] Manual resolution of failed scans.
+- [ ] Tracking and manual resolution of failed scans.
 - [ ] Resolve detected non-SPDX licenses.
 - [ ] User interface for manual curation.
 - [ ] Production-grade database (e.g. Postgres).
