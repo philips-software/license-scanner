@@ -11,30 +11,31 @@ class LicenseParserTest {
 
     @Test
     void parsesNoLicense() {
-        assertThat(LicenseParser.parse("")).isEmpty();
-        assertThat(LicenseParser.parse("   ")).isEmpty();
-        assertThat(LicenseParser.parse("( )")).isEmpty();
+        assertThat(LicenseParser.parse("")).isEqualTo(License.NONE);
+        assertThat(LicenseParser.parse("   ")).isEqualTo(License.NONE);
+        assertThat(LicenseParser.parse("( )")).isEqualTo(License.NONE);
+        assertThat(LicenseParser.parse(null)).isEqualTo(License.NONE);
     }
 
     @Test
     void parsesSingleLicense() {
         var license = LicenseParser.parse(IDENTIFIER);
 
-        assertThat(license).contains(License.of(IDENTIFIER));
+        assertThat(license).isEqualTo(License.of(IDENTIFIER));
     }
 
     @Test
     void withExceptionClause() {
         var license = LicenseParser.parse(IDENTIFIER + " with " + EXCEPTION);
 
-        assertThat(license).contains(License.of(IDENTIFIER).with(EXCEPTION));
+        assertThat(license).isEqualTo(License.of(IDENTIFIER).with(EXCEPTION));
     }
 
     @Test
     void parsesSingleBracketedLicense() {
         var license = LicenseParser.parse("(" + IDENTIFIER + ")");
 
-        assertThat(license).contains(License.of(IDENTIFIER));
+        assertThat(license).isEqualTo(License.of(IDENTIFIER));
     }
 
     @Test
@@ -54,21 +55,21 @@ class LicenseParserTest {
     void parsesOrCombination() {
         var license = LicenseParser.parse("A or B or C");
 
-        assertThat(license).contains(License.of("A").or(License.of("B")).or(License.of("C")));
+        assertThat(license).isEqualTo(License.of("A").or(License.of("B")).or(License.of("C")));
     }
 
     @Test
     void parsesAndCombination() {
         var license = LicenseParser.parse("A and B and C");
 
-        assertThat(license).contains(License.of("A").and(License.of("B")).and(License.of("C")));
+        assertThat(license).isEqualTo(License.of("A").and(License.of("B")).and(License.of("C")));
     }
 
     @Test
     void parsesMixedLogicCombination() {
         var license = LicenseParser.parse("A or B and C");
 
-        assertThat(license).contains(License.of("A").or(License.of("B")).and(License.of("C")));
+        assertThat(license).isEqualTo(License.of("A").or(License.of("B")).and(License.of("C")));
     }
 
     @Test
@@ -82,21 +83,21 @@ class LicenseParserTest {
     void addsWithClauseToLatestParsedLicense() {
         var license = LicenseParser.parse("A or B with E and C");
 
-        assertThat(license).contains(License.of("A").or(License.of("B").with("E")).and(License.of("C")));
+        assertThat(license).isEqualTo(License.of("A").or(License.of("B").with("E")).and(License.of("C")));
     }
 
     @Test
     void parsesBracketedCombination() {
         var license = LicenseParser.parse("A or (B and C)");
 
-        assertThat(license).contains(License.of("A").or(License.of("B").and(License.of("C"))));
+        assertThat(license).isEqualTo(License.of("A").or(License.of("B").and(License.of("C"))));
     }
 
     @Test
     void parsesNestedBrackets() {
         var license = LicenseParser.parse("((A) or (B))");
 
-        assertThat(license).contains(License.of("A").or(License.of("B")));
+        assertThat(license).isEqualTo(License.of("A").or(License.of("B")));
     }
 
     @Test

@@ -35,10 +35,7 @@ public class ScanCodeDetector implements Detector {
         try {
             final var scanResult = MAPPER.readValue(directory.resolve(RESULT_FILE).toFile(), ScanCodeJson.class);
 
-            final var copyright = new Copyright();
-            scanResult.getLicenses().forEach(copyright::addLicense);
-
-            return copyright;
+            return new Copyright(scanResult.getLicense());
         } catch (IOException e) {
             throw new DetectorException("Failed to read ScanCode result file", e);
         }

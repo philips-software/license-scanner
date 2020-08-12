@@ -1,13 +1,11 @@
 package com.philips.research.licensescanner.core.domain.license;
 
-import java.util.Optional;
-
 /**
  * Parser for SPDX-like license statements containing AND, OR, WITH clauses and braces.
  */
 public class LicenseParser {
     private StringBuilder buffer = new StringBuilder();
-    private License license = null;
+    private License license = License.NONE;
     private License latest = null;
     private Mode mode = Mode.NONE;
 
@@ -17,31 +15,33 @@ public class LicenseParser {
     /**
      * @return the license matching the provided text
      */
-    public static Optional<License> parse(String text) {
+    public static License parse(String text) {
+        if (text == null) {
+            return License.NONE;
+        }
         return new LicenseParser().decode(text);
     }
 
-    private Optional<License> decode(String text) {
+    private License decode(String text) {
         for (var i = 0; i < text.length(); i++) {
             final var ch = text.charAt(i);
             switch (ch) {
                 case '(':
                     final var sub = bracketSubstring(text, i + 1);
-                    new LicenseParser().decode(sub).ifPresent(lic -> {
-                        switch (mode) {
-                            case AND:
-                                license = license.and(lic);
-                                break;
-                            case OR:
-                                license = license.or(lic);
-                                break;
-                            case NONE:
-                                license = lic;
-                                break;
-                            default:
-                                throw new LicenseException("Opening bracket is not expected");
-                        }
-                    });
+                    final var lic = new LicenseParser().decode(sub);
+                    switch (mode) {
+                        case AND:
+                            license = license.and(lic);
+                            break;
+                        case OR:
+                            license = license.or(lic);
+                            break;
+                        case NONE:
+                            license = lic;
+                            break;
+                        default:
+                            throw new LicenseException("Opening bracket is not expected");
+                    }
                     i += sub.length() + 1;
                     break;
                 case ')':
@@ -54,7 +54,7 @@ public class LicenseParser {
             }
         }
         parseToken();
-        return Optional.ofNullable(license);
+        return license;
     }
 
     private String bracketSubstring(String text, int start) {

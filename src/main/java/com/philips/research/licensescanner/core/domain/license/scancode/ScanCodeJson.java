@@ -6,7 +6,10 @@ import com.philips.research.licensescanner.core.domain.license.License;
 import com.philips.research.licensescanner.core.domain.license.LicenseParser;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,10 +32,10 @@ class ScanCodeJson {
     /**
      * @return license at are at least 50% certain.
      */
-    Collection<License> getLicenses() {
+    License getLicense() {
         return files.stream()
                 .flatMap(FileJson::getLicenses)
-                .collect(Collectors.toSet());
+                .reduce(License.NONE, License::and);
     }
 }
 
@@ -60,7 +63,7 @@ class FileJson {
 
         return expressions.stream()
                 .map(str -> mapToSpdx(str, dictionary))
-                .flatMap(str -> LicenseParser.parse(str).stream());
+                .map(LicenseParser::parse);
     }
 
     private String mapToSpdx(String str, Map<String, String> dictionary) {

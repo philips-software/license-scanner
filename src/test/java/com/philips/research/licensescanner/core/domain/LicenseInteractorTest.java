@@ -89,7 +89,7 @@ class LicenseInteractorTest {
         @Test
         void downloadsAndScansPackage() throws Exception {
             when(downloader.download(LOCATION)).thenReturn(directory);
-            when(detector.scan(directory)).thenReturn(new Copyright().addLicense(License.of(LICENSE)));
+            when(detector.scan(directory)).thenReturn(new Copyright(License.of(LICENSE)));
 
             service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 

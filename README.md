@@ -23,9 +23,16 @@ Supported version control systems:
 Supported license scanners:
 - ScanCode Toolkit 3.0.x and 3.1.x
 
+## Interpretation of detected licenses
+License scanners report detected licenses per source file, which are joined by the 
+service into a single package-level license using the logical "AND" operator.
+The API reports licenses as-is, without checking for validity or compatibility. 
+In case of dual licensing, it is left to the client to choose the appropriate 
+license.
+
 ## Configuration
-ScanCode Toolkit requires to be invoked on Linux and OSX using the 
-installation path (see [documuntation](https://scancode-toolkit.readthedocs.io/en/latest/cli-reference/synopsis.html)).
+ScanCode Toolkit requires to be invoked on Linux and OSX using an absolute
+installation path (see [the ScanCode Toolkit documentation](https://scancode-toolkit.readthedocs.io/en/latest/cli-reference/synopsis.html)).
 When not installed using pip or running on Windows, make sure `extractcode` and 
 `scancode` can be accessed through a script, without providing the installation 
 path.
@@ -38,8 +45,7 @@ the `LICENSE_DIR` environment variable.
 (Checked items are under development.)
 
 Must-have
-- [x] Fix: List all individually scanned licenses (instead of joining them 
-with an "AND" operator).
+- [x] Join all individually scanned licenses with an "AND" operator.
 - [ ] Manual curation of scanned licenses.
 - [ ] Manual resolution of failed scans.
 - [ ] Resolve detected non-SPDX licenses.

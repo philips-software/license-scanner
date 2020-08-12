@@ -17,7 +17,7 @@ class ScanCodeJsonTest {
                 new FileJson(List.of(LICENSE_1, LICENSE_2), LICENSE_1.key, LICENSE_2.key)
         ));
 
-        assertThat(scan.getLicenses()).contains(License.of(LICENSE_1.spdx), License.of(LICENSE_2.spdx));
+        assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE_1.spdx).and(License.of(LICENSE_2.spdx)));
     }
 
     @Test
@@ -26,7 +26,7 @@ class ScanCodeJsonTest {
                 new FileJson(List.of(LICENSE_1, LICENSE_1), LICENSE_1.key)
         ));
 
-        assertThat(scan.getLicenses()).contains(License.of(LICENSE_1.spdx));
+        assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE_1.spdx));
     }
 
     @Test
@@ -42,7 +42,7 @@ class ScanCodeJsonTest {
                 new FileJson(List.of(LICENSE_1, LICENSE_2), LICENSE_1.key + " AND " + LICENSE_2.key)
         ));
 
-        assertThat(scan.getLicenses()).contains(License.of(LICENSE_1.spdx ).and(License.of(LICENSE_2.spdx)));
+        assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE_1.spdx).and(License.of(LICENSE_2.spdx)));
     }
 
     @Test
@@ -51,6 +51,6 @@ class ScanCodeJsonTest {
                 new FileJson(List.of(LICENSE_1, LICENSE_2), LICENSE_1.key, LICENSE_1.key + " OR " + LICENSE_2.key)
         ));
 
-        assertThat(scan.getLicenses()).contains(License.of(LICENSE_1.spdx).or(License.of(LICENSE_2.spdx)), License.of(LICENSE_1.spdx));
+        assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE_1.spdx).or(License.of(LICENSE_2.spdx)).and(License.of(LICENSE_1.spdx)));
     }
 }

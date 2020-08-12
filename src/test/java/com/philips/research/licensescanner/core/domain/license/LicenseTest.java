@@ -9,14 +9,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class LicenseTest {
     private static final String IDENTIFIER = "Identifier";
     private static final String EXCEPTION = "Exception";
+    private static final License NO_LICENSE = License.of("");
 
     @Nested
     class ProgrammaticConstruction {
+        @Test
+        void createsNoLicenseFromEmptyString() {
+            assertThat(NO_LICENSE.toString()).isEqualTo("");
+            assertThat(NO_LICENSE.isDefined()).isFalse();
+        }
+
         @Test
         void createsSingleLicense() {
             var license = License.of(IDENTIFIER);
 
             assertThat(license.toString()).isEqualTo(IDENTIFIER);
+            assertThat(license.isDefined()).isTrue();
         }
 
         @Test
@@ -72,6 +80,33 @@ class LicenseTest {
             assertThat(one.or(two.and(three)).toString()).isEqualTo("((B AND C) OR A)");
             assertThat((one.and(two)).or(three).toString()).isEqualTo("((A AND B) OR C)");
             assertThat(one.and(two.or(three)).toString()).isEqualTo("((B OR C) AND A)");
+        }
+
+        @Test
+        void combinesNoLicensesIntoNoLicense() {
+            assertThat(NO_LICENSE.and(License.of("")).isDefined()).isFalse();
+        }
+
+        @Test
+        void combinesNoLicenseWithDefinedLicense() {
+            final var license = License.of(IDENTIFIER);
+
+            assertThat(NO_LICENSE.and(license)).isEqualTo(license);
+        }
+
+        @Test
+        void combinesLicenseWithNoLicense() {
+            final var license = License.of(IDENTIFIER);
+
+            assertThat(license.and(NO_LICENSE)).isEqualTo(license);
+            assertThat(license.or(NO_LICENSE)).isEqualTo(license);
+        }
+
+        @Test
+        void ignoresAddingNoLicenseToCombo() {
+            final var combo = License.of("A").and(License.of("B"));
+
+            assertThat(combo.and(NO_LICENSE)).isEqualTo(combo);
         }
     }
 

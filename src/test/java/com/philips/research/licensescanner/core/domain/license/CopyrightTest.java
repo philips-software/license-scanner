@@ -5,20 +5,13 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CopyrightTest {
-    final Copyright copyright = new Copyright();
+
+    private static final License LICENSE = License.of("License");
 
     @Test
     void createsInstance() {
-        assertThat(copyright.getLicenses()).isEmpty();
-    }
+        final var copyright = new Copyright(LICENSE);
 
-    @Test
-    void tracksUniqueLicenses() {
-        final var license = License.of("License");
-
-        copyright.addLicense(license);
-        copyright.addLicense(license);
-
-        assertThat(copyright.getLicenses()).containsExactly(license);
+        assertThat(copyright.getLicense()).isEqualTo(LICENSE);
     }
 }

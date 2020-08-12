@@ -5,7 +5,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 abstract public class License {
+    @SuppressWarnings("StaticInitializerReferencesSubClass")
+    public static final License NONE = new NoLicense();
+
     public static License of(String identifier) {
+        if (identifier.isBlank()) {
+            return NONE;
+        }
         return new SingleLicense(identifier);
     }
 
@@ -14,10 +20,16 @@ abstract public class License {
     }
 
     public License and(License license) {
+        if (license instanceof NoLicense) {
+            return this;
+        }
         return new AndLicense(this).and(license);
     }
 
     public License or(License license) {
+        if (license instanceof NoLicense) {
+            return this;
+        }
         return new OrLicense(this).or(license);
     }
 
@@ -33,6 +45,32 @@ abstract public class License {
         }
         return this.getClass() == obj.getClass()
                 && toString().equals(obj.toString());
+    }
+
+    public boolean isDefined() {
+        return true;
+    }
+
+    private static class NoLicense extends License {
+        @Override
+        public boolean isDefined() {
+            return false;
+        }
+
+        @Override
+        public License and(License license) {
+            return license;
+        }
+
+        @Override
+        public License or(License license) {
+            return license;
+        }
+
+        @Override
+        public String toString() {
+            return "";
+        }
     }
 
     private static class SingleLicense extends License {
@@ -73,7 +111,7 @@ abstract public class License {
         License merge(License license) {
             if (license.getClass() == this.getClass()) {
                 licenses.addAll(((ComboLicense) license).licenses);
-            } else {
+            } else if (!(license instanceof NoLicense)) {
                 licenses.add(license);
             }
             return this;
