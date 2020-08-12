@@ -42,36 +42,36 @@ class LicenseTest {
 
         @Test
         void combinesLicensesUsingOr() {
-            final var one = License.of("one");
-            final var two = License.of("two");
-            final var three = License.of("three");
+            final var one = License.of("A");
+            final var two = License.of("B");
+            final var three = License.of("C");
 
-            assertThat(one.or(two).toString()).isEqualTo("(one OR two)");
-            assertThat((one.or(two)).or(three).toString()).isEqualTo("(one OR two OR three)");
-            assertThat(one.or(two.or(three)).toString()).isEqualTo("(one OR two OR three)");
+            assertThat(one.or(two).toString()).isEqualTo("(A OR B)");
+            assertThat((one.or(two)).or(three).toString()).isEqualTo("(A OR B OR C)");
+            assertThat(one.or(two.or(three)).toString()).isEqualTo("(A OR B OR C)");
         }
 
         @Test
         void combinesLicensesUsingAnd() {
-            final var one = License.of("one");
-            final var two = License.of("two");
-            final var three = License.of("three");
+            final var one = License.of("A");
+            final var two = License.of("B");
+            final var three = License.of("C");
 
-            assertThat(one.and(two).toString()).isEqualTo("(one AND two)");
-            assertThat((one.and(two)).and(three).toString()).isEqualTo("(one AND two AND three)");
-            assertThat(one.and(two.and(three)).toString()).isEqualTo("(one AND two AND three)");
+            assertThat(one.and(two).toString()).isEqualTo("(A AND B)");
+            assertThat((one.and(two)).and(three).toString()).isEqualTo("(A AND B AND C)");
+            assertThat(one.and(two.and(three)).toString()).isEqualTo("(A AND B AND C)");
         }
 
         @Test
         void combinesComboLicenses() {
-            final var one = License.of("one");
-            final var two = License.of("two");
-            final var three = License.of("three");
+            final var one = License.of("A");
+            final var two = License.of("B");
+            final var three = License.of("C");
 
-            assertThat((one.or(two)).and(three).toString()).isEqualTo("((one OR two) AND three)");
-            assertThat(one.or(two.and(three)).toString()).isEqualTo("(one OR (two AND three))");
-            assertThat((one.and(two)).or(three).toString()).isEqualTo("((one AND two) OR three)");
-            assertThat(one.and(two.or(three)).toString()).isEqualTo("(one AND (two OR three))");
+            assertThat((one.or(two)).and(three).toString()).isEqualTo("((A OR B) AND C)");
+            assertThat(one.or(two.and(three)).toString()).isEqualTo("((B AND C) OR A)");
+            assertThat((one.and(two)).or(three).toString()).isEqualTo("((A AND B) OR C)");
+            assertThat(one.and(two.or(three)).toString()).isEqualTo("((B OR C) AND A)");
         }
     }
 
@@ -94,6 +94,7 @@ class LicenseTest {
             assertThat(license).isEqualTo(License.of(IDENTIFIER));
             //noinspection AssertBetweenInconvertibleTypes
             assertThat(license).isNotEqualTo("42");
+            assertThat(License.of("A").and(License.of("B"))).isEqualTo(License.of("B").and(License.of("A")));
         }
     }
 }

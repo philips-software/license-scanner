@@ -33,6 +33,6 @@ class ScanCodeDetectorTest {
     void decompressesAndScansDirectory() {
         final var result = detector.scan(tempDir);
 
-        assertThat(result.license).isNotEmpty();
+        assertThat(result.getLicenses()).isNotEmpty();
     }
 }

@@ -18,6 +18,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * License detection use cases implementation.
@@ -62,8 +63,12 @@ public class LicenseInteractor implements LicenseService {
             path = downloader.download(location);
             //TODO Check hash after download
             final var copyright = detector.scan(path);
-            store.createScan(pkg, copyright.license, location);
-            LOG.info("Detected license for {}:{} {} is {}", origin, name, version, copyright.license);
+            //TODO Should be list of licenses
+            final var license = copyright.getLicenses().stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(", "));
+            store.createScan(pkg, license, location);
+            LOG.info("Detected license for {}:{} {} is {}", origin, name, version, license);
         } catch (Exception e) {
             LOG.error("Scanning failed", e);
         } finally {

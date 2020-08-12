@@ -5,6 +5,7 @@ import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
 import com.philips.research.licensescanner.core.domain.license.Copyright;
 import com.philips.research.licensescanner.core.domain.license.Detector;
+import com.philips.research.licensescanner.core.domain.license.License;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -88,7 +89,7 @@ class LicenseInteractorTest {
         @Test
         void downloadsAndScansPackage() throws Exception {
             when(downloader.download(LOCATION)).thenReturn(directory);
-            when(detector.scan(directory)).thenReturn(new Copyright(LICENSE));
+            when(detector.scan(directory)).thenReturn(new Copyright().addLicense(License.of(LICENSE)));
 
             service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 

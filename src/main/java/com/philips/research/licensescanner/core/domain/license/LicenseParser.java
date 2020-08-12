@@ -26,7 +26,7 @@ public class LicenseParser {
             final var ch = text.charAt(i);
             switch (ch) {
                 case '(':
-                    final var sub = bracketSubstring(text,i+1);
+                    final var sub = bracketSubstring(text, i + 1);
                     new LicenseParser().decode(sub).ifPresent(lic -> {
                         switch (mode) {
                             case AND:

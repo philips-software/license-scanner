@@ -83,6 +83,7 @@ abstract public class License {
         public String toString() {
             return licenses.stream()
                     .map(Object::toString)
+                    .sorted()
                     .collect(Collectors.joining(operation, "(", ")"));
         }
     }
