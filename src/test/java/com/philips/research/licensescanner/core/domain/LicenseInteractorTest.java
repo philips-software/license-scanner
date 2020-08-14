@@ -16,6 +16,7 @@ import org.springframework.util.FileSystemUtils;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,14 +40,30 @@ class LicenseInteractorTest {
 
     @BeforeEach
     void beforeEach() {
-        when(store.findPackage(ORIGIN, NAME, VERSION)).thenReturn(Optional.of(PACKAGE));
+        when(store.getPackage(ORIGIN, NAME, VERSION)).thenReturn(Optional.of(PACKAGE));
+    }
+
+    @Nested
+    class FindPackages {
+        @Test
+        void findsPackages() {
+            when(store.findPackages(ORIGIN, NAME, VERSION)).thenReturn(List.of(new Package(ORIGIN, NAME, VERSION)));
+
+            final var result = service.findPackages(ORIGIN, NAME, VERSION);
+
+            assertThat(result).hasSize(1);
+            final var pkg = result.get(0);
+            assertThat(pkg.namespace).isEqualTo(ORIGIN);
+            assertThat(pkg.name).isEqualTo(NAME);
+            assertThat(pkg.version).isEqualTo(VERSION);
+        }
     }
 
     @Nested
     class QueryLicenseInformation {
         @Test
         void noLicense_packageNotFound() {
-            when(store.findPackage(ORIGIN, NAME, VERSION)).thenReturn(Optional.empty());
+            when(store.getPackage(ORIGIN, NAME, VERSION)).thenReturn(Optional.empty());
 
             final var noInfo = service.licenseFor(ORIGIN, NAME, VERSION);
 

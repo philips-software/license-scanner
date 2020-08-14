@@ -33,8 +33,20 @@ public class PackageDatabase implements PackageStore {
     }
 
     @Override
-    public Optional<Package> findPackage(String namespace, String name, String version) {
+    public Optional<Package> getPackage(String namespace, String name, String version) {
         return packageRepository.findByNamespaceAndNameAndVersion(namespace, name, version).map(pkg -> pkg);
+    }
+
+    @Override
+    public List<Package> findPackages(String namespace, String name, String version) {
+        final var result = packageRepository.findTop50ByNamespaceLikeAndNameLikeAndVersionLikeOrderByNamespaceAscNameAscVersionAsc(
+                wildcard(namespace), wildcard(name), wildcard(version));
+        //noinspection unchecked
+        return (List<Package>) (Object) result;
+    }
+
+    private String wildcard(String name) {
+        return '%' + name + '%';
     }
 
     @Override

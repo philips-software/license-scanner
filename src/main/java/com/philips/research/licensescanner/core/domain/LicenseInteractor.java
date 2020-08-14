@@ -18,6 +18,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * License detection use cases implementation.
@@ -39,16 +40,16 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public Optional<LicenseInfo> licenseFor(String origin, String name, String version) {
-        return store.findPackage(origin, name, version)
-                .flatMap(store::latestScan)
-                .map(this::toLicenseInfo);
+    public List<PackageId> findPackages(String namespace, String name, String version) {
+        final var packages = store.findPackages(namespace, name, version);
+        return packages.stream().map(this::toPackageId).collect(Collectors.toList());
     }
 
-    private LicenseInfo toLicenseInfo(Scan scan) {
-        final var licenses = scan.getLicense().map(List::of).orElse(List.of());
-        final var location = scan.getLocation().orElse(null);
-        return new LicenseInfo(location, licenses);
+    @Override
+    public Optional<LicenseInfo> licenseFor(String origin, String name, String version) {
+        return store.getPackage(origin, name, version)
+                .flatMap(store::latestScan)
+                .map(this::toLicenseInfo);
     }
 
     @Override
@@ -76,7 +77,7 @@ public class LicenseInteractor implements LicenseService {
     }
 
     private Package getOrCreatePackage(String origin, String name, String version) {
-        return store.findPackage(origin, name, version).orElseGet(() -> store.createPackage(origin, name, version));
+        return store.getPackage(origin, name, version).orElseGet(() -> store.createPackage(origin, name, version));
     }
 
     private void deleteDirectory(Path path) {
@@ -94,4 +95,16 @@ public class LicenseInteractor implements LicenseService {
     public Iterable<ErrorReport> scanErrors() {
         return null;
     }
+
+    private PackageId toPackageId(Package pkg) {
+        return new PackageId(pkg.getNamespace(), pkg.getName(), pkg.getVersion());
+    }
+
+    private LicenseInfo toLicenseInfo(Scan scan) {
+        final var licenses = scan.getLicense().map(List::of).orElse(List.of());
+        final var location = scan.getLocation().orElse(null);
+        final var pkg = scan.getPackage();
+        return new LicenseInfo(pkg.getNamespace(), pkg.getName(), pkg.getVersion(), location, licenses);
+    }
+
 }

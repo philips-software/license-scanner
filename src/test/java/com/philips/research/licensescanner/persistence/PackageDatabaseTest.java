@@ -32,11 +32,11 @@ class PackageDatabaseTest {
     ScanRepository scanRepository;
 
     @Test
-    void findsPackage() {
+    void getsPackage() {
         database.createPackage(ORIGIN, NAME, "other");
         final var expected = database.createPackage(ORIGIN, NAME, VERSION);
 
-        final var pkg = database.findPackage(ORIGIN, NAME, VERSION);
+        final var pkg = database.getPackage(ORIGIN, NAME, VERSION);
 
         assertThat(pkg).contains(expected);
     }
@@ -45,7 +45,19 @@ class PackageDatabaseTest {
     void empty_packageDoesNotExist() {
         database.createPackage(ORIGIN, NAME, "other");
 
-        assertThat(database.findPackage(ORIGIN, NAME, VERSION)).isEmpty();
+        assertThat(database.getPackage(ORIGIN, NAME, VERSION)).isEmpty();
+    }
+
+    @Test
+    void findsMatchingPackages() {
+        final var pkg = database.createPackage(ORIGIN, NAME, VERSION);
+        database.createPackage(ORIGIN, "Other", VERSION);
+        database.createPackage(ORIGIN, NAME, "Other");
+
+        assertThat(database.findPackages(ORIGIN, NAME, VERSION)).containsExactly(pkg);
+        assertThat(database.findPackages("", "", "")).hasSize(3);
+        assertThat(database.findPackages(ORIGIN, NAME, "")).hasSize(2);
+        assertThat(database.findPackages("Other", NAME, VERSION)).isEmpty();
     }
 
     @Test

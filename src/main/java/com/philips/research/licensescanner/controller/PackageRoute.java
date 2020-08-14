@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Instant;
 
 /**
  * REST API for interacting with packages.
@@ -20,7 +21,7 @@ public class PackageRoute {
     }
 
     /**
-     * Provides scan results for a single package.
+     * Gets scan results for a single package.
      *
      * @param namespace
      * @param name
@@ -38,19 +39,23 @@ public class PackageRoute {
     /**
      * Finds all registered packages matching the provided search criteria.
      *
-     * @param namespace
-     * @param name
-     * @param version
+     * @param namespace (Optional) part of the namespace
+     * @param name      (Optional) part of the name
+     * @param version   (Optional) part of the version
      * @return list of scanning results matching the query
      */
     @GetMapping
-    SearchResultJson findPackages(@RequestParam String namespace, @RequestParam String name, @RequestParam String version) {
-        //TODO Query for provided parameters
-        return null;
+    SearchResultJson findPackages(
+            @RequestParam(required = false, defaultValue = "") String namespace,
+            @RequestParam(required = false, defaultValue = "") String name,
+            @RequestParam(required = false, defaultValue = "") String version) {
+        final var packages = service.findPackages(namespace, name, version);
+
+        return new SearchResultJson(packages.stream().map(ScanInfoJson::new));
     }
 
     /**
-     * Requests scanning of the indicated packages. If the package was scanned before, the result is returned. Else the
+     * Requests licenses for the indicated packages. If the package was scanned before, the result is returned. Else the
      * package is scheduled for scanning.
      *
      * @param namespace
@@ -82,7 +87,7 @@ public class PackageRoute {
     }
 
     /**
-     * Override a scan results with (manually corrected) information.
+     * Overrides a scan results with (manually corrected) information.
      *
      * @param namespace
      * @param name
@@ -110,5 +115,44 @@ public class PackageRoute {
         response.location = lic.location;
         response.licenses = lic.licenses;
         return response;
+    }
+
+    /**
+     * Lists all successful scans in the given period.
+     *
+     * @param after  (Optional) start timestamp
+     * @param before (Optional) end timestamp: defaults to "now"
+     * @param limit  maximum number of entries
+     */
+    @GetMapping("scans")
+    SearchResultJson latestScans(@RequestParam Instant after, @RequestParam Instant before, @RequestParam int limit) {
+        // TODO Implement me
+        return new SearchResultJson();
+    }
+
+    /**
+     * Lists all failed package scans in the given period.
+     *
+     * @param after  (Optional) start timestamp
+     * @param before (Optional) end timestamp; defaults to "now"
+     * @param limit  maximum number of entries
+     */
+    @GetMapping("errors")
+    SearchResultJson failedPackages(@RequestParam Instant after, @RequestParam Instant before, @RequestParam int limit) {
+        // TODO Implement me
+        return new SearchResultJson();
+    }
+
+    /**
+     * Lists all scan errors for a package.
+     *
+     * @param namespace
+     * @param name
+     * @param version
+     */
+    @GetMapping("{namespace}/{name}/{version}/errors")
+    SearchResultJson findPackageScanErrors(@PathVariable String namespace, @PathVariable String name, @PathVariable String version) {
+        // TODO Implement me
+        return new SearchResultJson();
     }
 }

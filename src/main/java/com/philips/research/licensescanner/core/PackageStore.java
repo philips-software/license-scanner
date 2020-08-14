@@ -30,7 +30,17 @@ public interface PackageStore {
      * @param version
      * @return the package (if any)
      */
-    Optional<Package> findPackage(String namespace, String name, String version);
+    Optional<Package> getPackage(String namespace, String name, String version);
+
+    /**
+     * Finds all packages (partly) containing the indicated fields.
+     *
+     * @param namespace (frogment of) namespace
+     * @param name      (fragment of) name
+     * @param version   (fragment of) version
+     * @return all matching packages
+     */
+    List<Package> findPackages(String namespace, String name, String version);
 
     /**
      * Creates a new persistent scan registration.
