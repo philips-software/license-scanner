@@ -1,7 +1,5 @@
 package com.philips.research.licensescanner.persistence;
 
-import com.philips.research.licensescanner.core.domain.ScanError;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.URI;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

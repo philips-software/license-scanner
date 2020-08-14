@@ -4,7 +4,7 @@ import java.net.URI;
 import java.time.Instant;
 
 public class ScanError {
-    private final Instant timestamp ;
+    private final Instant timestamp;
     private final Package pkg;
     private final URI location;
     private final String message;

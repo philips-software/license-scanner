@@ -23,7 +23,7 @@ public class PackageDatabase implements PackageStore {
     public PackageDatabase(PackageRepository packageRepository, ScanRepository scanRepository, ScanErrorRepository errorRepository) {
         this.packageRepository = packageRepository;
         this.scanRepository = scanRepository;
-        this.errorRepository= errorRepository;
+        this.errorRepository = errorRepository;
     }
 
     @Override
@@ -50,7 +50,7 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public void registerScanError(Package pkg, URI location, String message) {
-        final var entity = new ScanErrorEntity(Instant.now(), (PackageEntity)pkg, location, message);
+        final var entity = new ScanErrorEntity(Instant.now(), (PackageEntity) pkg, location, message);
         errorRepository.save(entity);
     }
 

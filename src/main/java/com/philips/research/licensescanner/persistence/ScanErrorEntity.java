@@ -13,7 +13,7 @@ import java.time.Instant;
  * JPA entity for persisting a scan.
  */
 @Entity
-@Table(name="scans")
+@Table(name = "scans")
 class ScanErrorEntity extends ScanError {
     @Id
     @GeneratedValue
