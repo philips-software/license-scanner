@@ -1,5 +1,7 @@
 package com.philips.research.licensescanner.persistence;
 
+import com.philips.research.licensescanner.core.domain.ScanError;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.URI;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,6 +23,7 @@ class PackageDatabaseTest {
     private static final String VERSION = "Version";
     private static final String LICENSE = "License";
     private static final URI LOCATION = URI.create("git+http://example.com");
+    private static final String MESSAGE = "Message";
 
     @Autowired
     PackageDatabase database;
@@ -42,6 +46,8 @@ class PackageDatabaseTest {
 
     @Test
     void empty_packageDoesNotExist() {
+        database.createPackage(ORIGIN, NAME, "other");
+
         assertThat(database.findPackage(ORIGIN, NAME, VERSION)).isEmpty();
     }
 
@@ -54,14 +60,34 @@ class PackageDatabaseTest {
         //noinspection OptionalGetWithoutIsPresent
         final var latest = database.latestScan(pkg).get();
 
+        assertThat(latest.getPackage()).isEqualTo(pkg);
         assertThat(latest.getLicense()).contains(LICENSE);
     }
 
     @Test
     void empty_noLatestScanResult() {
+        final var decoy = database.createPackage(ORIGIN, "Decoy", VERSION);
+        database.createScan(decoy, LICENSE, LOCATION);
         final var pkg = database.createPackage(ORIGIN, NAME, VERSION);
         database.createScan(pkg, null, LOCATION);
 
+        assertThat(database.latestScan(pkg)).isEmpty();
+    }
+
+    @Test
+    void registersScanningError() {
+        final var pkg = database.createPackage(ORIGIN, NAME, VERSION);
+        database.registerScanError(pkg, LOCATION, "first");
+        database.registerScanError(pkg, LOCATION, MESSAGE);
+        final var decoy = database.createPackage(ORIGIN, "Decoy", VERSION);
+        database.createScan(decoy, LICENSE, LOCATION);
+        database.registerScanError(decoy, LOCATION, MESSAGE);
+
+        final var errors = database.scanErrors(pkg);
+
+        assertThat(errors).hasSize(2);
+        assertThat(errors.get(0).getPackage()).isEqualTo(pkg);
+        assertThat(errors.get(0).getMessage()).isEqualTo(MESSAGE);
         assertThat(database.latestScan(pkg)).isEmpty();
     }
 }

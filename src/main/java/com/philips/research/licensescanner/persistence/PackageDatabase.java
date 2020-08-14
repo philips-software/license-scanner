@@ -3,9 +3,12 @@ package com.philips.research.licensescanner.persistence;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
+import com.philips.research.licensescanner.core.domain.ScanError;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -15,10 +18,12 @@ import java.util.Optional;
 public class PackageDatabase implements PackageStore {
     private final PackageRepository packageRepository;
     private final ScanRepository scanRepository;
+    private final ScanErrorRepository errorRepository;
 
-    public PackageDatabase(PackageRepository packageRepository, ScanRepository scanRepository) {
+    public PackageDatabase(PackageRepository packageRepository, ScanRepository scanRepository, ScanErrorRepository errorRepository) {
         this.packageRepository = packageRepository;
         this.scanRepository = scanRepository;
+        this.errorRepository= errorRepository;
     }
 
     @Override
@@ -41,6 +46,17 @@ public class PackageDatabase implements PackageStore {
     @Override
     public Optional<Scan> latestScan(Package pkg) {
         return scanRepository.findTopByPkgAndLicenseNotNullOrderByIdDesc((PackageEntity) pkg).map(scan -> scan);
+    }
+
+    @Override
+    public void registerScanError(Package pkg, URI location, String message) {
+        final var entity = new ScanErrorEntity(Instant.now(), (PackageEntity)pkg, location, message);
+        errorRepository.save(entity);
+    }
+
+    @Override
+    public List<ScanError> scanErrors(Package pkg) {
+        return errorRepository.findAllByPkgOrderByTimestampDesc(pkg);
     }
 }
 

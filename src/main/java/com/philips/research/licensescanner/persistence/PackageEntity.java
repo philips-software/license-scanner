@@ -5,11 +5,13 @@ import com.philips.research.licensescanner.core.domain.Package;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * JPA entity for persisting a package.
  */
-@Entity(name = "packages")
+@Entity
+@Table(name = "packages")
 class PackageEntity extends Package {
     @Id
     @GeneratedValue

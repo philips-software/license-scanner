@@ -5,12 +5,14 @@ import com.philips.research.licensescanner.core.domain.Scan;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.net.URI;
 
 /**
  * JPA entity for persisting a scan.
  */
-@Entity(name = "scans")
+@Entity
+@Table(name = "scans")
 class ScanEntity extends Scan {
     @Id
     @GeneratedValue

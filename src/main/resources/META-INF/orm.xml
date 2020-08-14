@@ -14,4 +14,22 @@
             </many-to-one>
         </attributes>
     </mapped-superclass>
+    <mapped-superclass class="com.philips.research.licensescanner.core.domain.ScanError">
+        <attributes>
+            <basic name="timestamp">
+                <column name="created"/>
+            </basic>
+            <basic name="location">
+                <lob/>
+            </basic>
+            <basic name="message">
+                <column name="error"/>
+                <lob/>
+            </basic>
+            <many-to-one name="pkg" access="FIELD"
+                         target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
+                <join-column name="package_id"/>
+            </many-to-one>
+        </attributes>
+    </mapped-superclass>
 </entity-mappings>
