@@ -126,8 +126,8 @@ public class PackageRoute {
     @GetMapping("scans")
     SearchResultJson latestScans(@RequestParam(required = false) Instant start, @RequestParam(required = false) Instant end) {
         final var scans = service.findScans(
-                start != null ? start : Instant.MIN,
-                end != null ? end : Instant.MAX);
+                start != null ? start : Instant.EPOCH,
+                end != null ? end : Instant.now());
         return new SearchResultJson(scans.stream().map(ScanInfoJson::new));
     }
 

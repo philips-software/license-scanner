@@ -168,7 +168,7 @@ class PackageRouteTest {
         @Test
         void findsLatestScans() throws Exception {
             final var response = searchResult(packageInfoJson().put("licenses", new JSONArray().put(LICENSE)));
-            when(service.findScans(Instant.MIN, Instant.MAX)).thenReturn(List.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, List.of(LICENSE))));
+            when(service.findScans(eq(Instant.EPOCH), any(Instant.class))).thenReturn(List.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, List.of(LICENSE))));
 
             mockMvc.perform(get(SCANS_URL))
                     .andExpect(status().isOk())
