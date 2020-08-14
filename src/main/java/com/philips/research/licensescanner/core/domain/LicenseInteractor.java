@@ -56,9 +56,10 @@ public class LicenseInteractor implements LicenseService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void scanLicense(String origin, String name, String version, URI location) {
         Path path = null;
+        Package pkg = null;
         try {
             LOG.info("Scan license for {}:{} {} from {}", origin, name, version, location);
-            final var pkg = getOrCreatePackage(origin, name, version);
+            pkg = getOrCreatePackage(origin, name, version);
             path = downloader.download(location);
             //TODO Check hash after download
             final var copyright = detector.scan(path);
@@ -66,6 +67,9 @@ public class LicenseInteractor implements LicenseService {
             LOG.info("Detected license for {}:{} {} is '{}'", origin, name, version, copyright.getLicense());
         } catch (Exception e) {
             LOG.error("Scanning failed", e);
+            if (pkg != null) {
+                store.registerScanError(pkg, location, e.getMessage());
+            }
         } finally {
             deleteDirectory(path);
         }

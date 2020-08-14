@@ -1,5 +1,6 @@
 package com.philips.research.licensescanner.core.domain;
 
+import com.philips.research.licensescanner.core.BusinessException;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
@@ -95,6 +96,19 @@ class LicenseInteractorTest {
 
             verify(detector).scan(directory);
             verify(store).createScan(PACKAGE, LICENSE, LOCATION);
+            assertThat(directory.toFile()).doesNotExist();
+        }
+
+        @Test
+        void registersExceptionAsScanFailure() {
+            var message = "Test error";
+            when(downloader.download(LOCATION)).thenReturn(directory);
+            when(detector.scan(directory)).thenThrow(new BusinessException(message));
+
+            service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+
+            verify(store).registerScanError(PACKAGE, LOCATION, message);
+            verify(store, never()).createScan(PACKAGE, LICENSE, LOCATION);
             assertThat(directory.toFile()).doesNotExist();
         }
     }
