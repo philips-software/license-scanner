@@ -120,14 +120,15 @@ public class PackageRoute {
     /**
      * Lists all successful scans in the given period.
      *
-     * @param after  (Optional) start timestamp
-     * @param before (Optional) end timestamp: defaults to "now"
-     * @param limit  maximum number of entries
+     * @param start (Optional) start timestamp
+     * @param end   (Optional) end timestamp: defaults to "now"
      */
     @GetMapping("scans")
-    SearchResultJson latestScans(@RequestParam Instant after, @RequestParam Instant before, @RequestParam int limit) {
-        // TODO Implement me
-        return new SearchResultJson();
+    SearchResultJson latestScans(@RequestParam(required = false) Instant start, @RequestParam(required = false) Instant end) {
+        final var scans = service.findScans(
+                start != null ? start : Instant.MIN,
+                end != null ? end : Instant.MAX);
+        return new SearchResultJson(scans.stream().map(ScanInfoJson::new));
     }
 
     /**
@@ -135,10 +136,9 @@ public class PackageRoute {
      *
      * @param after  (Optional) start timestamp
      * @param before (Optional) end timestamp; defaults to "now"
-     * @param limit  maximum number of entries
      */
     @GetMapping("errors")
-    SearchResultJson failedPackages(@RequestParam Instant after, @RequestParam Instant before, @RequestParam int limit) {
+    SearchResultJson failedPackages(@RequestParam Instant after, @RequestParam Instant before) {
         // TODO Implement me
         return new SearchResultJson();
     }

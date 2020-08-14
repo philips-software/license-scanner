@@ -5,6 +5,7 @@ import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.ScanError;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,4 +77,12 @@ public interface PackageStore {
      * @return all scanning errors, sorted on descending timestamp
      */
     List<ScanError> scanErrors(Package pkg);
+
+    /**
+     * Finds all latest scans in a period.
+     *
+     * @param from
+     * @param until
+     */
+    List<Scan> findScans(Instant from, Instant until);
 }

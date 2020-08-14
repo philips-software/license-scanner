@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.URI;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,7 +62,7 @@ class PackageDatabaseTest {
     }
 
     @Test
-    void findsLatestValidScanResult() throws Exception {
+    void findsLatestValidScanResultForPackage() throws Exception {
         final var pkg = database.createPackage(ORIGIN, NAME, VERSION);
         database.createScan(pkg, "other", LOCATION);
         database.createScan(pkg, LICENSE, LOCATION);
@@ -74,7 +75,7 @@ class PackageDatabaseTest {
     }
 
     @Test
-    void empty_noLatestScanResult() {
+    void empty_noLatestScanResultForPackage() {
         final var decoy = database.createPackage(ORIGIN, "Decoy", VERSION);
         database.createScan(decoy, LICENSE, LOCATION);
         final var pkg = database.createPackage(ORIGIN, NAME, VERSION);
@@ -98,5 +99,25 @@ class PackageDatabaseTest {
         assertThat(errors.get(0).getPackage()).isEqualTo(pkg);
         assertThat(errors.get(0).getMessage()).isEqualTo(MESSAGE);
         assertThat(database.latestScan(pkg)).isEmpty();
+    }
+
+    @Test
+    void findsLatestScanResultsForPeriod() {
+        final var otherPkg = database.createPackage(ORIGIN, "Other", VERSION);
+        final var pkg = database.createPackage(ORIGIN, NAME, VERSION);
+        database.createScan(otherPkg, "other before", LOCATION);
+        database.createScan(pkg, "before", LOCATION);
+        final var from = Instant.now();
+        database.createScan(otherPkg, "other", LOCATION);
+        database.createScan(pkg, LICENSE, LOCATION);
+        final var until = Instant.now();
+        database.createScan(pkg, "after", LOCATION);
+        database.createScan(otherPkg, "other after", LOCATION);
+
+        final var scans = database.findScans(from, until);
+
+        assertThat(scans).hasSize(2);
+        assertThat(scans.get(0).getPackage()).isEqualTo(pkg);
+        assertThat(scans.get(0).getLicense()).contains(LICENSE);
     }
 }

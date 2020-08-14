@@ -40,6 +40,15 @@ public interface LicenseService {
     void scanLicense(String origin, String name, String version, URI vcsId);
 
     /**
+     * Lists all latest successful scan results for the indicated period.
+     *
+     * @param from
+     * @param until
+     * @return scan results
+     */
+    List<LicenseInfo> findScans(Instant from, Instant until);
+
+    /**
      * @return All current scanning errors.
      */
     Iterable<ErrorReport> scanErrors();

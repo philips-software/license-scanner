@@ -16,6 +16,7 @@ import org.springframework.util.FileSystemUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,6 +75,14 @@ public class LicenseInteractor implements LicenseService {
         } finally {
             deleteDirectory(path);
         }
+    }
+
+    @Override
+    public List<LicenseInfo> findScans(Instant from, Instant until) {
+        final var results = store.findScans(from, until);
+        return results.stream()
+                .map(this::toLicenseInfo)
+                .collect(Collectors.toList());
     }
 
     private Package getOrCreatePackage(String origin, String name, String version) {

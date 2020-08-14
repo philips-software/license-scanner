@@ -16,6 +16,8 @@ import org.springframework.util.FileSystemUtils;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +33,8 @@ class LicenseInteractorTest {
     private static final Package PACKAGE = new Package(ORIGIN, NAME, VERSION);
     private static final Scan SCAN = new Scan(PACKAGE, LICENSE, LOCATION);
     private static final Path WORK_DIR = Path.of("not", "for", "real");
+    private static final Instant UNTIL = Instant.now();
+    private static final Instant FROM = UNTIL.minus(Duration.ofDays(5));
 
     private final Downloader downloader = mock(Downloader.class);
     private final Detector detector = mock(Detector.class);
@@ -127,6 +131,22 @@ class LicenseInteractorTest {
             verify(store).registerScanError(PACKAGE, LOCATION, message);
             verify(store, never()).createScan(PACKAGE, LICENSE, LOCATION);
             assertThat(directory.toFile()).doesNotExist();
+        }
+    }
+
+    @Nested
+    class QueryScanResults {
+        @Test
+        void findsScansForPeriod() {
+            when(store.findScans(FROM, UNTIL)).thenReturn(List.of(new Scan(PACKAGE, LICENSE, LOCATION)));
+
+            final var result = service.findScans(FROM, UNTIL);
+
+            assertThat(result).hasSize(1);
+            final var pkg = result.get(0);
+            assertThat(pkg.name).isEqualTo(NAME);
+            assertThat(pkg.licenses).contains(LICENSE);
+            assertThat(pkg.location).isEqualTo(LOCATION);
         }
     }
 }

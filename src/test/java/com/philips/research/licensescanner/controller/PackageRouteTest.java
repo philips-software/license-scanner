@@ -18,6 +18,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +41,7 @@ class PackageRouteTest {
     private static final String LICENSE = "MIT OR Apache-2.0";
     private static final String BASE_URL = "/package";
     private static final String PACKAGE_URL = BASE_URL + "/{origin}/{pkg}/{version}";
+    private static final String SCANS_URL = BASE_URL + "/scans";
 
     @MockBean
     LicenseService service;
@@ -160,6 +163,28 @@ class PackageRouteTest {
                     .andExpect(content().json(response.toString()));
 
             verify(service).scanLicense(NAMESPACE, NAME, VERSION, LOCATION);
+        }
+
+        @Test
+        void findsLatestScans() throws Exception {
+            final var response = searchResult(packageInfoJson().put("licenses", new JSONArray().put(LICENSE)));
+            when(service.findScans(Instant.MIN, Instant.MAX)).thenReturn(List.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, List.of(LICENSE))));
+
+            mockMvc.perform(get(SCANS_URL))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(response.toString(), true));
+        }
+
+        @Test
+        void findsLatestScansInPeriod() throws Exception {
+            final var from = Instant.now();
+            final var until = from.plus(Duration.ofHours(3));
+            final var response = searchResult(packageInfoJson().put("licenses", new JSONArray().put(LICENSE)));
+            when(service.findScans(from, until)).thenReturn(List.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, List.of(LICENSE))));
+
+            mockMvc.perform(get(SCANS_URL + "?start={from}&end={until}", from, until))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(response.toString(), true));
         }
     }
 }

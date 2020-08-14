@@ -17,6 +17,12 @@ class ScanInfoJson {
     List<String> licenses;
     String error;
 
+    public ScanInfoJson(LicenseService.LicenseInfo info) {
+        this(info.namespace, info.name, info.version);
+        location = info.location;
+        licenses = info.licenses;
+    }
+
     public ScanInfoJson(LicenseService.PackageId pkg) {
         this(pkg.namespace, pkg.name, pkg.version);
     }
@@ -26,5 +32,4 @@ class ScanInfoJson {
         this.name = name;
         this.version = version;
     }
-
 }

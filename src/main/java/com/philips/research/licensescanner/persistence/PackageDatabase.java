@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,10 +40,8 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public List<Package> findPackages(String namespace, String name, String version) {
-        final var result = packageRepository.findTop50ByNamespaceLikeAndNameLikeAndVersionLikeOrderByNamespaceAscNameAscVersionAsc(
+        return packageRepository.findTop50ByNamespaceLikeAndNameLikeAndVersionLikeOrderByNamespaceAscNameAscVersionAsc(
                 wildcard(namespace), wildcard(name), wildcard(version));
-        //noinspection unchecked
-        return (List<Package>) (Object) result;
     }
 
     private String wildcard(String name) {
@@ -51,13 +50,13 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public Scan createScan(Package pkg, String license, URI location) {
-        final var entity = new ScanEntity((PackageEntity) pkg, license, location);
+        final var entity = new ScanEntity(Instant.now(), (PackageEntity) pkg, license, location);
         return scanRepository.save(entity);
     }
 
     @Override
     public Optional<Scan> latestScan(Package pkg) {
-        return scanRepository.findTopByPkgAndLicenseNotNullOrderByIdDesc((PackageEntity) pkg).map(scan -> scan);
+        return scanRepository.findTopByPkgAndLicenseNotNullOrderByIdDesc((PackageEntity) pkg);
     }
 
     @Override
@@ -69,6 +68,11 @@ public class PackageDatabase implements PackageStore {
     @Override
     public List<ScanError> scanErrors(Package pkg) {
         return errorRepository.findAllByPkgOrderByTimestampDesc(pkg);
+    }
+
+    @Override
+    public List<Scan> findScans(Instant from, Instant until) {
+        return new ArrayList<>(scanRepository.findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualAndLicenseNotNullOrderByTimestampDesc(from, until));
     }
 }
 
