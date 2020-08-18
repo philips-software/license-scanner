@@ -12,12 +12,11 @@ import java.time.Instant;
 @Entity
 @Table(name = "scans")
 class ScanEntity extends Scan {
+    @Column(name = "created")
+    private final Instant timestamp;
     @Id
     @GeneratedValue
     private Long id;
-
-    @Column(name = "created")
-    private final Instant timestamp;
 
     public ScanEntity() {
         this(null, null, null, null);

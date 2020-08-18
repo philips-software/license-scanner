@@ -5,7 +5,6 @@ import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.validation.annotation.Validated;
 
 import java.net.URI;
-import java.util.List;
 
 @Validated
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,13 +13,13 @@ class ScanInfoJson {
     final String name;
     final String version;
     URI location;
-    List<String> licenses;
+    String license;
     String error;
 
     public ScanInfoJson(LicenseService.LicenseInfo info) {
         this(info.namespace, info.name, info.version);
         location = info.location;
-        licenses = info.licenses;
+        license = info.license;
     }
 
     public ScanInfoJson(LicenseService.PackageId pkg) {

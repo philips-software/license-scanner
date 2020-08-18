@@ -89,7 +89,7 @@ class LicenseInteractorTest {
 
             @SuppressWarnings("OptionalGetWithoutIsPresent") final var info = service.licenseFor(ORIGIN, NAME, VERSION).get();
 
-            assertThat(info.licenses).contains(LICENSE);
+            assertThat(info.license).contains(LICENSE);
             assertThat(info.location).isEqualTo(LOCATION);
         }
     }
@@ -145,7 +145,7 @@ class LicenseInteractorTest {
             assertThat(result).hasSize(1);
             final var pkg = result.get(0);
             assertThat(pkg.name).isEqualTo(NAME);
-            assertThat(pkg.licenses).contains(LICENSE);
+            assertThat(pkg.license).contains(LICENSE);
             assertThat(pkg.location).isEqualTo(LOCATION);
         }
     }

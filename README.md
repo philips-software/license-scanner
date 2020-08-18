@@ -45,10 +45,12 @@ the `LICENSE_DIR` environment variable.
 (Checked items are under development.)
 
 Must-have
+- [ ] Add type to package identifier (or use Package URL instead).
+- [ ] Keep file and line information of scanned licenses in the database.
 - [ ] Manual curation of scanned licenses.
 - [ ] Tracking and manual resolution of failed scans.
 - [ ] Resolve detected non-SPDX licenses.
-- [ ] User interface for manual curation.
+- [ ] User interface for monitoring, management, and manual curation.
 - [ ] Production-grade database (e.g. Postgres).
 - [ ] Authentication of clients.
 

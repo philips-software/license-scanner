@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,7 +71,7 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public List<Scan> findScans(Instant from, Instant until) {
-        return new ArrayList<>(scanRepository.findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualAndLicenseNotNullOrderByTimestampDesc(from, until));
+        return scanRepository.findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualAndLicenseNotNullOrderByTimestampDesc(from, until);
     }
 }
 

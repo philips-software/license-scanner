@@ -73,11 +73,11 @@ public interface LicenseService {
      */
     class LicenseInfo extends PackageId {
         public final URI location;
-        public final List<String> licenses;
+        public final String license;
 
-        public LicenseInfo(String namespace, String name, String version, URI location, List<String> licenses) {
+        public LicenseInfo(String namespace, String name, String version, URI location, String license) {
             super(namespace, name, version);
-            this.licenses = licenses;
+            this.license = license;
             this.location = location;
         }
     }

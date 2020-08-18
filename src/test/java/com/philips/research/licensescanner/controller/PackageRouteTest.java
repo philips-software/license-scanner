@@ -78,7 +78,8 @@ class PackageRouteTest {
         @Test
         void findsPackageByAllFields() throws Exception {
             final var response = searchResult(packageJson());
-            when(service.findPackages(NAMESPACE, NAME, VERSION)).thenReturn(List.of(new LicenseService.PackageId(NAMESPACE, NAME, VERSION)));
+            when(service.findPackages(NAMESPACE, NAME, VERSION))
+                    .thenReturn(List.of(new LicenseService.PackageId(NAMESPACE, NAME, VERSION)));
 
             mockMvc.perform(get(BASE_URL + "?namespace={ns}&name={name}&version={version}", NAMESPACE, NAME, VERSION))
                     .andExpect(status().isOk())
@@ -88,7 +89,8 @@ class PackageRouteTest {
         @Test
         void findsPackagesByOptionalFields() throws Exception {
             final var response = searchResult(packageJson());
-            when(service.findPackages("", "", "")).thenReturn(List.of(new LicenseService.PackageId(NAMESPACE, NAME, VERSION)));
+            when(service.findPackages("", "", ""))
+                    .thenReturn(List.of(new LicenseService.PackageId(NAMESPACE, NAME, VERSION)));
 
             mockMvc.perform(get(BASE_URL, NAMESPACE, NAME, VERSION))
                     .andExpect(status().isOk())
@@ -100,9 +102,9 @@ class PackageRouteTest {
     class ScanResults {
         @Test
         void getsExistingScanResult() throws Exception {
-            final var response = packageInfoJson().put("licenses", new JSONArray().put(LICENSE));
+            final var response = packageInfoJson().put("license", LICENSE);
             when(service.licenseFor(NAMESPACE, NAME, VERSION))
-                    .thenReturn(Optional.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, List.of(LICENSE))));
+                    .thenReturn(Optional.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, LICENSE)));
 
             mockMvc.perform(get(PACKAGE_URL, NAMESPACE, NAME, VERSION))
                     .andExpect(status().isOk())
@@ -122,9 +124,9 @@ class PackageRouteTest {
         void returnsEarlierScanResult_scannedBefore() throws Exception {
             final var body = new JSONObject().put("location", LOCATION);
             final var response = packageInfoJson()
-                    .put("licenses", new JSONArray().put(LICENSE));
+                    .put("license", LICENSE);
             when(service.licenseFor(NAMESPACE, NAME, VERSION))
-                    .thenReturn(Optional.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, List.of(LICENSE))));
+                    .thenReturn(Optional.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, LICENSE)));
 
             mockMvc.perform(post(PACKAGE_URL, NAMESPACE, NAME, VERSION)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -154,7 +156,7 @@ class PackageRouteTest {
             final var body = new JSONObject().put("location", LOCATION);
             final var response = packageInfoJson();
             when(service.licenseFor(NAMESPACE, NAME, VERSION))
-                    .thenReturn(Optional.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, List.of(LICENSE))));
+                    .thenReturn(Optional.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, LICENSE)));
 
             mockMvc.perform(post(PACKAGE_URL + "?force=yes", NAMESPACE, NAME, VERSION)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -167,8 +169,9 @@ class PackageRouteTest {
 
         @Test
         void findsLatestScans() throws Exception {
-            final var response = searchResult(packageInfoJson().put("licenses", new JSONArray().put(LICENSE)));
-            when(service.findScans(eq(Instant.EPOCH), any(Instant.class))).thenReturn(List.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, List.of(LICENSE))));
+            final var response = searchResult(packageInfoJson().put("license", LICENSE));
+            when(service.findScans(eq(Instant.EPOCH), any(Instant.class)))
+                    .thenReturn(List.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, LICENSE)));
 
             mockMvc.perform(get(SCANS_URL))
                     .andExpect(status().isOk())
@@ -179,8 +182,9 @@ class PackageRouteTest {
         void findsLatestScansInPeriod() throws Exception {
             final var from = Instant.now();
             final var until = from.plus(Duration.ofHours(3));
-            final var response = searchResult(packageInfoJson().put("licenses", new JSONArray().put(LICENSE)));
-            when(service.findScans(from, until)).thenReturn(List.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, List.of(LICENSE))));
+            final var response = searchResult(packageInfoJson().put("license", LICENSE));
+            when(service.findScans(from, until))
+                    .thenReturn(List.of(new LicenseService.LicenseInfo(NAMESPACE, NAME, VERSION, LOCATION, LICENSE)));
 
             mockMvc.perform(get(SCANS_URL + "?start={from}&end={until}", from, until))
                     .andExpect(status().isOk())

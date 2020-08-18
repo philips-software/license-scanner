@@ -113,7 +113,7 @@ public class PackageRoute {
 
     private ScanInfoJson withLicenseInfo(ScanInfoJson response, LicenseService.LicenseInfo lic) {
         response.location = lic.location;
-        response.licenses = lic.licenses;
+        response.license = lic.license;
         return response;
     }
 

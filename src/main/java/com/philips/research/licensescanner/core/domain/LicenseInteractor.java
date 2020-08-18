@@ -110,10 +110,10 @@ public class LicenseInteractor implements LicenseService {
     }
 
     private LicenseInfo toLicenseInfo(Scan scan) {
-        final var licenses = scan.getLicense().map(List::of).orElse(List.of());
+        final var license = scan.getLicense().orElse(null);
         final var location = scan.getLocation().orElse(null);
         final var pkg = scan.getPackage();
-        return new LicenseInfo(pkg.getNamespace(), pkg.getName(), pkg.getVersion(), location, licenses);
+        return new LicenseInfo(pkg.getNamespace(), pkg.getName(), pkg.getVersion(), location, license);
     }
 
 }
