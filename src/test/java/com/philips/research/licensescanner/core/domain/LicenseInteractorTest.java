@@ -32,15 +32,15 @@ class LicenseInteractorTest {
     private static final URI LOCATION = URI.create("git+git://example.com");
     private static final Package PACKAGE = new Package(ORIGIN, NAME, VERSION);
     private static final Scan SCAN = new Scan(PACKAGE, LICENSE, LOCATION);
-    private static final Path WORK_DIR = Path.of("not", "for", "real");
     private static final Instant UNTIL = Instant.now();
     private static final Instant FROM = UNTIL.minus(Duration.ofDays(5));
+    private static final int THRESHOLD = 70;
 
     private final Downloader downloader = mock(Downloader.class);
     private final Detector detector = mock(Detector.class);
     private final PackageStore store = mock(PackageStore.class);
 
-    private final LicenseService service = new LicenseInteractor(store, downloader, detector);
+    private final LicenseService service = new LicenseInteractor(store, downloader, detector, THRESHOLD);
 
     @BeforeEach
     void beforeEach() {
@@ -109,13 +109,13 @@ class LicenseInteractorTest {
         }
 
         @Test
-        void downloadsAndScansPackage() throws Exception {
+        void downloadsAndScansPackage() {
             when(downloader.download(LOCATION)).thenReturn(directory);
-            when(detector.scan(directory)).thenReturn(new Copyright(License.of(LICENSE)));
+            when(detector.scan(directory, THRESHOLD)).thenReturn(new Copyright(License.of(LICENSE)));
 
             service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 
-            verify(detector).scan(directory);
+            verify(detector).scan(directory, THRESHOLD);
             verify(store).createScan(PACKAGE, LICENSE, LOCATION);
             assertThat(directory.toFile()).doesNotExist();
         }
@@ -124,7 +124,7 @@ class LicenseInteractorTest {
         void registersExceptionAsScanFailure() {
             var message = "Test error";
             when(downloader.download(LOCATION)).thenReturn(directory);
-            when(detector.scan(directory)).thenThrow(new BusinessException(message));
+            when(detector.scan(directory, THRESHOLD)).thenThrow(new BusinessException(message));
 
             service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 

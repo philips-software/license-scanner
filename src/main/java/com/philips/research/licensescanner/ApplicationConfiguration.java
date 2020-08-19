@@ -17,6 +17,8 @@ public class ApplicationConfiguration {
     @NotNull
     private Path tempDir;
 
+    private int thresholdPercent = 50;
+
     /**
      * @return The common working directory.
      */
@@ -32,5 +34,21 @@ public class ApplicationConfiguration {
             throw new ValidationException(directory + " is not a valid working directory");
         }
         this.tempDir = directory;
+    }
+
+    /**
+      * @return license probability threshold as a percentage.
+     */
+    public int getThresholdPercent() {
+        return thresholdPercent;
+    }
+
+    /**
+     * Sets license probability threshold.
+     * @param thresholdPercent percentage certainty about the detected license
+     */
+    public ApplicationConfiguration setThresholdPercent(int thresholdPercent) {
+        this.thresholdPercent = Math.min(Math.max(0, thresholdPercent), 100);
+        return this;
     }
 }

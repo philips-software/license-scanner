@@ -23,15 +23,15 @@ public class ScanCodeDetector implements Detector {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
-    public Copyright scan(Path directory) {
-
+    public Copyright scan(Path directory, int scoreThreshold) {
         new ShellCommand("extractcode").setDirectory(directory.toFile())
                 .execute("--verbose", ".");
         new ShellCommand("scancode")
                 .setDirectory(directory.toFile())
                 .setTimeout(MAX_DURATION)
                 .execute("--license", "-n2", "--verbose", "--timeout=" + MAX_DURATION.toSeconds(), "--only-findings",
-                        "--strip-root", "--ignore", "test*", "--ignore", RESULT_FILE, "--json-pp", RESULT_FILE, ".");
+                        "--license-score", scoreThreshold, "--strip-root", "--ignore", "test*", "--ignore", RESULT_FILE,
+                        "--json-pp", RESULT_FILE, ".");
         try {
             final var scanResult = MAPPER.readValue(directory.resolve(RESULT_FILE).toFile(), ScanCodeJson.class);
 

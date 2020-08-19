@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ScanCodeDetectorTest {
+    private static final int THRESHOLD = 50;
+
     private final Detector detector = new ScanCodeDetector();
 
     private Path tempDir;
@@ -31,7 +33,7 @@ class ScanCodeDetectorTest {
 
     @Test
     void decompressesAndScansDirectory() {
-        final var result = detector.scan(tempDir);
+        final var result = detector.scan(tempDir, THRESHOLD);
 
         assertThat(result.getLicense().isDefined()).isTrue();
     }

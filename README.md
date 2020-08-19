@@ -31,15 +31,23 @@ In case of dual licensing, it is left to the client to choose the appropriate
 license.
 
 ## Configuration
+### ScanCode Toolkit installation
 ScanCode Toolkit requires to be invoked on Linux and OSX using an absolute
 installation path (see [the ScanCode Toolkit documentation](https://scancode-toolkit.readthedocs.io/en/latest/cli-reference/synopsis.html)).
 When not installed using pip or running on Windows, make sure `extractcode` and 
 `scancode` can be accessed through a script, without providing the installation 
 path.
 
+### Working directory for temporary files
 Package source code gets downloaded to a temporary directory for scanning.
 The base directory is the `TMPDIR` directory, and can be changed by setting 
 the `LICENSE_DIR` environment variable.
+
+### License detection threshold
+The heuristic processes detecting licenses from source code use a default 
+certainty threshold of 50 (percent) to accept a detected license. This threshold
+can be overridden using the `LICENSE_THRESHOLD` environment variable to set a 
+value between 0 and 100.
 
 ## TO DO / Limitations
 (Checked items are under development.)
@@ -49,7 +57,6 @@ Must-have
 - [ ] Keep file and line information of scanned licenses in the database.
 - [ ] Manual curation of scanned licenses.
 - [ ] Tracking and manual resolution of failed scans.
-- [ ] Resolve detected non-SPDX licenses.
 - [ ] User interface for monitoring, management, and manual curation.
 - [ ] Production-grade database (e.g. Postgres).
 - [ ] Authentication of clients.

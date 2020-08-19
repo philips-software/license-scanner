@@ -7,6 +7,7 @@ import com.philips.research.licensescanner.core.domain.license.Detector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -32,12 +33,15 @@ public class LicenseInteractor implements LicenseService {
     private final PackageStore store;
     private final Downloader downloader;
     private final Detector detector;
+    private final int licenseThreshold;
 
     @Autowired
-    public LicenseInteractor(PackageStore store, Downloader downloader, Detector detector) {
+    public LicenseInteractor(PackageStore store, Downloader downloader, Detector detector,
+                             @Value("${licenses.threshold-percent}") int licenseThreshold) {
         this.store = store;
         this.downloader = downloader;
         this.detector = detector;
+        this.licenseThreshold = licenseThreshold;
     }
 
     @Override
@@ -64,7 +68,7 @@ public class LicenseInteractor implements LicenseService {
             pkg = getOrCreatePackage(origin, name, version);
             path = downloader.download(location);
             //TODO Check hash after download
-            final var copyright = detector.scan(path);
+            final var copyright = detector.scan(path, licenseThreshold);
             store.createScan(pkg, copyright.getLicense().toString(), location);
             LOG.info("Detected license for {}:{} {} is '{}'", origin, name, version, copyright.getLicense());
         } catch (Exception e) {

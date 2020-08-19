@@ -14,6 +14,7 @@ class ApplicationConfigurationTest {
     @Test
     void configurationIsInitialized() {
         assertThat(config.getTempDir().toFile().isDirectory()).isTrue();
+        assertThat(config.getThresholdPercent()).isNotZero();
     }
 }
 
