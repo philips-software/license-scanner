@@ -31,14 +31,13 @@ class ScanCodeJson {
 @SuppressWarnings("unused")
 @JsonIgnoreProperties(ignoreUnknown = true)
 class FileJson {
+    private final Map<String, LicenseJson> licenseDictionary = new HashMap<>();
     @JsonProperty("path")
     String path = "";
     @JsonProperty("licenses")
     List<LicenseJson> licenses;
     @JsonProperty("license_expressions")
     List<String> expressions;
-
-    private final Map<String, LicenseJson> licenseDictionary = new HashMap<>();
 
     void addLicenseExpressionsTo(Scan scan) {
         buildDictionary();

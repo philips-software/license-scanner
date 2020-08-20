@@ -14,7 +14,7 @@ public class Scan {
     private final URI location;
     private final Map<License, Detection> detections = new HashMap<>();
 
-    private License license = License.NONE;
+    public License license = License.NONE;
     private String error;
 
     public Scan(Package pkg, URI location) {

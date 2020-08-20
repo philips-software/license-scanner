@@ -112,6 +112,15 @@ class PackageRouteTest {
         }
 
         @Test
+        void getsExistingScanResultForEmptyNamespace() throws Exception {
+            when(service.licenseFor("", NAME, VERSION))
+                    .thenReturn(Optional.of(new LicenseService.LicenseInfo("", NAME, VERSION, LOCATION, LICENSE)));
+
+            mockMvc.perform(get(PACKAGE_URL, "", NAME, VERSION))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
         void notFound_getUnknownPackage() throws Exception {
             when(service.licenseFor(NAMESPACE, NAME, VERSION))
                     .thenReturn(Optional.empty());
@@ -135,6 +144,18 @@ class PackageRouteTest {
                     .andExpect(content().json(response.toString(), true));
 
             verify(service, never()).scanLicense(NAMESPACE, NAME, VERSION, LOCATION);
+        }
+
+        @Test
+        void scansPackagesWithoutNamespace() throws Exception {
+            final var body = new JSONObject().put("location", LOCATION);
+
+            mockMvc.perform(post(PACKAGE_URL, "", NAME, VERSION)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body.toString()))
+                    .andExpect(status().isOk());
+
+            verify(service).scanLicense("", NAME, VERSION, LOCATION);
         }
 
         @Test

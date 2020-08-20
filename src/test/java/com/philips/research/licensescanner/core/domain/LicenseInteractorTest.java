@@ -113,6 +113,16 @@ class LicenseInteractorTest {
         }
 
         @Test
+        void skipsIfAlreadyScanned() {
+            when(store.latestScan(PACKAGE)).thenReturn(Optional.of(scan));
+
+            service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+
+            verify(store, never()).createScan(PACKAGE, LOCATION);
+            verify(detector, never()).scan(any(Path.class), any(Scan.class), anyInt());
+        }
+
+        @Test
         void downloadsAndScansPackage() {
             when(downloader.download(LOCATION)).thenReturn(directory);
 

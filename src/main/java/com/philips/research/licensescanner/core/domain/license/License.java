@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-abstract public class License {
+public abstract class License {
     @SuppressWarnings("StaticInitializerReferencesSubClass")
     public static final License NONE = new NoLicense();
 

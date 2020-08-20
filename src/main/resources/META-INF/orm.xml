@@ -1,27 +1,14 @@
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" version="2.0">
     <mapped-superclass class="com.philips.research.licensescanner.core.domain.Package"/>
-    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Detection">
-        <attributes>
-            <basic name="license">
-                <lob/>
-            </basic>
-            <basic name="filePath">
-                <lob/>
-            </basic>
-            <basic name="score">
-                <column column-definition="SMALLINT"/>
-            </basic>
-        </attributes>
-    </mapped-superclass>
     <mapped-superclass class="com.philips.research.licensescanner.core.domain.Scan">
         <attributes>
-            <basic name="license">
+            <basic name="license" access="FIELD" optional="false">
                 <lob/>
             </basic>
-            <basic name="location">
+            <basic name="location" access="FIELD">
                 <lob/>
             </basic>
-            <basic name="error">
+            <basic name="error" access="FIELD">
                 <lob/>
             </basic>
             <many-to-one name="pkg" access="FIELD"
@@ -33,6 +20,19 @@
                 <map-key name="license"/>
                 <join-column name="scan_id"/>
             </one-to-many>
+        </attributes>
+    </mapped-superclass>
+    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Detection">
+        <attributes>
+            <basic name="license">
+                <lob/>
+            </basic>
+            <basic name="filePath">
+                <lob/>
+            </basic>
+            <basic name="score">
+                <column column-definition="SMALLINT"/>
+            </basic>
         </attributes>
     </mapped-superclass>
 </entity-mappings>

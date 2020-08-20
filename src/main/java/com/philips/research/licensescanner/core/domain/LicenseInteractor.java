@@ -66,18 +66,22 @@ public class LicenseInteractor implements LicenseService {
         try {
             LOG.info("Scan license for {}:{} {} from {}", origin, name, version, location);
             final var pkg = getOrCreatePackage(origin, name, version);
-            path = downloader.download(location);
-            //TODO Check hash after download
-            scan = store.createScan(pkg, location);
-            detector.scan(path, scan, licenseThreshold);
-            LOG.info("Detected license for {}:{} {} is '{}'", origin, name, version, scan.getLicense());
+            if (store.latestScan(pkg).isEmpty()) {
+                path = downloader.download(location);
+                //TODO Check hash after download
+                scan = store.createScan(pkg, location);
+                detector.scan(path, scan, licenseThreshold);
+                LOG.info("Detected license for {}:{} {} is '{}'", origin, name, version, scan.getLicense());
+            }
         } catch (Exception e) {
             LOG.error("Scanning failed", e);
             if (scan != null) {
                 scan.setError(e.getMessage());
             }
         } finally {
-            deleteDirectory(path);
+            if (path != null) {
+                deleteDirectory(path);
+            }
         }
     }
 

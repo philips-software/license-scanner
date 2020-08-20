@@ -1,6 +1,7 @@
 package com.philips.research.licensescanner.persistence;
 
 import com.philips.research.licensescanner.core.domain.Package;
+import com.philips.research.licensescanner.core.domain.license.License;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.io.File;
 import java.net.URI;
 import java.time.Instant;
 
@@ -22,6 +24,11 @@ class PackageDatabaseTest {
     private static final String NAME = "Name";
     private static final String VERSION = "Version";
     private static final URI LOCATION = URI.create("git+http://example.com");
+    private static final License LICENSE = License.of("License");
+    private static final int SCORE = 42;
+    private static final int START_LINE = 12;
+    private static final int END_LINE = 15;
+    private static final File FILE = new File("test.txt");
 
     @Autowired
     PackageDatabase database;
@@ -60,8 +67,9 @@ class PackageDatabaseTest {
     }
 
     @Test
-    void findsLatestValidScanResultForPackage() {
-        database.createScan(pkg, LOCATION);
+    void findsLatestNonErrorScanResultForPackage() {
+        final var scan = database.createScan(pkg, LOCATION).addDetection(LICENSE, SCORE, FILE, START_LINE, END_LINE);
+        scanRepository.save((ScanEntity) scan);
         final var error = database.createScan(pkg, null).setError("Testing");
         scanRepository.save((ScanEntity) error);
 
@@ -70,6 +78,19 @@ class PackageDatabaseTest {
 
         assertThat(latest.getPackage()).isEqualTo(pkg);
         assertThat(latest.getLocation()).contains(LOCATION);
+        assertThat(latest.getLicense()).isEqualTo(LICENSE);
+    }
+
+    @Test
+    void findsLatestScanError() {
+        final var scan = database.createScan(pkg, null).addDetection(LICENSE, SCORE, FILE, START_LINE, END_LINE);
+        scan.setError("Boeh!");
+        scanRepository.save((ScanEntity) scan);
+
+        final var errors = database.scanErrors(pkg);
+
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getError()).isNotNull();
     }
 
     @Test

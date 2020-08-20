@@ -28,8 +28,11 @@ public class PackageRoute {
      * @param version
      * @return scan result
      */
-    @GetMapping("{namespace}/{name}/{version}")
-    ScanInfoJson getPackage(@PathVariable String namespace, @PathVariable String name, @PathVariable String version) {
+    @GetMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
+    ScanInfoJson getPackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable String version) {
+        if (namespace == null) {
+            namespace = "";
+        }
         final var license = service.licenseFor(namespace, name, version)
                 .orElseThrow(() -> new ResourceNotFoundException("package"));
 
@@ -65,10 +68,13 @@ public class PackageRoute {
      * @param force     forces re-scanning despite an existing scan result
      * @return scan result
      */
-    @PostMapping("{namespace}/{name}/{version}")
-    ScanInfoJson scanPackage(@PathVariable String namespace, @PathVariable String name, @PathVariable(required = false) String version,
+    @PostMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
+    ScanInfoJson scanPackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable(required = false) String version,
                              @Valid @RequestBody ScanRequestJson body,
                              @RequestParam(name = "force", required = false) boolean force) {
+        if (namespace == null) {
+            namespace = "";
+        }
         final var response = new ScanInfoJson(namespace, name, version);
 
         if (!force) {
@@ -94,8 +100,8 @@ public class PackageRoute {
      * @param version
      * @param body      Updated scan result
      */
-    @PutMapping("{namespace}/{name}/{version}")
-    void updatePackage(@PathVariable String namespace, @PathVariable String name, @PathVariable String version, @Valid @RequestBody ScanInfoJson body) {
+    @PutMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
+    void updatePackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable String version, @Valid @RequestBody ScanInfoJson body) {
         //TODO Manually override scan result
     }
 
@@ -106,8 +112,8 @@ public class PackageRoute {
      * @param name
      * @param version   (optional) version
      */
-    @DeleteMapping("{namespace}/{name}/{version}")
-    void deletePackage(@PathVariable String namespace, @PathVariable String name, @PathVariable(required = false) String version) {
+    @DeleteMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
+    void deletePackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable(required = false) String version) {
         //TODO Manually remove scan results
     }
 
@@ -150,7 +156,7 @@ public class PackageRoute {
      * @param name
      * @param version
      */
-    @GetMapping("{namespace}/{name}/{version}/errors")
+    @GetMapping({"{name}/{version}/errors", "{namespace}/{name}/{version}/errors"})
     SearchResultJson findPackageScanErrors(@PathVariable String namespace, @PathVariable String name, @PathVariable String version) {
         // TODO Implement me
         return new SearchResultJson();

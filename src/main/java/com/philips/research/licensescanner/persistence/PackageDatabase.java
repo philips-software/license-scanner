@@ -55,7 +55,7 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public Optional<Scan> latestScan(Package pkg) {
-        return scanRepository.findTopByPkgAndErrorIsNullOrderByIdDesc((PackageEntity) pkg);
+        return scanRepository.findTopByPkgAndErrorIsNullOrderByIdDesc((PackageEntity) pkg).map(scan -> scan);
     }
 
     @Override
@@ -65,12 +65,19 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public List<Scan> scanErrors(Package pkg) {
-        return scanRepository.findAllByPkgAndErrorIsNotNullOrderByTimestampDesc((PackageEntity) pkg);
+        var list = scanRepository.findAllByPkgAndErrorIsNotNullOrderByTimestampDesc((PackageEntity) pkg);
+        return toScans(list);
     }
 
     @Override
     public List<Scan> findScans(Instant from, Instant until) {
-        return scanRepository.findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualAndLicenseNotNullOrderByTimestampDesc(from, until);
+        var list = scanRepository.findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualAndLicenseNotNullOrderByTimestampDesc(from, until);
+        return toScans(list);
+    }
+
+    private List<Scan> toScans(List<ScanEntity> list) {
+        //noinspection unchecked
+        return (List<Scan>) (Object) list;
     }
 }
 
