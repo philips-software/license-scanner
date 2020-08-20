@@ -2,16 +2,14 @@ package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.license.License;
 import com.philips.research.licensescanner.core.domain.license.LicenseParser;
-import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * ScanCode Toolkit JSON result file mapping.
@@ -22,20 +20,11 @@ class ScanCodeJson {
     @JsonProperty("files")
     List<FileJson> files;
 
-    ScanCodeJson() {
-    }
-
-    ScanCodeJson(List<FileJson> files) {
-        this.files = files;
-    }
-
     /**
-     * @return license at are at least 50% certain.
+     * Adds all (mapped) license expressions from each file to the scan.
      */
-    License getLicense() {
-        return files.stream()
-                .flatMap(FileJson::getLicenses)
-                .reduce(License.NONE, License::and);
+    public void addScanResultsTo(Scan scan) {
+        files.forEach(f -> f.addLicenseExpressionsTo(scan));
     }
 }
 
@@ -43,35 +32,81 @@ class ScanCodeJson {
 @JsonIgnoreProperties(ignoreUnknown = true)
 class FileJson {
     @JsonProperty("path")
-    String path;
+    String path = "";
     @JsonProperty("licenses")
     List<LicenseJson> licenses;
     @JsonProperty("license_expressions")
     List<String> expressions;
 
-    FileJson() {
+    private final Map<String, LicenseJson> licenseDictionary = new HashMap<>();
+
+    void addLicenseExpressionsTo(Scan scan) {
+        buildDictionary();
+
+        expressions.forEach(exp -> {
+            final var scanner = new ExpressionScanner();
+            scanner.scan(exp);
+
+            scan.addDetection(scanner.license, scanner.score, new File(path), scanner.startLine, scanner.endLine);
+        });
     }
 
-    FileJson(List<LicenseJson> licenses, String... expressions) {
-        this.licenses = licenses;
-        this.expressions = List.of(expressions);
+    private void buildDictionary() {
+        for (var license : licenses) {
+            final var existing = licenseDictionary.get(license.key);
+            if (existing == null || license.score > existing.score) {
+                licenseDictionary.put(license.key, license);
+            }
+        }
     }
 
-    Stream<License> getLicenses() {
-        final Map<String, String> dictionary = new HashMap<>();
-        licenses.forEach(lic -> dictionary.put(lic.key, lic.getSpdxIdentifier()));
+    /**
+     * Extracts and collects license details from a key-based expression.
+     */
+    private class ExpressionScanner {
+        private int startLine = Integer.MAX_VALUE;
+        private int endLine = 0;
+        private int score = 100;
+        private License license;
 
-        return expressions.stream()
-                .map(str -> mapToSpdx(str, dictionary))
-                .map(LicenseParser::parse);
-    }
+        void scan(String expression) {
+            license = LicenseParser.parse(toSpdx(expression));
+        }
 
-    private String mapToSpdx(String str, Map<String, String> dictionary) {
-        var parts = str.split("\\s+");
-        var spdx = Arrays.stream(parts)
-                .map(key -> dictionary.getOrDefault(key, key))
-                .collect(Collectors.joining(" "));
-        return (parts.length <= 1) ? spdx : "(" + spdx + ")";
+        private String toSpdx(String expression) {
+            final var converted = new StringBuilder();
+            var key = "";
+            for (var ch : expression.toCharArray()) {
+                switch (ch) {
+                    case ' ':
+                    case '(':
+                    case ')':
+                        final var spdx = handleKey(key);
+                        converted.append(spdx);
+                        converted.append(ch);
+                        key = "";
+                        break;
+                    default:
+                        key += ch;
+                        break;
+                }
+            }
+            converted.append(handleKey(key));
+
+            return converted.toString();
+        }
+
+        String handleKey(String key) {
+            final var lic = licenseDictionary.get(key);
+            if (lic == null) {
+                return key;
+            }
+
+            startLine = Math.min(startLine, lic.startLine);
+            endLine = Math.max(endLine, lic.endLine);
+            score = Math.min(score, (int) lic.score);
+            return lic.getSpdxIdentifier();
+        }
     }
 }
 
@@ -80,19 +115,17 @@ class FileJson {
 class LicenseJson {
     @JsonProperty("key")
     String key;
+    @JsonProperty("score")
+    double score;
+    @JsonProperty("start_line")
+    int startLine;
+    @JsonProperty("end_line")
+    int endLine;
     @JsonProperty("spdx_license_key")
     String spdx;
 
-    LicenseJson() {
-    }
-
-    LicenseJson(String key, String spdx) {
-        this.key = key;
-        this.spdx = spdx;
-    }
-
-    public String getSpdxIdentifier() {
-        return StringUtils.isEmpty(spdx) ? "Unknown" : spdx;
+    String getSpdxIdentifier() {
+        return (spdx != null) ? spdx : key;
     }
 }
 

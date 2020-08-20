@@ -4,7 +4,6 @@ import com.philips.research.licensescanner.core.BusinessException;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
-import com.philips.research.licensescanner.core.domain.license.Copyright;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;
 import org.junit.jupiter.api.AfterEach;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.FileSystemUtils;
 
+import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +31,8 @@ class LicenseInteractorTest {
     private static final String LICENSE = "License";
     private static final URI LOCATION = URI.create("git+git://example.com");
     private static final Package PACKAGE = new Package(ORIGIN, NAME, VERSION);
-    private static final Scan SCAN = new Scan(PACKAGE, LICENSE, LOCATION);
+    private static final Scan SCAN = new Scan(PACKAGE, LOCATION)
+            .addDetection(License.of(LICENSE), 73, new File(""), 1, 2);
     private static final Instant UNTIL = Instant.now();
     private static final Instant FROM = UNTIL.minus(Duration.ofDays(5));
     private static final int THRESHOLD = 70;
@@ -96,11 +97,14 @@ class LicenseInteractorTest {
 
     @Nested
     class ScanPackage {
+        private final Scan scan = new Scan(PACKAGE, LOCATION);
+
         Path directory;
 
         @BeforeEach
         void beforeEach() throws Exception {
             directory = Files.createTempDirectory("test");
+            when(store.createScan(PACKAGE, LOCATION)).thenReturn(scan);
         }
 
         @AfterEach
@@ -111,25 +115,22 @@ class LicenseInteractorTest {
         @Test
         void downloadsAndScansPackage() {
             when(downloader.download(LOCATION)).thenReturn(directory);
-            when(detector.scan(directory, THRESHOLD)).thenReturn(new Copyright(License.of(LICENSE)));
 
             service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 
-            verify(detector).scan(directory, THRESHOLD);
-            verify(store).createScan(PACKAGE, LICENSE, LOCATION);
+            verify(detector).scan(directory, scan, THRESHOLD);
             assertThat(directory.toFile()).doesNotExist();
         }
 
         @Test
         void registersExceptionAsScanFailure() {
-            var message = "Test error";
+            final var message = "Test error";
             when(downloader.download(LOCATION)).thenReturn(directory);
-            when(detector.scan(directory, THRESHOLD)).thenThrow(new BusinessException(message));
+            doThrow(new BusinessException(message)).when(detector).scan(directory, scan, THRESHOLD);
 
             service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 
-            verify(store).registerScanError(PACKAGE, LOCATION, message);
-            verify(store, never()).createScan(PACKAGE, LICENSE, LOCATION);
+            assertThat(scan.getError()).contains(message);
             assertThat(directory.toFile()).doesNotExist();
         }
     }
@@ -138,7 +139,8 @@ class LicenseInteractorTest {
     class QueryScanResults {
         @Test
         void findsScansForPeriod() {
-            when(store.findScans(FROM, UNTIL)).thenReturn(List.of(new Scan(PACKAGE, LICENSE, LOCATION)));
+            when(store.findScans(FROM, UNTIL)).thenReturn(List.of(new Scan(PACKAGE, LOCATION)
+                    .addDetection(License.of(LICENSE), 100, null, 1, 2)));
 
             final var result = service.findScans(FROM, UNTIL);
 

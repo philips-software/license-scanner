@@ -62,19 +62,19 @@ public class LicenseInteractor implements LicenseService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void scanLicense(String origin, String name, String version, URI location) {
         Path path = null;
-        Package pkg = null;
+        Scan scan = null;
         try {
             LOG.info("Scan license for {}:{} {} from {}", origin, name, version, location);
-            pkg = getOrCreatePackage(origin, name, version);
+            final var pkg = getOrCreatePackage(origin, name, version);
             path = downloader.download(location);
             //TODO Check hash after download
-            final var copyright = detector.scan(path, licenseThreshold);
-            store.createScan(pkg, copyright.getLicense().toString(), location);
-            LOG.info("Detected license for {}:{} {} is '{}'", origin, name, version, copyright.getLicense());
+            scan = store.createScan(pkg, location);
+            detector.scan(path, scan, licenseThreshold);
+            LOG.info("Detected license for {}:{} {} is '{}'", origin, name, version, scan.getLicense());
         } catch (Exception e) {
             LOG.error("Scanning failed", e);
-            if (pkg != null) {
-                store.registerScanError(pkg, location, e.getMessage());
+            if (scan != null) {
+                scan.setError(e.getMessage());
             }
         } finally {
             deleteDirectory(path);
@@ -114,10 +114,10 @@ public class LicenseInteractor implements LicenseService {
     }
 
     private LicenseInfo toLicenseInfo(Scan scan) {
-        final var license = scan.getLicense().orElse(null);
+        final var license = scan.getLicense();
         final var location = scan.getLocation().orElse(null);
         final var pkg = scan.getPackage();
-        return new LicenseInfo(pkg.getNamespace(), pkg.getName(), pkg.getVersion(), location, license);
+        return new LicenseInfo(pkg.getNamespace(), pkg.getName(), pkg.getVersion(), location, license.toString());
     }
 
 }

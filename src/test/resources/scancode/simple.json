@@ -1,0 +1,19 @@
+{
+  "files": [
+    {
+      "path": "file.txt",
+      "licenses": [
+        {
+          "key": "key",
+          "score": 42,
+          "start_line": 14,
+          "end_line": 21
+        }
+      ],
+      "license_expressions": [
+        "key"
+      ],
+      "scan_errors": []
+    }
+  ]
+}

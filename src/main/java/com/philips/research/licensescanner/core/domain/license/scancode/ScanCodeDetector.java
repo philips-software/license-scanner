@@ -2,7 +2,7 @@ package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.philips.research.licensescanner.core.command.ShellCommand;
-import com.philips.research.licensescanner.core.domain.license.Copyright;
+import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.DetectorException;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class ScanCodeDetector implements Detector {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
-    public Copyright scan(Path directory, int scoreThreshold) {
+    public void scan(Path directory, Scan scan, int scoreThreshold) {
         new ShellCommand("extractcode").setDirectory(directory.toFile())
                 .execute("--verbose", ".");
         new ShellCommand("scancode")
@@ -32,10 +32,13 @@ public class ScanCodeDetector implements Detector {
                 .execute("--license", "-n2", "--verbose", "--timeout=" + MAX_DURATION.toSeconds(), "--only-findings",
                         "--license-score", scoreThreshold, "--strip-root", "--ignore", "test*", "--ignore", RESULT_FILE,
                         "--json-pp", RESULT_FILE, ".");
+        parseResult(directory, scan);
+    }
+
+    private void parseResult(Path directory, Scan scan) {
         try {
             final var scanResult = MAPPER.readValue(directory.resolve(RESULT_FILE).toFile(), ScanCodeJson.class);
-
-            return new Copyright(scanResult.getLicense());
+            scanResult.addScanResultsTo(scan);
         } catch (IOException e) {
             throw new DetectorException("Failed to read ScanCode result file", e);
         }

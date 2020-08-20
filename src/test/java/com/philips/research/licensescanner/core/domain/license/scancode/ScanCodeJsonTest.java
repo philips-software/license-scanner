@@ -1,56 +1,71 @@
 package com.philips.research.licensescanner.core.domain.license.scancode;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.philips.research.licensescanner.core.domain.Package;
+import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.license.License;
+import com.philips.research.licensescanner.core.domain.license.LicenseParser;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.net.URI;
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ScanCodeJsonTest {
-    private static final LicenseJson LICENSE_1 = new LicenseJson("bsd2", "BSD-2-Clause");
-    private static final LicenseJson LICENSE_2 = new LicenseJson("mit", "MIT");
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Package PACKAGE = new Package("ns", "name", "version");
+    private static final URI LOCATION = URI.create("http://example.com");
+    private static final Path DIRECTORY = Path.of("src", "test", "resources", "scancode");
 
-    @Test
-    void listsSpdxLicensesPerFile() {
-        final var scan = new ScanCodeJson(List.of(
-                new FileJson(List.of(LICENSE_1, LICENSE_2), LICENSE_1.key, LICENSE_2.key)
-        ));
+    private Scan processFile(String filename) throws java.io.IOException {
+        final var scanResult = MAPPER.readValue(DIRECTORY.resolve(filename).toFile(), ScanCodeJson.class);
+        final var scan = new Scan(PACKAGE, LOCATION);
 
-        assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE_1.spdx).and(License.of(LICENSE_2.spdx)));
+        scanResult.addScanResultsTo(scan);
+        return scan;
     }
 
     @Test
-    void filtersDuplicateLicenses() {
-        final var scan = new ScanCodeJson(List.of(
-                new FileJson(List.of(LICENSE_1, LICENSE_1), LICENSE_1.key)
-        ));
+    void populatesScan() throws Exception {
+        final Scan scan = processFile("simple.json");
 
-        assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE_1.spdx));
+        assertThat(scan.getLicense()).isEqualTo(License.of("key"));
+        final var detection = scan.getDetections().get(0);
+        assertThat(detection.getConfirmations()).isEqualTo(1);
+        assertThat(detection.getLicense()).isEqualTo(License.of("key"));
+        assertThat(detection.getFilePath().getPath()).isEqualTo("file.txt");
+        assertThat(detection.getScore()).isEqualTo(42);
+        assertThat(detection.getStartLine()).isEqualTo(14);
+        assertThat(detection.getEndLine()).isEqualTo(21);
     }
 
     @Test
-    void defaultsUnknownSpdxIdentifiers() {
-        final var license = new LicenseJson("key", "");
+    void buildsComplexLicenseExpressions() throws Exception {
+        final Scan scan = processFile("expressions.json");
 
-        assertThat(license.getSpdxIdentifier()).isEqualTo("Unknown");
+        assertThat(scan.getLicense()).isEqualTo(LicenseParser.parse("a AND (b OR c)"));
+        assertThat(scan.getDetections()).hasSize(2);
+        final var detection1 = scan.getDetections().get(0);
+        assertThat(detection1.getLicense()).isEqualTo(License.of("a"));
+        assertThat(detection1.getFilePath().getPath()).isEqualTo("file.txt");
+        assertThat(detection1.getScore()).isEqualTo(42);
+        assertThat(detection1.getStartLine()).isEqualTo(4);
+        assertThat(detection1.getEndLine()).isEqualTo(8);
+        final var detection2 = scan.getDetections().get(1);
+        assertThat(detection2.getLicense()).isEqualTo(LicenseParser.parse("b OR c"));
+        assertThat(detection2.getFilePath().getPath()).isEqualTo("file.txt");
+        assertThat(detection2.getScore()).isEqualTo(23);
+        assertThat(detection2.getStartLine()).isEqualTo(6);
+        assertThat(detection2.getEndLine()).isEqualTo(14);
     }
 
     @Test
-    void supportsLicenseCombinations() {
-        final var scan = new ScanCodeJson(List.of(
-                new FileJson(List.of(LICENSE_1, LICENSE_2), LICENSE_1.key + " AND " + LICENSE_2.key)
-        ));
+    void usesSpdxLicenseIdentifiers() throws Exception {
+        final Scan scan = processFile("spdx.json");
 
-        assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE_1.spdx).and(License.of(LICENSE_2.spdx)));
-    }
-
-    @Test
-    void groupsLicenseCombinations() {
-        final var scan = new ScanCodeJson(List.of(
-                new FileJson(List.of(LICENSE_1, LICENSE_2), LICENSE_1.key, LICENSE_1.key + " OR " + LICENSE_2.key)
-        ));
-
-        assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE_1.spdx).or(License.of(LICENSE_2.spdx)).and(License.of(LICENSE_1.spdx)));
+        assertThat(scan.getLicense()).isEqualTo(LicenseParser.parse("MIT WITH Exception OR (AFL AND xyzzy)"));
+        final var detection = scan.getDetections().get(0);
+        assertThat(detection.getLicense()).isEqualTo(scan.getLicense());
     }
 }

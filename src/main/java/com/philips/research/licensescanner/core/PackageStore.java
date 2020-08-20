@@ -2,7 +2,6 @@ package com.philips.research.licensescanner.core;
 
 import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
-import com.philips.research.licensescanner.core.domain.ScanError;
 
 import java.net.URI;
 import java.time.Instant;
@@ -47,11 +46,10 @@ public interface PackageStore {
      * Creates a new persistent scan registration.
      *
      * @param pkg
-     * @param license
      * @param location
      * @return scan instance
      */
-    Scan createScan(Package pkg, String license, URI location);
+    Scan createScan(Package pkg, URI location);
 
     /**
      * Finds the latest scan for a package.
@@ -62,13 +60,11 @@ public interface PackageStore {
     Optional<Scan> latestScan(Package pkg);
 
     /**
-     * Registers a failed package scan.
+     * Removes a scan registration.
      *
-     * @param pkg
-     * @param location
-     * @param message
+     * @param scan
      */
-    void registerScanError(Package pkg, URI location, String message);
+    void deleteScan(Scan scan);
 
     /**
      * Finds all scanning errors for a package.
@@ -76,7 +72,7 @@ public interface PackageStore {
      * @param pkg
      * @return all scanning errors, sorted on descending timestamp
      */
-    List<ScanError> scanErrors(Package pkg);
+    List<Scan> scanErrors(Package pkg);
 
     /**
      * Finds all latest scans in a period.

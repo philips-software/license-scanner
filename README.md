@@ -54,7 +54,7 @@ value between 0 and 100.
 
 Must-have
 - [ ] Add type to package identifier (or use Package URL instead).
-- [ ] Keep file and line information of scanned licenses in the database.
+- [x] Keep file and line information of scanned licenses in the database.
 - [ ] Manual curation of scanned licenses.
 - [ ] Tracking and manual resolution of failed scans.
 - [ ] User interface for monitoring, management, and manual curation.

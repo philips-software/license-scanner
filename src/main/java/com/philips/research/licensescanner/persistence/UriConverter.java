@@ -12,11 +12,11 @@ import java.net.URI;
 class UriConverter implements AttributeConverter<URI, String> {
     @Override
     public String convertToDatabaseColumn(URI uri) {
-        return uri.toString();
+        return (uri != null) ? uri.toString() : null;
     }
 
     @Override
     public URI convertToEntityAttribute(String uri) {
-        return URI.create(uri);
+        return (uri != null) ? URI.create(uri) : null;
     }
 }

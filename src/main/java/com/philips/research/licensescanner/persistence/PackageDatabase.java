@@ -3,7 +3,6 @@ package com.philips.research.licensescanner.persistence;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
-import com.philips.research.licensescanner.core.domain.ScanError;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
@@ -16,14 +15,15 @@ import java.util.Optional;
  */
 @Repository
 public class PackageDatabase implements PackageStore {
+    static DetectionRepository detectionRepository;
     private final PackageRepository packageRepository;
     private final ScanRepository scanRepository;
-    private final ScanErrorRepository errorRepository;
 
-    public PackageDatabase(PackageRepository packageRepository, ScanRepository scanRepository, ScanErrorRepository errorRepository) {
+    public PackageDatabase(PackageRepository packageRepository, ScanRepository scanRepository,
+                           DetectionRepository detectionRepository) {
         this.packageRepository = packageRepository;
         this.scanRepository = scanRepository;
-        this.errorRepository = errorRepository;
+        PackageDatabase.detectionRepository = detectionRepository;
     }
 
     @Override
@@ -48,25 +48,24 @@ public class PackageDatabase implements PackageStore {
     }
 
     @Override
-    public Scan createScan(Package pkg, String license, URI location) {
-        final var entity = new ScanEntity(Instant.now(), (PackageEntity) pkg, license, location);
+    public Scan createScan(Package pkg, URI location) {
+        final var entity = new ScanEntity(Instant.now(), (PackageEntity) pkg, location);
         return scanRepository.save(entity);
     }
 
     @Override
     public Optional<Scan> latestScan(Package pkg) {
-        return scanRepository.findTopByPkgAndLicenseNotNullOrderByIdDesc((PackageEntity) pkg);
+        return scanRepository.findTopByPkgAndErrorIsNullOrderByIdDesc((PackageEntity) pkg);
     }
 
     @Override
-    public void registerScanError(Package pkg, URI location, String message) {
-        final var entity = new ScanErrorEntity(Instant.now(), (PackageEntity) pkg, location, message);
-        errorRepository.save(entity);
+    public void deleteScan(Scan scan) {
+        scanRepository.delete((ScanEntity) scan);
     }
 
     @Override
-    public List<ScanError> scanErrors(Package pkg) {
-        return errorRepository.findAllByPkgOrderByTimestampDesc(pkg);
+    public List<Scan> scanErrors(Package pkg) {
+        return scanRepository.findAllByPkgAndErrorIsNotNullOrderByTimestampDesc((PackageEntity) pkg);
     }
 
     @Override

@@ -1,5 +1,18 @@
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" version="2.0">
     <mapped-superclass class="com.philips.research.licensescanner.core.domain.Package"/>
+    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Detection">
+        <attributes>
+            <basic name="license">
+                <lob/>
+            </basic>
+            <basic name="filePath">
+                <lob/>
+            </basic>
+            <basic name="score">
+                <column column-definition="SMALLINT"/>
+            </basic>
+        </attributes>
+    </mapped-superclass>
     <mapped-superclass class="com.philips.research.licensescanner.core.domain.Scan">
         <attributes>
             <basic name="license">
@@ -8,28 +21,18 @@
             <basic name="location">
                 <lob/>
             </basic>
-            <many-to-one name="pkg" access="FIELD"
-                         target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
-                <join-column name="package_id"/>
-            </many-to-one>
-        </attributes>
-    </mapped-superclass>
-    <mapped-superclass class="com.philips.research.licensescanner.core.domain.ScanError">
-        <attributes>
-            <basic name="timestamp">
-                <column name="created"/>
-            </basic>
-            <basic name="location">
-                <lob/>
-            </basic>
-            <basic name="message">
-                <column name="error"/>
+            <basic name="error">
                 <lob/>
             </basic>
             <many-to-one name="pkg" access="FIELD"
                          target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
                 <join-column name="package_id"/>
             </many-to-one>
+            <one-to-many name="detections"
+                         target-entity="com.philips.research.licensescanner.persistence.DetectionEntity">
+                <map-key name="license"/>
+                <join-column name="scan_id"/>
+            </one-to-many>
         </attributes>
     </mapped-superclass>
 </entity-mappings>

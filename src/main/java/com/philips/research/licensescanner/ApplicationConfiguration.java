@@ -37,7 +37,7 @@ public class ApplicationConfiguration {
     }
 
     /**
-      * @return license probability threshold as a percentage.
+     * @return license probability threshold as a percentage.
      */
     public int getThresholdPercent() {
         return thresholdPercent;
@@ -45,6 +45,7 @@ public class ApplicationConfiguration {
 
     /**
      * Sets license probability threshold.
+     *
      * @param thresholdPercent percentage certainty about the detected license
      */
     public ApplicationConfiguration setThresholdPercent(int thresholdPercent) {

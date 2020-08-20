@@ -33,6 +33,10 @@ abstract public class License {
         return new OrLicense(this).or(license);
     }
 
+    public boolean isDefined() {
+        return true;
+    }
+
     @Override
     public final int hashCode() {
         return toString().toLowerCase().hashCode();
@@ -47,8 +51,9 @@ abstract public class License {
                 && toString().equalsIgnoreCase(obj.toString());
     }
 
-    public boolean isDefined() {
-        return true;
+    @Override
+    public String toString() {
+        return "License{}";
     }
 
     private static class NoLicense extends License {

@@ -11,8 +11,10 @@ import java.util.Optional;
  * Spring JPA query definitions for scans.
  */
 interface ScanRepository extends CrudRepository<ScanEntity, Long> {
-    Optional<Scan> findTopByPkgAndLicenseNotNullOrderByIdDesc(PackageEntity pkg);
+    Optional<Scan> findTopByPkgAndErrorIsNullOrderByIdDesc(PackageEntity pkg);
 
     List<Scan> findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualAndLicenseNotNullOrderByTimestampDesc(
             Instant from, Instant until);
+
+    List<Scan> findAllByPkgAndErrorIsNotNullOrderByTimestampDesc(PackageEntity pkg);
 }

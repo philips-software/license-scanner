@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "path": "file.txt",
+      "licenses": [
+        {
+          "key": "mit",
+          "spdx_license_key": "MIT"
+        },
+        {
+          "key": "ex",
+          "is_exception": "true",
+          "spdx_license_key": "Exception"
+        },
+        {
+          "key": "afl",
+          "spdx_license_key": "AFL"
+        },
+        {
+          "key": "xyzzy"
+        }
+      ],
+      "license_expressions": [
+        "mit WITH ex OR (afl AND xyzzy)"
+      ],
+      "scan_errors": []
+    }
+  ]
+}

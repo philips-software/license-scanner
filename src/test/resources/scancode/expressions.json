@@ -1,0 +1,33 @@
+{
+  "files": [
+    {
+      "path": "file.txt",
+      "licenses": [
+        {
+          "key": "a",
+          "score": 42,
+          "start_line": 4,
+          "end_line": 8
+        },
+        {
+          "key": "b",
+          "score": 23,
+          "start_line": 6,
+          "end_line": 7
+        },
+        {
+          "key": "c",
+          "score": 73,
+          "start_line": 9,
+          "end_line": 14
+        }
+      ],
+      "license_expressions": [
+        "a",
+        "b or c",
+        "b or c"
+      ],
+      "scan_errors": []
+    }
+  ]
+}
