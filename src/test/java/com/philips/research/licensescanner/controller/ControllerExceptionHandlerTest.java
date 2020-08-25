@@ -29,7 +29,7 @@ class ControllerExceptionHandlerTest {
     private static final String ORIGIN = "Origin";
     private static final String PACKAGE = "Package";
     private static final String VERSION = "Version";
-    private static final String PACKAGE_URL = "/package/{origin}/{package}/{version}";
+    private static final String PACKAGE_URL = "/packages/{origin}/{package}/{version}";
 
     @Autowired
     MockMvc mockMvc;

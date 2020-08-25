@@ -62,8 +62,8 @@ class PackageInfoJson {
 }
 
 class DetectionInfoJson {
-    final String file;
     final String license;
+    final String file;
     final int startLine;
     final int endLine;
     final int confirmations;

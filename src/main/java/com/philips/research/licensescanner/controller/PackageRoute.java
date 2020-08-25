@@ -5,13 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.Instant;
 
 /**
  * REST API for interacting with packages.
  */
 @RestController
-@RequestMapping("/package")
+@RequestMapping("/packages")
 public class PackageRoute {
     private final LicenseService service;
 
@@ -29,7 +28,7 @@ public class PackageRoute {
      * @return scan result
      */
     @GetMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
-    ScanInfoJson getLatestScan(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable String version) {
+    ScanInfoJson getLatestScanForPackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable String version) {
         if (namespace == null) {
             namespace = "";
         }
@@ -85,20 +84,6 @@ public class PackageRoute {
         service.scanLicense(namespace, name, version, body.location);
 
         return new ScanInfoJson(namespace, name, version, body.location);
-    }
-
-    /**
-     * Lists all successful scans in the given period.
-     *
-     * @param start (Optional) start timestamp
-     * @param end   (Optional) end timestamp: defaults to "now"
-     */
-    @GetMapping("scans")
-    SearchResultJson latestScans(@RequestParam(required = false) Instant start, @RequestParam(required = false) Instant end) {
-        final var scans = service.findScans(
-                start != null ? start : Instant.EPOCH,
-                end != null ? end : Instant.now());
-        return new SearchResultJson(scans.stream().map(ScanInfoJson::new));
     }
 }
 
