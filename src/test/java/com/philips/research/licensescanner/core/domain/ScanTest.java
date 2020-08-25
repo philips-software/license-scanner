@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.net.URI;
+import java.time.Duration;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,11 +24,44 @@ class ScanTest {
 
     @Test
     void createsInstance() {
+        Instant now = Instant.now();
+        assertThat(scan.getUuid()).isNotNull();
+        assertThat(scan.getTimestamp()).isBetween(now.minus(Duration.ofSeconds(1)), now);
         assertThat(scan.getPackage()).isEqualTo(PACKAGE);
         assertThat(scan.getLicense()).isEqualTo(License.NONE);
         assertThat(scan.getLocation()).contains(LOCATION);
+        assertThat(scan.isContested()).isFalse();
+        assertThat(scan.isConfirmed()).isFalse();
         assertThat(scan.getError()).isEmpty();
         assertThat(scan.getDetections()).isEmpty();
+    }
+
+    @Test
+    void contestsScan() {
+        scan.contest();
+
+        assertThat(scan.isContested()).isTrue();
+    }
+
+    @Test
+    void noContest_licenseWasConfirmed() {
+        scan.confirm(LICENSE);
+
+        scan.contest();
+
+        assertThat(scan.isContested()).isFalse();
+    }
+
+    @Test
+    void confirmsContestedScan() {
+        final var license = License.of("Confirmed");
+        scan.contest();
+
+        scan.confirm(license);
+
+        assertThat(scan.isConfirmed()).isTrue();
+        assertThat(scan.getLicense()).isEqualTo(license);
+        assertThat(scan.isContested()).isFalse();
     }
 
     @Test

@@ -5,7 +5,7 @@ hide circle
 skinparam linetype ortho
 
 entity packages {
-    *id: integer <<generated>>
+    *id: bigint <<generated>>
     ---
     namespace: varchar
     name: varchar
@@ -13,14 +13,30 @@ entity packages {
 }
 
 entity scans {
-    *id: integer <<generated>>
+    *id: bigint <<generated>>
+    uuid: uuid
     ---
-    package_id: integer
+    package_id: bigint <<fk>>
     created: timestamp
     location: clob
     license: clob
     error: clob
+    contested: boolean
+    confirmed: boolean
 }
-
 packages ||--o{ scans
+
+entity detections {
+    *id: bigint
+    ---
+    scan_id: bigint <<fk>>
+    license: clob
+    score: smallint
+    file_path: clob
+    start_line: integer
+    end_line: integer
+    confirmations: integer
+}
+scans ||--o{ detections
+
 @enduml

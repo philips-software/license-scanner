@@ -156,7 +156,7 @@ class LicenseInteractorTest {
 
             assertThat(result).hasSize(1);
             final var pkg = result.get(0);
-            assertThat(pkg.name).isEqualTo(NAME);
+            assertThat(pkg.pkg.name).isEqualTo(NAME);
             assertThat(pkg.license).contains(LICENSE);
             assertThat(pkg.location).isEqualTo(LOCATION);
         }

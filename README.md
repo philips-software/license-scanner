@@ -53,17 +53,19 @@ value between 0 and 100.
 (Checked items are under development.)
 
 Must-have
-- [ ] Add type to package identifier (or use Package URL instead).
+- [ ] Add package manager type to package identifier. (Or use "purl" instead?)
 - [x] Keep file and line information of scanned licenses in the database.
-- [ ] Manual curation of scanned licenses.
-- [ ] Tracking and manual resolution of failed scans.
-- [ ] User interface for monitoring, management, and manual curation.
+- [x] Explicit manual curation of scanned licenses to override false-positives.
+- [x] Tracking and manual resolution of failed scans.
+- [x] User interface for monitoring, management, and manual curation.
 - [ ] Production-grade database (e.g. Postgres).
 - [ ] Authentication of clients.
 
 Should-have
 - [ ] Support (confirmed) declared non-SPDX custom licenses.
 - [ ] Verify checksum for downloaded artifact before scanning.
+- [ ] API to "challenge" a package license based on a mismatch with the 
+declared license.
 - [ ] Detect and return other copyright statements.
 - [ ] provide scanning time budget based on number of files.
 

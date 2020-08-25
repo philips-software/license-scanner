@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * License related use-cases.
@@ -49,51 +50,38 @@ public interface LicenseService {
     List<LicenseInfo> findScans(Instant from, Instant until);
 
     /**
-     * @return All current scanning errors.
-     */
-    Iterable<ErrorReport> scanErrors();
-
-    /**
      * Response model for a package identifier.
      */
     class PackageId {
-        public final String namespace;
-        public final String name;
-        public final String version;
-
-        public PackageId(String namespace, String name, String version) {
-            this.namespace = namespace;
-            this.name = name;
-            this.version = version;
-        }
+        public String namespace;
+        public String name;
+        public String version;
     }
 
     /**
      * Response model for license information.
      */
-    class LicenseInfo extends PackageId {
-        public final URI location;
-        public final String license;
-
-        public LicenseInfo(String namespace, String name, String version, URI location, String license) {
-            super(namespace, name, version);
-            this.license = license;
-            this.location = location;
-        }
+    class LicenseInfo {
+        public UUID uuid;
+        public Instant timestamp;
+        public PackageId pkg;
+        public URI location;
+        public String license;
+        public String error;
+        public List<DetectionInfo> detections;
+        public boolean isContested;
+        public boolean isConfirmed;
     }
 
     /**
-     * Response model for error information.
+     * Response model for license detection information.
      */
-    class ErrorReport extends PackageId {
-        public final Instant timestamp;
-        public final String message;
-
-        public ErrorReport(Instant timestamp, String namespace, String name, String version, String message) {
-            super(namespace, name, version);
-            this.timestamp = timestamp;
-            this.message = message;
-        }
+    class DetectionInfo {
+        public String license;
+        public String file;
+        public int startLine;
+        public int endLine;
+        public int confirmations;
     }
 }
 

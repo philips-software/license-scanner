@@ -4,9 +4,11 @@ import com.philips.research.licensescanner.core.domain.Detection;
 import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.license.License;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.net.URI;
-import java.time.Instant;
 
 /**
  * JPA entity for persisting a scan.
@@ -14,20 +16,16 @@ import java.time.Instant;
 @Entity
 @Table(name = "scans")
 class ScanEntity extends Scan {
-    @Column(name = "created")
-    private final Instant timestamp;
-
     @Id
     @GeneratedValue
     private Long id;
 
     public ScanEntity() {
-        this(null, null, null);
+        this(null, null);
     }
 
-    ScanEntity(Instant timestamp, PackageEntity pkg, URI location) {
+    ScanEntity(PackageEntity pkg, URI location) {
         super(pkg, location);
-        this.timestamp = timestamp;
     }
 
     @Override

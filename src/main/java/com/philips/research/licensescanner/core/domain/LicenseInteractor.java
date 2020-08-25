@@ -54,7 +54,7 @@ public class LicenseInteractor implements LicenseService {
     public Optional<LicenseInfo> licenseFor(String origin, String name, String version) {
         return store.getPackage(origin, name, version)
                 .flatMap(store::latestScan)
-                .map(this::toLicenseInfo);
+                .map(this::toLicenseInfoWithDetections);
     }
 
     @Override
@@ -108,20 +108,42 @@ public class LicenseInteractor implements LicenseService {
         }
     }
 
-    @Override
-    public Iterable<ErrorReport> scanErrors() {
-        return null;
-    }
-
     private PackageId toPackageId(Package pkg) {
-        return new PackageId(pkg.getNamespace(), pkg.getName(), pkg.getVersion());
+        final var id = new PackageId();
+        id.namespace = pkg.getNamespace();
+        id.name = pkg.getName();
+        id.version = pkg.getVersion();
+        return id;
     }
 
     private LicenseInfo toLicenseInfo(Scan scan) {
-        final var license = scan.getLicense();
-        final var location = scan.getLocation().orElse(null);
-        final var pkg = scan.getPackage();
-        return new LicenseInfo(pkg.getNamespace(), pkg.getName(), pkg.getVersion(), location, license.toString());
+        final var info = new LicenseInfo();
+        info.uuid = scan.getUuid();
+        info.timestamp = scan.getTimestamp();
+        info.pkg = toPackageId(scan.getPackage());
+        info.license = scan.getLicense().toString();
+        info.location = scan.getLocation().orElse(null);
+        info.error = scan.getError().orElse(null);
+        info.isContested = scan.isContested();
+        info.isConfirmed = scan.isConfirmed();
+        return info;
     }
 
+    private LicenseInfo toLicenseInfoWithDetections(Scan scan) {
+        final var info = toLicenseInfo(scan);
+        info.detections = scan.getDetections().stream()
+                .map(this::toDetectionInfo)
+                .collect(Collectors.toList());
+        return info;
+    }
+
+    private DetectionInfo toDetectionInfo(Detection detection) {
+        final var info = new DetectionInfo();
+        info.license = detection.getLicense().toString();
+        info.file = detection.getFilePath().toString();
+        info.startLine = detection.getStartLine();
+        info.endLine = detection.getEndLine();
+        info.confirmations = detection.getConfirmations();
+        return info;
+    }
 }

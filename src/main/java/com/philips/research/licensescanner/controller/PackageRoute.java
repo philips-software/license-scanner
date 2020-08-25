@@ -29,14 +29,14 @@ public class PackageRoute {
      * @return scan result
      */
     @GetMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
-    ScanInfoJson getPackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable String version) {
+    ScanInfoJson getLatestScan(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable String version) {
         if (namespace == null) {
             namespace = "";
         }
         final var license = service.licenseFor(namespace, name, version)
                 .orElseThrow(() -> new ResourceNotFoundException("package"));
 
-        return withLicenseInfo(new ScanInfoJson(namespace, name, version), license);
+        return new ScanInfoJson(license);
     }
 
     /**
@@ -54,7 +54,7 @@ public class PackageRoute {
             @RequestParam(required = false, defaultValue = "") String version) {
         final var packages = service.findPackages(namespace, name, version);
 
-        return new SearchResultJson(packages.stream().map(ScanInfoJson::new));
+        return new SearchResultJson(packages.stream().map(PackageInfoJson::new));
     }
 
     /**
@@ -75,52 +75,16 @@ public class PackageRoute {
         if (namespace == null) {
             namespace = "";
         }
-        final var response = new ScanInfoJson(namespace, name, version);
 
         if (!force) {
             final var license = service.licenseFor(namespace, name, version);
             if (license.isPresent()) {
-                return withLicenseInfo(response, license.get());
+                return new ScanInfoJson(license.get());
             }
         }
+        service.scanLicense(namespace, name, version, body.location);
 
-        if (body.location != null) {
-            service.scanLicense(namespace, name, version, body.location);
-            response.location = body.location;
-        }
-
-        return response;
-    }
-
-    /**
-     * Overrides a scan results with (manually corrected) information.
-     *
-     * @param namespace
-     * @param name
-     * @param version
-     * @param body      Updated scan result
-     */
-    @PutMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
-    void updatePackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable String version, @Valid @RequestBody ScanInfoJson body) {
-        //TODO Manually override scan result
-    }
-
-    /**
-     * Removes a scan result. If no scan result matches the parameters, nothing happens.
-     *
-     * @param namespace
-     * @param name
-     * @param version   (optional) version
-     */
-    @DeleteMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
-    void deletePackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable(required = false) String version) {
-        //TODO Manually remove scan results
-    }
-
-    private ScanInfoJson withLicenseInfo(ScanInfoJson response, LicenseService.LicenseInfo lic) {
-        response.location = lic.location;
-        response.license = lic.license;
-        return response;
+        return new ScanInfoJson(namespace, name, version, body.location);
     }
 
     /**
@@ -136,29 +100,5 @@ public class PackageRoute {
                 end != null ? end : Instant.now());
         return new SearchResultJson(scans.stream().map(ScanInfoJson::new));
     }
-
-    /**
-     * Lists all failed package scans in the given period.
-     *
-     * @param after  (Optional) start timestamp
-     * @param before (Optional) end timestamp; defaults to "now"
-     */
-    @GetMapping("errors")
-    SearchResultJson failedPackages(@RequestParam Instant after, @RequestParam Instant before) {
-        // TODO Implement me
-        return new SearchResultJson();
-    }
-
-    /**
-     * Lists all scan errors for a package.
-     *
-     * @param namespace
-     * @param name
-     * @param version
-     */
-    @GetMapping({"{name}/{version}/errors", "{namespace}/{name}/{version}/errors"})
-    SearchResultJson findPackageScanErrors(@PathVariable String namespace, @PathVariable String name, @PathVariable String version) {
-        // TODO Implement me
-        return new SearchResultJson();
-    }
 }
+

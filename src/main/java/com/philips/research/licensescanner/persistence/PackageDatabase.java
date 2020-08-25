@@ -49,7 +49,7 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public Scan createScan(Package pkg, URI location) {
-        final var entity = new ScanEntity(Instant.now(), (PackageEntity) pkg, location);
+        final var entity = new ScanEntity((PackageEntity) pkg, location);
         return scanRepository.save(entity);
     }
 
