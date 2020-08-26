@@ -1,10 +1,11 @@
 package com.philips.research.licensescanner.core.domain;
 
-import com.philips.research.licensescanner.core.BusinessException;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
+import com.philips.research.licensescanner.core.domain.download.DownloadException;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
 import com.philips.research.licensescanner.core.domain.license.Detector;
+import com.philips.research.licensescanner.core.domain.license.DetectorException;
 import com.philips.research.licensescanner.core.domain.license.License;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -133,10 +134,20 @@ class LicenseInteractorTest {
         }
 
         @Test
-        void registersExceptionAsScanFailure() {
+        void registersDownloadFailure() {
+            final var message = "Test error";
+            when(downloader.download(LOCATION)).thenThrow(new DownloadException(message));
+
+            service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+
+            assertThat(scan.getError()).contains(message);
+        }
+
+        @Test
+        void registersScanningFailure() {
             final var message = "Test error";
             when(downloader.download(LOCATION)).thenReturn(directory);
-            doThrow(new BusinessException(message)).when(detector).scan(directory, scan, THRESHOLD);
+            doThrow(new DetectorException(message, null)).when(detector).scan(directory, scan, THRESHOLD);
 
             service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 

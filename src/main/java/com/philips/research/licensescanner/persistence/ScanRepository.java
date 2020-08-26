@@ -12,7 +12,7 @@ import java.util.Optional;
 interface ScanRepository extends CrudRepository<ScanEntity, Long> {
     Optional<ScanEntity> findTopByPkgAndErrorIsNullOrderByIdDesc(PackageEntity pkg);
 
-    List<ScanEntity> findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualAndLicenseNotNullOrderByTimestampDesc(
+    List<ScanEntity> findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(
             Instant from, Instant until);
 
     List<ScanEntity> findAllByPkgAndErrorIsNotNullOrderByTimestampDesc(PackageEntity pkg);

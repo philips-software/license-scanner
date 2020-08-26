@@ -66,7 +66,13 @@ public class Downloader {
         final var directory = newDirectory();
         final var uri = downloadUri(location);
 
-        handler.download(directory, uri);
+        try {
+            handler.download(directory, uri);
+        } catch (Exception e) {
+            //noinspection ResultOfMethodCallIgnored
+            directory.toFile().delete();
+            throw e;
+        }
 
         return directory;
     }

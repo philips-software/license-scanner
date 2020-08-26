@@ -58,4 +58,15 @@ class DownloaderTest {
         assertThat(directory.getParent()).isEqualTo(configuration.getTempDir());
         verify(mockHandler).download(any(Path.class), eq(LOCATION));
     }
+
+    @Test
+    void removesWorkingDirectoryUponException() {
+        final var location = URI.create(TOOL + "+" + LOCATION.toString() + "#path/to/whatever");
+        doThrow(new DownloadException("Test")).when(mockHandler).download(any(), any());
+
+        assertThatThrownBy(() -> downloader.download(location))
+                .isInstanceOf(DownloadException.class);
+
+        assertThat(configuration.getTempDir().toFile().listFiles()).isEmpty();
+    }
 }

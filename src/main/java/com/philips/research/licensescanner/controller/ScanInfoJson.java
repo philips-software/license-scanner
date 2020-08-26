@@ -19,8 +19,8 @@ class ScanInfoJson extends PackageInfoJson {
     String license;
     String error;
     List<DetectionInfoJson> detections;
-    boolean isContested;
-    boolean isConfirmed;
+    boolean contested;
+    boolean confirmed;
 
     public ScanInfoJson(String namespace, String name, String version, URI location) {
         super(namespace, name, version);
@@ -34,8 +34,8 @@ class ScanInfoJson extends PackageInfoJson {
         location = info.location;
         license = info.license;
         error = info.error;
-        isContested = info.isContested;
-        isConfirmed = info.isConfirmed;
+        contested = info.isContested;
+        confirmed = info.isConfirmed;
         if (info.detections != null) {
             this.detections = info.detections.stream()
                     .map(DetectionInfoJson::new)

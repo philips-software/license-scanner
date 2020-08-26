@@ -71,7 +71,7 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public List<Scan> findScans(Instant from, Instant until) {
-        var list = scanRepository.findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualAndLicenseNotNullOrderByTimestampDesc(from, until);
+        var list = scanRepository.findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(from, until);
         return toScans(list);
     }
 

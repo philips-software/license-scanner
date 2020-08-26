@@ -53,7 +53,7 @@ class FileJson {
     private void buildDictionary() {
         for (var license : licenses) {
             final var existing = licenseDictionary.get(license.key);
-            if (existing == null || license.score > existing.score) {
+            if (existing == null || license.score > existing.score || (license.score == existing.score && license.lines() > existing.lines())) {
                 licenseDictionary.put(license.key, license);
             }
         }
@@ -125,6 +125,10 @@ class LicenseJson {
 
     String getSpdxIdentifier() {
         return (spdx != null) ? spdx : key;
+    }
+
+    public int lines() {
+        return 1 + endLine - startLine;
     }
 }
 

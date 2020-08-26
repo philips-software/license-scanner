@@ -41,7 +41,7 @@ public interface LicenseService {
     void scanLicense(String origin, String name, String version, URI vcsId);
 
     /**
-     * Lists all latest successful scan results for the indicated period.
+     * Lists all latest scan results for the indicated period.
      *
      * @param from
      * @param until
