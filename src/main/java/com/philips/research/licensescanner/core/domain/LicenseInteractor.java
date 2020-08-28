@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -51,8 +52,8 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public Optional<LicenseInfo> licenseFor(String origin, String name, String version) {
-        return store.getPackage(origin, name, version)
+    public Optional<LicenseInfo> licenseFor(String namespace, String name, String version) {
+        return store.getPackage(namespace, name, version)
                 .flatMap(store::latestScan)
                 .map(this::toLicenseInfoWithDetections);
     }
@@ -60,18 +61,18 @@ public class LicenseInteractor implements LicenseService {
     @Override
     @Async("licenseDetectionExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void scanLicense(String origin, String name, String version, URI location) {
+    public void scanLicense(String namespace, String name, String version, URI location) {
         Path path = null;
         Scan scan = null;
         try {
-            LOG.info("Scan license for {}:{} {} from {}", origin, name, version, location);
-            final var pkg = getOrCreatePackage(origin, name, version);
+            LOG.info("Scan license for {}:{} {} from {}", namespace, name, version, location);
+            final var pkg = getOrCreatePackage(namespace, name, version);
             if (store.latestScan(pkg).isEmpty()) {
                 scan = store.createScan(pkg, location);
                 //TODO Check hash after download
                 path = downloader.download(location);
                 detector.scan(path, scan, licenseThreshold);
-                LOG.info("Detected license for {}:{} {} is '{}'", origin, name, version, scan.getLicense());
+                LOG.info("Detected license for {}:{} {} is '{}'", namespace, name, version, scan.getLicense());
             }
         } catch (Exception e) {
             LOG.error("Scanning failed", e);
@@ -86,11 +87,22 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
+    public Optional<LicenseInfo> getScan(UUID scanId) {
+        return store.getScan(scanId).map(this::toLicenseInfoWithDetections);
+    }
+
+    @Override
     public List<LicenseInfo> findScans(Instant from, Instant until) {
         final var results = store.findScans(from, until);
         return results.stream()
                 .map(this::toLicenseInfo)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteScans(String namespace, String name, String version) {
+        store.getPackage(namespace, name, version)
+                .ifPresent(store::deleteScans);
     }
 
     private Package getOrCreatePackage(String origin, String name, String version) {

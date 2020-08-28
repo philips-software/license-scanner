@@ -136,6 +136,7 @@ class PackageRouteTest extends AbstractRouteTest {
                     .andExpect(status().isOk())
                     .andExpect(content().json(response.toString()));
 
+            verify(service).deleteScans(NAMESPACE, NAME, VERSION);
             verify(service).scanLicense(NAMESPACE, NAME, VERSION, LOCATION);
         }
     }

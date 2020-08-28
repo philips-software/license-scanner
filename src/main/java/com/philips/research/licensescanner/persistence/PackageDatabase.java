@@ -9,6 +9,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Spring component implementing the persistence of packages.
@@ -43,6 +44,11 @@ public class PackageDatabase implements PackageStore {
                 wildcard(namespace), wildcard(name), wildcard(version));
     }
 
+    @Override
+    public void deleteScans(Package pkg) {
+        scanRepository.deleteByPkg(pkg);
+    }
+
     private String wildcard(String name) {
         return '%' + name + '%';
     }
@@ -67,6 +73,11 @@ public class PackageDatabase implements PackageStore {
     public List<Scan> scanErrors(Package pkg) {
         var list = scanRepository.findAllByPkgAndErrorIsNotNullOrderByTimestampDesc((PackageEntity) pkg);
         return toScans(list);
+    }
+
+    @Override
+    public Optional<Scan> getScan(UUID scanId) {
+        return scanRepository.findByUuid(scanId).map(scan -> scan);
     }
 
     @Override

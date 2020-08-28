@@ -6,8 +6,8 @@ package com.philips.research.licensescanner.controller;
 public class ResourceNotFoundException extends RuntimeException {
     private final String resource;
 
-    public ResourceNotFoundException(String resource) {
-        this.resource = resource;
+    public ResourceNotFoundException(Object resource) {
+        this.resource = (resource != null) ? resource.toString() : "?";
     }
 
     public String getResource() {

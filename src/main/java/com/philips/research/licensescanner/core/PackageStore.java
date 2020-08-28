@@ -7,6 +7,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Persistence API for packages.
@@ -43,6 +44,13 @@ public interface PackageStore {
     List<Package> findPackages(String namespace, String name, String version);
 
     /**
+     * Deletes all scans for the indicated package.
+     *
+     * @param pkg
+     */
+    void deleteScans(Package pkg);
+
+    /**
      * Creates a new persistent scan registration.
      *
      * @param pkg
@@ -73,6 +81,11 @@ public interface PackageStore {
      * @return all scanning errors, sorted on descending timestamp
      */
     List<Scan> scanErrors(Package pkg);
+
+    /**
+     * @return the requested scan
+     */
+    Optional<Scan> getScan(UUID scanId);
 
     /**
      * Finds all latest scans in a period.

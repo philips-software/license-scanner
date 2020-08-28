@@ -30,7 +30,7 @@ class ScanEntity extends Scan {
 
     @Override
     protected Detection newDetection(License license) {
-        final var detection = new DetectionEntity(this, license);
+        final var detection = new DetectionEntity(license);
         PackageDatabase.detectionRepository.save(detection);
         return detection;
     }

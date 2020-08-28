@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -34,6 +35,7 @@ class LicenseInteractorTest {
     private static final Package PACKAGE = new Package(ORIGIN, NAME, VERSION);
     private static final Scan SCAN = new Scan(PACKAGE, LOCATION)
             .addDetection(License.of(LICENSE), 73, new File(""), 1, 2);
+    private static final UUID SCAN_ID = SCAN.getUuid();
     private static final Instant UNTIL = Instant.now();
     private static final Instant FROM = UNTIL.minus(Duration.ofDays(5));
     private static final int THRESHOLD = 70;
@@ -97,7 +99,7 @@ class LicenseInteractorTest {
     }
 
     @Nested
-    class ScanPackage {
+    class PackageScanning {
         private final Scan scan = new Scan(PACKAGE, LOCATION);
 
         Path directory;
@@ -159,6 +161,16 @@ class LicenseInteractorTest {
     @Nested
     class QueryScanResults {
         @Test
+        void findsScanByUuid() {
+            when(store.getScan(SCAN_ID)).thenReturn(Optional.of(SCAN));
+
+            final var result = service.getScan(SCAN_ID);
+
+            assertThat(result).isPresent();
+            assertThat(result.get().detections).isNotEmpty();
+        }
+
+        @Test
         void findsScansForPeriod() {
             when(store.findScans(FROM, UNTIL)).thenReturn(List.of(new Scan(PACKAGE, LOCATION)
                     .addDetection(License.of(LICENSE), 100, null, 1, 2)));
@@ -170,6 +182,13 @@ class LicenseInteractorTest {
             assertThat(pkg.pkg.name).isEqualTo(NAME);
             assertThat(pkg.license).contains(LICENSE);
             assertThat(pkg.location).isEqualTo(LOCATION);
+        }
+
+        @Test
+        void deletesScansForPackage() {
+            service.deleteScans(ORIGIN, NAME, VERSION);
+
+            verify(store).deleteScans(PACKAGE);
         }
     }
 }

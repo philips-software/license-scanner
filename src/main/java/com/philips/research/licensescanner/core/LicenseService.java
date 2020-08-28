@@ -21,33 +21,33 @@ public interface LicenseService {
     List<PackageId> findPackages(String namespace, String name, String version);
 
     /**
-     * Provides license per package.
-     *
-     * @param origin  Package manager
-     * @param name    Package identifier
-     * @param version Package version name
      * @return License information if the package is known.
      */
-    Optional<LicenseInfo> licenseFor(String origin, String name, String version);
+    Optional<LicenseInfo> licenseFor(String namespace, String name, String version);
 
     /**
      * Queues package for scanning.
      *
-     * @param origin  Package manager
-     * @param name    Package identifier
-     * @param version Package version name
-     * @param vcsId   Version control coordinates
+     * @param vcsId Version control coordinates
      */
-    void scanLicense(String origin, String name, String version, URI vcsId);
+    void scanLicense(String namespace, String name, String version, URI vcsId);
+
+    /**
+     * @return the details for the indicated scan
+     */
+    Optional<LicenseInfo> getScan(UUID scanId);
 
     /**
      * Lists all latest scan results for the indicated period.
      *
-     * @param from
-     * @param until
      * @return scan results
      */
     List<LicenseInfo> findScans(Instant from, Instant until);
+
+    /**
+     * Clear any existing scans for the indicated package.
+     */
+    void deleteScans(String namespace, String name, String version);
 
     /**
      * Response model for a package identifier.
@@ -84,4 +84,3 @@ public interface LicenseService {
         public int confirmations;
     }
 }
-

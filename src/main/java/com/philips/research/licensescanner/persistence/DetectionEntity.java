@@ -8,20 +8,15 @@ import javax.persistence.*;
 @Entity
 @Table(name = "detections")
 public class DetectionEntity extends Detection {
-    @ManyToOne
-    @JoinColumn(name = "scan_id")
-    private final ScanEntity scan;
-
     @Id
     @GeneratedValue
     private Long id;
 
     public DetectionEntity() {
-        this(null, null);
+        this(null);
     }
 
-    public DetectionEntity(ScanEntity scan, License license) {
+    public DetectionEntity(License license) {
         super(license);
-        this.scan = scan;
     }
 }

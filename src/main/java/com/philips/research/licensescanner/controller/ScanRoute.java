@@ -3,12 +3,10 @@ package com.philips.research.licensescanner.controller;
 
 import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * REST API for interacting with scan results.
@@ -34,6 +32,15 @@ public class ScanRoute {
         final var scans = service.findScans(
                 start != null ? start : Instant.EPOCH,
                 end != null ? end : Instant.now());
+
         return new SearchResultJson(scans.stream().map(ScanInfoJson::new));
+    }
+
+    @GetMapping("{uuid}")
+    ScanInfoJson getScanById(@PathVariable UUID uuid) {
+        final var scan = service.getScan(uuid)
+                .orElseThrow(() -> new ResourceNotFoundException(uuid));
+
+        return new ScanInfoJson(scan);
     }
 }

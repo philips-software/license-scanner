@@ -21,7 +21,7 @@
                          target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
                 <join-column name="package_id"/>
             </many-to-one>
-            <one-to-many name="detections"
+            <one-to-many name="detections" orphan-removal="true"
                          target-entity="com.philips.research.licensescanner.persistence.DetectionEntity">
                 <map-key name="license"/>
                 <join-column name="scan_id"/>

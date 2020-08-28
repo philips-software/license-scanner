@@ -12,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
 import java.net.URI;
+import java.time.Duration;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,5 +120,31 @@ class PackageDatabaseTest {
 
         assertThat(scans).hasSize(2);
         assertThat(scans.get(0).getPackage()).isEqualTo(pkg);
+    }
+
+    @Test
+    void deletesScansForPackage() {
+        database.createScan(pkg, LOCATION);
+
+        database.deleteScans(pkg);
+
+        final var now = Instant.now();
+        assertThat(database.findScans(now.minus(Duration.ofSeconds(1)), now)).isEmpty();
+    }
+
+    @Test
+    void findsScanResultById() {
+        Instant before = Instant.now();
+        database.createScan(pkg, LOCATION);
+        database.createScan(pkg, LOCATION);
+        Instant after = Instant.now();
+        final var scans = database.findScans(before, after);
+        assertThat(scans).hasSize(2);
+        final var uuid = scans.get(0).getUuid();
+
+        //noinspection OptionalGetWithoutIsPresent
+        final var found = database.getScan(uuid).get();
+
+        assertThat(found.getUuid()).isEqualTo(uuid);
     }
 }

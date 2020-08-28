@@ -80,6 +80,8 @@ public class PackageRoute {
             if (license.isPresent()) {
                 return new ScanInfoJson(license.get());
             }
+        } else {
+            service.deleteScans(namespace, name, version);
         }
         service.scanLicense(namespace, name, version, body.location);
 
