@@ -53,7 +53,8 @@ class FileJson {
     private void buildDictionary() {
         for (var license : licenses) {
             final var existing = licenseDictionary.get(license.key);
-            if (existing == null || license.score > existing.score || (license.score == existing.score && license.lines() > existing.lines())) {
+            if (existing == null || license.score > existing.score
+                    || (license.score == existing.score && license.lines() > existing.lines())) {
                 licenseDictionary.put(license.key, license);
             }
         }

@@ -74,3 +74,16 @@ Others
 - [ ] Include SPDX version handling.
 - [ ] Multi-server scanning queue (like AMQP) that persists after restart of 
 individual servers in a load-balanced configuration.
+
+## Development
+### Accessing the H2 database
+The H2 database exposes its (simple) web client at path `/h2` with 
+credentials "user" and "password".
+
+If migration of the database fails, a stand-alone can be started from the 
+command line on Linux or Mac using:
+
+    java -jar ~/.m2/repository/com/h2database/h2/<version>/h2-<version>.jar
+    
+(Migrations can be manually fixed or removed in the "flyway_schema_history" 
+table.)

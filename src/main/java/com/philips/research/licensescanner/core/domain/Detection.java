@@ -33,7 +33,8 @@ public class Detection {
      * @param endLine   ending line in the file
      */
     public void addEvidence(int score, File filePath, int startLine, int endLine) {
-        if (score > this.score) {
+        if (score > this.score ||
+                (score == this.score && (endLine - startLine > this.endLine - this.startLine))) {
             this.score = score;
             this.filePath = filePath;
             this.startLine = startLine;

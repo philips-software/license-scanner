@@ -68,10 +68,9 @@ public class Downloader {
 
         try {
             handler.download(directory, uri);
-        } catch (Exception e) {
+        } finally {
             //noinspection ResultOfMethodCallIgnored
             directory.toFile().delete();
-            throw e;
         }
 
         return directory;

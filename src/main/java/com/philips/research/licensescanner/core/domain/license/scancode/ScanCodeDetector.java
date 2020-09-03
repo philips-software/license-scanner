@@ -19,7 +19,7 @@ import java.time.Duration;
 @Component
 public class ScanCodeDetector implements Detector {
     private static final String RESULT_FILE = "scancode.json";
-    private static final Duration MAX_DURATION = Duration.ofMinutes(10);
+    private static final Duration MAX_DURATION = Duration.ofMinutes(30);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override

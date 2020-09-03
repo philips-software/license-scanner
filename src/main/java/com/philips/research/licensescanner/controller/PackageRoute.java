@@ -75,13 +75,13 @@ public class PackageRoute {
             namespace = "";
         }
 
-        if (!force) {
+        if (force) {
+            service.deleteScans(namespace, name, version);
+        } else {
             final var license = service.licenseFor(namespace, name, version);
             if (license.isPresent()) {
                 return new ScanInfoJson(license.get());
             }
-        } else {
-            service.deleteScans(namespace, name, version);
         }
         service.scanLicense(namespace, name, version, body.location);
 

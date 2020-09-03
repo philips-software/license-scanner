@@ -36,7 +36,7 @@ class DetectionTest {
     }
 
     @Test
-    void onlyCountsLowerAndEqualScoringEvidence() {
+    void countsLowerAndEqualScoringEvidence() {
         detection.addEvidence(SCORE, FILE, START_LINE, END_LINE);
 
         detection.addEvidence(SCORE, new File("other.txt"), 666, 666);
@@ -45,6 +45,17 @@ class DetectionTest {
         assertThat(detection.getScore()).isEqualTo(SCORE);
         assertThat(detection.getFilePath()).isEqualTo(FILE);
         assertThat(detection.getConfirmations()).isEqualTo(3);
+    }
+
+    @Test
+    void prefersLongerEvidenceBlocks() {
+        detection.addEvidence(SCORE, new File("other.txt"), 1, 10);
+        detection.addEvidence(SCORE, FILE, 11, 21);
+
+        assertThat(detection.getFilePath()).isEqualTo(FILE);
+        assertThat(detection.getStartLine()).isEqualTo(11);
+        assertThat(detection.getEndLine()).isEqualTo(21);
+        assertThat(detection.getConfirmations()).isEqualTo(2);
     }
 
     @Test

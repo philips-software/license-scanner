@@ -1,5 +1,6 @@
 package com.philips.research.licensescanner.core.domain;
 
+import ch.qos.logback.core.spi.ScanException;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
@@ -69,13 +70,16 @@ public class LicenseInteractor implements LicenseService {
             final var pkg = getOrCreatePackage(namespace, name, version);
             if (store.latestScan(pkg).isEmpty()) {
                 scan = store.createScan(pkg, location);
+                if (location == null) {
+                    throw new ScanException("No source code location provided");
+                }
                 //TODO Check hash after download
                 path = downloader.download(location);
                 detector.scan(path, scan, licenseThreshold);
                 LOG.info("Detected license for {}:{} {} is '{}'", namespace, name, version, scan.getLicense());
             }
         } catch (Exception e) {
-            LOG.error("Scanning failed", e);
+            LOG.error("Scanning failed: " + e.toString());
             if (scan != null) {
                 scan.setError(e.getMessage());
             }
