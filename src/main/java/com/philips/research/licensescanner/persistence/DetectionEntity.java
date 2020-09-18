@@ -3,7 +3,10 @@ package com.philips.research.licensescanner.persistence;
 import com.philips.research.licensescanner.core.domain.Detection;
 import com.philips.research.licensescanner.core.domain.license.License;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "detections")
