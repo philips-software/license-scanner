@@ -3,6 +3,7 @@ package com.philips.research.licensescanner.controller;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.philips.research.licensescanner.core.LicenseService;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
 import java.time.Instant;
@@ -12,13 +13,13 @@ import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class ScanInfoJson extends PackageInfoJson {
-    UUID uuid;
+    @NullOr UUID uuid;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    Instant timestamp;
-    URI location;
-    String license;
-    String error;
-    List<DetectionInfoJson> detections;
+    @NullOr Instant timestamp;
+    @NullOr URI location;
+    @NullOr String license;
+    @NullOr String error;
+    @NullOr List<DetectionInfoJson> detections;
     boolean contested;
     boolean confirmed;
 

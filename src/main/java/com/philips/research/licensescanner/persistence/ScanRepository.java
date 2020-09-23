@@ -12,11 +12,13 @@ import java.util.UUID;
  * Spring JPA query definitions for scans.
  */
 interface ScanRepository extends CrudRepository<ScanEntity, Long> {
+    @SuppressWarnings("SpringDataRepositoryMethodParametersInspection")
     Optional<ScanEntity> findTopByPkgAndErrorIsNullOrderByIdDesc(PackageEntity pkg);
 
     List<ScanEntity> findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(
             Instant from, Instant until);
 
+    @SuppressWarnings("SpringDataRepositoryMethodParametersInspection")
     List<ScanEntity> findAllByPkgAndErrorIsNotNullOrderByTimestampDesc(PackageEntity pkg);
 
     Optional<ScanEntity> findByUuid(UUID scanId);

@@ -43,6 +43,7 @@ public class Detection {
         confirmations++;
     }
 
+    @SuppressWarnings("JpaAttributeTypeInspection")
     public License getLicense() {
         return license;
     }

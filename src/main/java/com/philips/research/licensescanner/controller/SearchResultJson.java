@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class SearchResultJson {
-    List<PackageInfoJson> results;
+    final List<PackageInfoJson> results;
 
     public SearchResultJson(Stream<PackageInfoJson> results) {
         this.results = results.collect(Collectors.toList());

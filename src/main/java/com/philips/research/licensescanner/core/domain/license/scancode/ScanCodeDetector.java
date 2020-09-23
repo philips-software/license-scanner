@@ -19,17 +19,20 @@ import java.time.Duration;
 @Component
 public class ScanCodeDetector implements Detector {
     private static final String RESULT_FILE = "scancode.json";
-    private static final Duration MAX_DURATION = Duration.ofMinutes(30);
+    private static final Duration MAX_EXTRACT_DURATION = Duration.ofMinutes(10);
+    private static final Duration MAX_SCAN_DURATION = Duration.ofMinutes(30);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     public void scan(Path directory, Scan scan, int scoreThreshold) {
+        //noinspection SpellCheckingInspection
         new ShellCommand("extractcode").setDirectory(directory.toFile())
+                .setTimeout(MAX_EXTRACT_DURATION)
                 .execute("--verbose", ".");
         new ShellCommand("scancode")
                 .setDirectory(directory.toFile())
-                .setTimeout(MAX_DURATION)
-                .execute("--license", "-n2", "--verbose", "--timeout=" + MAX_DURATION.toSeconds(), "--only-findings",
+                .setTimeout(MAX_SCAN_DURATION)
+                .execute("--license", "-n2", "--verbose", "--timeout=" + MAX_SCAN_DURATION.toSeconds(), "--only-findings",
                         "--license-score", scoreThreshold, "--strip-root", "--ignore", "test*", "--ignore", RESULT_FILE,
                         "--json-pp", RESULT_FILE, ".");
         parseResult(directory, scan);

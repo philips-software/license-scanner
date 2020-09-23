@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.license.License;
 import com.philips.research.licensescanner.core.domain.license.LicenseParser;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +16,10 @@ import java.util.Map;
 /**
  * ScanCode Toolkit JSON result file mapping.
  */
-@SuppressWarnings("unused")
 @JsonIgnoreProperties(ignoreUnknown = true)
 class ScanCodeJson {
     @JsonProperty("files")
-    List<FileJson> files;
+    final List<FileJson> files = new ArrayList<>();
 
     /**
      * Adds all (mapped) license expressions from each file to the scan.
@@ -28,16 +29,15 @@ class ScanCodeJson {
     }
 }
 
-@SuppressWarnings("unused")
 @JsonIgnoreProperties(ignoreUnknown = true)
 class FileJson {
+    @JsonProperty("licenses")
+    final List<LicenseJson> licenses = new ArrayList<>();
+    @JsonProperty("license_expressions")
+    final List<String> expressions = new ArrayList<>();
     private final Map<String, LicenseJson> licenseDictionary = new HashMap<>();
     @JsonProperty("path")
-    String path = "";
-    @JsonProperty("licenses")
-    List<LicenseJson> licenses;
-    @JsonProperty("license_expressions")
-    List<String> expressions;
+    @NullOr String path = "";
 
     void addLicenseExpressionsTo(Scan scan) {
         buildDictionary();
@@ -46,15 +46,16 @@ class FileJson {
             final var scanner = new ExpressionScanner();
             scanner.scan(exp);
 
-            scan.addDetection(scanner.license, scanner.score, new File(path), scanner.startLine, scanner.endLine);
+            var file = new File(path != null ? path : ".");
+            scan.addDetection(scanner.license, scanner.score, file, scanner.startLine, scanner.endLine);
         });
     }
 
     private void buildDictionary() {
         for (var license : licenses) {
             final var existing = licenseDictionary.get(license.key);
-            if (existing == null || license.score > existing.score
-                    || (license.score == existing.score && license.lines() > existing.lines())) {
+            if (license.key != null && (existing == null || license.score > existing.score
+                    || (license.score == existing.score && license.lines() > existing.lines()))) {
                 licenseDictionary.put(license.key, license);
             }
         }
@@ -67,7 +68,7 @@ class FileJson {
         private int startLine = Integer.MAX_VALUE;
         private int endLine = 0;
         private int score = 100;
-        private License license;
+        private License license = License.NONE;
 
         void scan(String expression) {
             license = LicenseParser.parse(toSpdx(expression));
@@ -75,23 +76,23 @@ class FileJson {
 
         private String toSpdx(String expression) {
             final var converted = new StringBuilder();
-            var key = "";
+            var key = new StringBuilder();
             for (var ch : expression.toCharArray()) {
                 switch (ch) {
                     case ' ':
                     case '(':
                     case ')':
-                        final var spdx = handleKey(key);
+                        final var spdx = handleKey(key.toString());
                         converted.append(spdx);
                         converted.append(ch);
-                        key = "";
+                        key.setLength(0);
                         break;
                     default:
-                        key += ch;
+                        key.append(ch);
                         break;
                 }
             }
-            converted.append(handleKey(key));
+            converted.append(handleKey(key.toString()));
 
             return converted.toString();
         }
@@ -110,11 +111,10 @@ class FileJson {
     }
 }
 
-@SuppressWarnings("unused")
 @JsonIgnoreProperties(ignoreUnknown = true)
 class LicenseJson {
     @JsonProperty("key")
-    String key;
+    @NullOr String key;
     @JsonProperty("score")
     double score;
     @JsonProperty("start_line")
@@ -122,10 +122,12 @@ class LicenseJson {
     @JsonProperty("end_line")
     int endLine;
     @JsonProperty("spdx_license_key")
-    String spdx;
+    @NullOr String spdx;
 
     String getSpdxIdentifier() {
-        return (spdx != null) ? spdx : key;
+        return (spdx != null)
+                ? spdx
+                : (key != null) ? key : "";
     }
 
     public int lines() {

@@ -1,6 +1,7 @@
 package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.core.domain.license.License;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.io.File;
 import java.net.URI;
@@ -17,8 +18,9 @@ public class Scan {
     private final URI location;
     private final Map<License, Detection> detections = new HashMap<>();
 
+    @SuppressWarnings("JpaAttributeTypeInspection")
     public License license = License.NONE;
-    private String error;
+    private @NullOr String error;
     private boolean contested;
     private boolean confirmed;
 
@@ -66,6 +68,7 @@ public class Scan {
     }
 
     public Optional<URI> getLocation() {
+        //noinspection ConstantConditions
         return Optional.ofNullable(location);
     }
 

@@ -15,6 +15,7 @@ import java.nio.file.Path;
 @ConfigurationProperties(prefix = "licenses")
 public class ApplicationConfiguration {
     @NotNull
+    @SuppressWarnings("NotNullFieldNotInitialized")
     private Path tempDir;
 
     private int thresholdPercent = 50;

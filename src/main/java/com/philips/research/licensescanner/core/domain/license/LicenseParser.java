@@ -1,12 +1,14 @@
 package com.philips.research.licensescanner.core.domain.license;
 
+import pl.tlinkowski.annotation.basic.NullOr;
+
 /**
  * Parser for SPDX-like license statements containing AND, OR, WITH clauses and braces.
  */
 public class LicenseParser {
     private StringBuilder buffer = new StringBuilder();
     private License license = License.NONE;
-    private License latest = null;
+    private @NullOr License latest = null;
     private Mode mode = Mode.NONE;
 
     private LicenseParser() {
@@ -15,8 +17,8 @@ public class LicenseParser {
     /**
      * @return the license matching the provided text
      */
-    public static License parse(String text) {
-        if (text == null) {
+    public static License parse(@NullOr String text) {
+        if (text == null || text.isBlank()) {
             return License.NONE;
         }
         return new LicenseParser().decode(text);

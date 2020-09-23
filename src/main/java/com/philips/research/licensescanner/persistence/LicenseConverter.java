@@ -10,7 +10,7 @@ import javax.persistence.Converter;
  * JPA converter for storing Licenses as a string.
  */
 @Converter(autoApply = true)
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "RedundantSuppression"})
 public class LicenseConverter implements AttributeConverter<License, String> {
     @Override
     public String convertToDatabaseColumn(License license) {

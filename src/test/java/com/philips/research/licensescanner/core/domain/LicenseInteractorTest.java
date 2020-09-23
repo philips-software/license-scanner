@@ -136,16 +136,6 @@ class LicenseInteractorTest {
         }
 
         @Test
-        void registersMissingLocation() {
-            when(store.createScan(PACKAGE, null)).thenReturn(scan);
-
-            service.scanLicense(ORIGIN, NAME, VERSION, null);
-
-            //noinspection OptionalGetWithoutIsPresent
-            assertThat(scan.getError().get()).contains("location");
-        }
-
-        @Test
         void registersDownloadFailure() {
             final var message = "Test error";
             when(downloader.download(LOCATION)).thenThrow(new DownloadException(message));

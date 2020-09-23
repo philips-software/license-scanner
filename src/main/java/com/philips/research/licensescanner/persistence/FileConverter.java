@@ -8,7 +8,7 @@ import java.io.File;
  * JPA converter for storing a file path as a String.
  */
 @Converter(autoApply = true)
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "RedundantSuppression"})
 class FileConverter implements AttributeConverter<File, String> {
     @Override
     public String convertToDatabaseColumn(File file) {

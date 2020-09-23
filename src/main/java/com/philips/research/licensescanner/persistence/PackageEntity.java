@@ -1,6 +1,7 @@
 package com.philips.research.licensescanner.persistence;
 
 import com.philips.research.licensescanner.core.domain.Package;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,14 +12,16 @@ import javax.persistence.Table;
  * JPA entity for persisting a package.
  */
 @Entity
+@SuppressWarnings("JpaDataSourceORMInspection")
 @Table(name = "packages")
 class PackageEntity extends Package {
     @Id
     @GeneratedValue
-    private Long id;
+    @SuppressWarnings({"unused", "RedundantSuppression"})
+    private @NullOr Long id;
 
     public PackageEntity() {
-        super(null, null, null);
+        super("", "", "");
     }
 
     PackageEntity(String namespace, String name, String version) {

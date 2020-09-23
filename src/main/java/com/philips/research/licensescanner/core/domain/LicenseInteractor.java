@@ -1,6 +1,5 @@
 package com.philips.research.licensescanner.core.domain;
 
-import ch.qos.logback.core.spi.ScanException;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.io.IOException;
 import java.net.URI;
@@ -63,16 +63,13 @@ public class LicenseInteractor implements LicenseService {
     @Async("licenseDetectionExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void scanLicense(String namespace, String name, String version, URI location) {
-        Path path = null;
-        Scan scan = null;
+        @NullOr Path path = null;
+        @NullOr Scan scan = null;
         try {
             LOG.info("Scan license for {}:{} {} from {}", namespace, name, version, location);
             final var pkg = getOrCreatePackage(namespace, name, version);
             if (store.latestScan(pkg).isEmpty()) {
                 scan = store.createScan(pkg, location);
-                if (location == null) {
-                    throw new ScanException("No source code location provided");
-                }
                 //TODO Check hash after download
                 path = downloader.download(location);
                 detector.scan(path, scan, licenseThreshold);
@@ -115,10 +112,8 @@ public class LicenseInteractor implements LicenseService {
 
     private void deleteDirectory(Path path) {
         try {
-            if (path != null) {
-                LOG.info("Removing working directory {}", path);
-                FileSystemUtils.deleteRecursively(path);
-            }
+            LOG.info("Removing working directory {}", path);
+            FileSystemUtils.deleteRecursively(path);
         } catch (IOException e) {
             LOG.warn("Failed to (fully) remove directory {}", path);
         }

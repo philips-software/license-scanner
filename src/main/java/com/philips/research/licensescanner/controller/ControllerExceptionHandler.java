@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ControllerExceptionHandler {
     /**
-     * Handles requested resources that are not availabe on the server.
+     * Handles requested resources that are not available on the server.
      *
      * @return NOT_FOUND status with a list of resources that were not found.
      */

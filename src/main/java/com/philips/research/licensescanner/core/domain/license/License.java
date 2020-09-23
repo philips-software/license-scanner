@@ -1,5 +1,7 @@
 package com.philips.research.licensescanner.core.domain.license;
 
+import pl.tlinkowski.annotation.basic.NullOr;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,7 +83,7 @@ public abstract class License {
     private static class SingleLicense extends License {
         private final String identifier;
 
-        private String exception = null;
+        private @NullOr String exception = null;
 
         SingleLicense(String identifier) {
             this.identifier = identifier;

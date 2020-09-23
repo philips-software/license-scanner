@@ -16,7 +16,9 @@ import java.util.UUID;
  */
 @Repository
 public class PackageDatabase implements PackageStore {
+    @SuppressWarnings("NotNullFieldNotInitialized")
     static DetectionRepository detectionRepository;
+
     private final PackageRepository packageRepository;
     private final ScanRepository scanRepository;
 

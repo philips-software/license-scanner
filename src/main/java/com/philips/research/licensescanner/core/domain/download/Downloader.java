@@ -1,8 +1,6 @@
 package com.philips.research.licensescanner.core.domain.download;
 
 import com.philips.research.licensescanner.ApplicationConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,8 +29,6 @@ interface DownloadHandler {
  */
 @Component
 public class Downloader {
-    private static final Logger LOG = LoggerFactory.getLogger(Downloader.class);
-
     private final Path baseDirectory;
     private final Map<String, DownloadHandler> registry = new HashMap<>();
 
@@ -47,8 +43,7 @@ public class Downloader {
     /**
      * Registers a download handler for a single tool.
      *
-     * @param tool    tool identifier
-     * @param handler
+     * @param tool tool identifier
      */
     void register(String tool, DownloadHandler handler) {
         registry.put(tool, handler);

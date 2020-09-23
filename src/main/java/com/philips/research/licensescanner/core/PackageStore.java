@@ -14,21 +14,13 @@ import java.util.UUID;
  */
 public interface PackageStore {
     /**
-     * Creates a new persistent package.
-     *
-     * @param namespace
-     * @param name
-     * @param version
-     * @return package instance
+     * @return a new package instance
      */
     Package createPackage(String namespace, String name, String version);
 
     /**
      * Finds a single package.
      *
-     * @param namespace
-     * @param name
-     * @param version
      * @return the package (if any)
      */
     Optional<Package> getPackage(String namespace, String name, String version);
@@ -36,7 +28,7 @@ public interface PackageStore {
     /**
      * Finds all packages (partly) containing the indicated fields.
      *
-     * @param namespace (frogment of) namespace
+     * @param namespace (fragment of) namespace
      * @param name      (fragment of) name
      * @param version   (fragment of) version
      * @return all matching packages
@@ -45,16 +37,12 @@ public interface PackageStore {
 
     /**
      * Deletes all scans for the indicated package.
-     *
-     * @param pkg
      */
     void deleteScans(Package pkg);
 
     /**
      * Creates a new persistent scan registration.
      *
-     * @param pkg
-     * @param location
      * @return scan instance
      */
     Scan createScan(Package pkg, URI location);
@@ -69,15 +57,12 @@ public interface PackageStore {
 
     /**
      * Removes a scan registration.
-     *
-     * @param scan
      */
     void deleteScan(Scan scan);
 
     /**
      * Finds all scanning errors for a package.
      *
-     * @param pkg
      * @return all scanning errors, sorted on descending timestamp
      */
     List<Scan> scanErrors(Package pkg);
@@ -89,9 +74,6 @@ public interface PackageStore {
 
     /**
      * Finds all latest scans in a period.
-     *
-     * @param from
-     * @param until
      */
     List<Scan> findScans(Instant from, Instant until);
 }

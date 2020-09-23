@@ -3,6 +3,7 @@ package com.philips.research.licensescanner.controller;
 import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import javax.validation.Valid;
 
@@ -22,13 +23,12 @@ public class PackageRoute {
     /**
      * Gets scan results for a single package.
      *
-     * @param namespace
-     * @param name
-     * @param version
      * @return scan result
      */
     @GetMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
-    ScanInfoJson getLatestScanForPackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable String version) {
+    ScanInfoJson getLatestScanForPackage(@NullOr @PathVariable(required = false) String namespace,
+                                         @PathVariable String name,
+                                         @PathVariable String version) {
         if (namespace == null) {
             namespace = "";
         }
@@ -60,19 +60,21 @@ public class PackageRoute {
      * Requests licenses for the indicated packages. If the package was scanned before, the result is returned. Else the
      * package is scheduled for scanning.
      *
-     * @param namespace
-     * @param name
-     * @param version
-     * @param body      details where to obtain the package source for scanning
-     * @param force     forces re-scanning despite an existing scan result
+     * @param body  details where to obtain the package source for scanning
+     * @param force forces re-scanning despite an existing scan result
      * @return scan result
      */
     @PostMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
-    ScanInfoJson scanPackage(@PathVariable(required = false) String namespace, @PathVariable String name, @PathVariable(required = false) String version,
+    ScanInfoJson scanPackage(@NullOr @PathVariable(required = false) String namespace,
+                             @PathVariable String name,
+                             @NullOr @PathVariable(required = false) String version,
                              @Valid @RequestBody ScanRequestJson body,
                              @RequestParam(name = "force", required = false) boolean force) {
         if (namespace == null) {
             namespace = "";
+        }
+        if (version == null) {
+            version = "";
         }
 
         if (force) {
@@ -83,7 +85,9 @@ public class PackageRoute {
                 return new ScanInfoJson(license.get());
             }
         }
-        service.scanLicense(namespace, name, version, body.location);
+        if (body.location != null) {
+            service.scanLicense(namespace, name, version, body.location);
+        }
 
         return new ScanInfoJson(namespace, name, version, body.location);
     }

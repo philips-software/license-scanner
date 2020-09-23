@@ -4,6 +4,7 @@ package com.philips.research.licensescanner.controller;
 import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -28,7 +29,8 @@ public class ScanRoute {
      * @param end   (Optional) end timestamp: defaults to "now"
      */
     @GetMapping()
-    SearchResultJson latestScans(@RequestParam(required = false) Instant start, @RequestParam(required = false) Instant end) {
+    SearchResultJson latestScans(@NullOr @RequestParam(required = false) Instant start,
+                                 @NullOr @RequestParam(required = false) Instant end) {
         final var scans = service.findScans(
                 start != null ? start : Instant.EPOCH,
                 end != null ? end : Instant.now());

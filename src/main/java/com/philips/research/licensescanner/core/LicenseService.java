@@ -1,5 +1,7 @@
 package com.philips.research.licensescanner.core;
 
+import pl.tlinkowski.annotation.basic.NullOr;
+
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
@@ -52,6 +54,7 @@ public interface LicenseService {
     /**
      * Response model for a package identifier.
      */
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class PackageId {
         public String namespace;
         public String name;
@@ -61,14 +64,15 @@ public interface LicenseService {
     /**
      * Response model for license information.
      */
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class LicenseInfo {
         public UUID uuid;
         public Instant timestamp;
         public PackageId pkg;
-        public URI location;
         public String license;
-        public String error;
-        public List<DetectionInfo> detections;
+        public @NullOr URI location;
+        public @NullOr String error;
+        public @NullOr List<DetectionInfo> detections;
         public boolean isContested;
         public boolean isConfirmed;
     }
@@ -76,6 +80,7 @@ public interface LicenseService {
     /**
      * Response model for license detection information.
      */
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class DetectionInfo {
         public String license;
         public String file;
