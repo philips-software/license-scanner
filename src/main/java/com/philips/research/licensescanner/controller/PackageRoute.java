@@ -32,7 +32,7 @@ public class PackageRoute {
         if (namespace == null) {
             namespace = "";
         }
-        if (version.isBlank()){
+        if (version.isBlank()) {
             version = "";
         }
         final var resource = String.format("%s/%s/%s", namespace, name, version);

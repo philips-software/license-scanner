@@ -53,7 +53,7 @@ class ControllerExceptionHandlerTest {
     @Test
     void handlesNotFound() throws Exception {
         final var response = new JSONObject()
-                .put("resource", "package");
+                .put("resource", String.format("%s/%s/%s", ORIGIN,PACKAGE,VERSION));
         when(service.licenseFor(ORIGIN, PACKAGE, VERSION))
                 .thenReturn(Optional.empty());
 
