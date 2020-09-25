@@ -15,7 +15,7 @@ public class Scan {
     private final UUID uuid = UUID.randomUUID();
     private final Instant timestamp = Instant.now();
     private final Package pkg;
-    private final URI location;
+    private final @NullOr URI location;
     private final Map<License, Detection> detections = new HashMap<>();
 
     @SuppressWarnings("JpaAttributeTypeInspection")
@@ -24,7 +24,7 @@ public class Scan {
     private boolean contested;
     private boolean confirmed;
 
-    public Scan(Package pkg, URI location) {
+    public Scan(Package pkg, @NullOr URI location) {
         this.pkg = pkg;
         this.location = location;
     }
@@ -68,7 +68,6 @@ public class Scan {
     }
 
     public Optional<URI> getLocation() {
-        //noinspection ConstantConditions
         return Optional.ofNullable(location);
     }
 

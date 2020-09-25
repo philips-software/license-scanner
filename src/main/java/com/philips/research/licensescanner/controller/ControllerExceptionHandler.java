@@ -1,5 +1,7 @@
 package com.philips.research.licensescanner.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
  */
 @ControllerAdvice
 public class ControllerExceptionHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(ControllerExceptionHandler.class);
+
     /**
      * Handles requested resources that are not available on the server.
      *
@@ -26,6 +30,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseBody
     public Map<String, String> handleNotFoundException(ResourceNotFoundException exception) {
+        LOG.info("Resource '{}' was not found", exception.getResource());
         return Map.of("resource", exception.getResource());
     }
 

@@ -32,8 +32,12 @@ public class PackageRoute {
         if (namespace == null) {
             namespace = "";
         }
+        if (version.isBlank()){
+            version = "";
+        }
+        final var resource = String.format("%s/%s/%s", namespace, name, version);
         final var license = service.licenseFor(namespace, name, version)
-                .orElseThrow(() -> new ResourceNotFoundException("package"));
+                .orElseThrow(() -> new ResourceNotFoundException(resource));
 
         return new ScanInfoJson(license);
     }
@@ -67,13 +71,13 @@ public class PackageRoute {
     @PostMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
     ScanInfoJson scanPackage(@NullOr @PathVariable(required = false) String namespace,
                              @PathVariable String name,
-                             @NullOr @PathVariable(required = false) String version,
+                             @PathVariable String version,
                              @Valid @RequestBody ScanRequestJson body,
                              @RequestParam(name = "force", required = false) boolean force) {
         if (namespace == null) {
             namespace = "";
         }
-        if (version == null) {
+        if (version.isBlank()) {
             version = "";
         }
 
@@ -85,9 +89,7 @@ public class PackageRoute {
                 return new ScanInfoJson(license.get());
             }
         }
-        if (body.location != null) {
-            service.scanLicense(namespace, name, version, body.location);
-        }
+        service.scanLicense(namespace, name, version, body.location);
 
         return new ScanInfoJson(namespace, name, version, body.location);
     }

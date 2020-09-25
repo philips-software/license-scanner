@@ -62,7 +62,7 @@ public class LicenseInteractor implements LicenseService {
     @Override
     @Async("licenseDetectionExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void scanLicense(String namespace, String name, String version, URI location) {
+    public void scanLicense(String namespace, String name, String version, @NullOr URI location) {
         @NullOr Path path = null;
         @NullOr Scan scan = null;
         try {
@@ -70,10 +70,14 @@ public class LicenseInteractor implements LicenseService {
             final var pkg = getOrCreatePackage(namespace, name, version);
             if (store.latestScan(pkg).isEmpty()) {
                 scan = store.createScan(pkg, location);
-                //TODO Check hash after download
-                path = downloader.download(location);
-                detector.scan(path, scan, licenseThreshold);
-                LOG.info("Detected license for {}:{} {} is '{}'", namespace, name, version, scan.getLicense());
+                if (location != null) {
+                    //TODO Check hash after download
+                    path = downloader.download(location);
+                    detector.scan(path, scan, licenseThreshold);
+                    LOG.info("Detected license for {}:{} {} is '{}'", namespace, name, version, scan.getLicense());
+                } else {
+                    scan.setError("No location provided");
+                }
             }
         } catch (Exception e) {
             LOG.error("Scanning failed: " + e.toString());

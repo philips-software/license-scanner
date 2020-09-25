@@ -2,6 +2,7 @@ package com.philips.research.licensescanner.core;
 
 import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
 import java.time.Instant;
@@ -45,7 +46,7 @@ public interface PackageStore {
      *
      * @return scan instance
      */
-    Scan createScan(Package pkg, URI location);
+    Scan createScan(Package pkg, @NullOr URI location);
 
     /**
      * Finds the latest scan for a package.

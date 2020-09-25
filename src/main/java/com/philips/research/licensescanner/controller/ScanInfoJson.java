@@ -23,7 +23,7 @@ class ScanInfoJson extends PackageInfoJson {
     boolean contested;
     boolean confirmed;
 
-    public ScanInfoJson(String namespace, String name, String version, URI location) {
+    public ScanInfoJson(String namespace, String name, String version, @NullOr URI location) {
         super(namespace, name, version);
         this.location = location;
     }

@@ -32,7 +32,7 @@ public interface LicenseService {
      *
      * @param vcsId Version control coordinates
      */
-    void scanLicense(String namespace, String name, String version, URI vcsId);
+    void scanLicense(String namespace, String name, String version, @NullOr URI vcsId);
 
     /**
      * @return the details for the indicated scan
