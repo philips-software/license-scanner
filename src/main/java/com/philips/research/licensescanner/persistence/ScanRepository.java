@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020-2020, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
+ */
+
 package com.philips.research.licensescanner.persistence;
 
 import com.philips.research.licensescanner.core.domain.Package;
@@ -13,7 +18,7 @@ import java.util.UUID;
  */
 interface ScanRepository extends CrudRepository<ScanEntity, Long> {
     @SuppressWarnings("SpringDataRepositoryMethodParametersInspection")
-    Optional<ScanEntity> findTopByPkgAndErrorIsNullOrderByIdDesc(PackageEntity pkg);
+    Optional<ScanEntity> findTopByPkgOrderByIdDesc(PackageEntity pkg);
 
     List<ScanEntity> findTop50ByTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(
             Instant from, Instant until);

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020-2020, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
+ */
+
 package com.philips.research.licensescanner.controller;
 
 import com.philips.research.licensescanner.core.LicenseService;
@@ -53,7 +58,7 @@ class ControllerExceptionHandlerTest {
     @Test
     void handlesNotFound() throws Exception {
         final var response = new JSONObject()
-                .put("resource", String.format("%s/%s/%s", ORIGIN,PACKAGE,VERSION));
+                .put("resource", String.format("%s/%s/%s", ORIGIN, PACKAGE, VERSION));
         when(service.licenseFor(ORIGIN, PACKAGE, VERSION))
                 .thenReturn(Optional.empty());
 

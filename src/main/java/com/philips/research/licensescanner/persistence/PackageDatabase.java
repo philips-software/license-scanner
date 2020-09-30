@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2020-2020, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
+ */
+
 package com.philips.research.licensescanner.persistence;
 
 import com.philips.research.licensescanner.core.PackageStore;
@@ -63,7 +68,7 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public Optional<Scan> latestScan(Package pkg) {
-        return scanRepository.findTopByPkgAndErrorIsNullOrderByIdDesc((PackageEntity) pkg).map(scan -> scan);
+        return scanRepository.findTopByPkgOrderByIdDesc((PackageEntity) pkg).map(scan -> scan);
     }
 
     @Override
