@@ -47,6 +47,11 @@ public interface LicenseService {
     List<LicenseInfo> findScans(Instant from, Instant until);
 
     /**
+     * Constests a scan
+     */
+    void contest(UUID scanId);
+
+    /**
      * Clear any existing scans for the indicated package.
      */
     void deleteScans(String namespace, String name, String version);

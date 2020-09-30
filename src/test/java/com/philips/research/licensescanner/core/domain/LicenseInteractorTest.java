@@ -44,7 +44,7 @@ class LicenseInteractorTest {
     private final Detector detector = mock(Detector.class);
     private final PackageStore store = mock(PackageStore.class);
 
-    private final LicenseService service = new LicenseInteractor(store, downloader, detector, THRESHOLD);
+    private final LicenseService interactor = new LicenseInteractor(store, downloader, detector, THRESHOLD);
 
     @BeforeEach
     void beforeEach() {
@@ -57,7 +57,7 @@ class LicenseInteractorTest {
         void findsPackages() {
             when(store.findPackages(ORIGIN, NAME, VERSION)).thenReturn(List.of(new Package(ORIGIN, NAME, VERSION)));
 
-            final var result = service.findPackages(ORIGIN, NAME, VERSION);
+            final var result = interactor.findPackages(ORIGIN, NAME, VERSION);
 
             assertThat(result).hasSize(1);
             final var pkg = result.get(0);
@@ -73,7 +73,7 @@ class LicenseInteractorTest {
         void noLicense_packageNotFound() {
             when(store.getPackage(ORIGIN, NAME, VERSION)).thenReturn(Optional.empty());
 
-            final var noInfo = service.licenseFor(ORIGIN, NAME, VERSION);
+            final var noInfo = interactor.licenseFor(ORIGIN, NAME, VERSION);
 
             assertThat(noInfo).isEmpty();
         }
@@ -82,7 +82,7 @@ class LicenseInteractorTest {
         void noLicense_noScanForPackage() {
             when(store.latestScan(PACKAGE)).thenReturn(Optional.empty());
 
-            final var noInfo = service.licenseFor(ORIGIN, NAME, VERSION);
+            final var noInfo = interactor.licenseFor(ORIGIN, NAME, VERSION);
 
             assertThat(noInfo).isEmpty();
         }
@@ -91,7 +91,7 @@ class LicenseInteractorTest {
         void retrievesLicenseForPackage() {
             when(store.latestScan(PACKAGE)).thenReturn(Optional.of(SCAN));
 
-            @SuppressWarnings("OptionalGetWithoutIsPresent") final var info = service.licenseFor(ORIGIN, NAME, VERSION).get();
+            @SuppressWarnings("OptionalGetWithoutIsPresent") final var info = interactor.licenseFor(ORIGIN, NAME, VERSION).get();
 
             assertThat(info.license).contains(LICENSE);
             assertThat(info.location).isEqualTo(LOCATION);
@@ -119,7 +119,7 @@ class LicenseInteractorTest {
         void skipsIfAlreadyScanned() {
             when(store.latestScan(PACKAGE)).thenReturn(Optional.of(scan));
 
-            service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+            interactor.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 
             verify(store, never()).createScan(PACKAGE, LOCATION);
             verify(detector, never()).scan(any(Path.class), any(Scan.class), anyInt());
@@ -130,7 +130,7 @@ class LicenseInteractorTest {
             when(store.latestScan(PACKAGE)).thenReturn(Optional.empty());
             when(store.createScan(PACKAGE, null)).thenReturn(scan);
 
-            service.scanLicense(ORIGIN, NAME, VERSION, null);
+            interactor.scanLicense(ORIGIN, NAME, VERSION, null);
 
             assertThat(scan.getError()).isNotEmpty();
             verify(detector, never()).scan(any(Path.class), any(Scan.class), anyInt());
@@ -140,7 +140,7 @@ class LicenseInteractorTest {
         void downloadsAndScansPackage() {
             when(downloader.download(LOCATION)).thenReturn(directory);
 
-            service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+            interactor.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 
             verify(detector).scan(directory, scan, THRESHOLD);
             assertThat(directory.toFile()).doesNotExist();
@@ -151,7 +151,7 @@ class LicenseInteractorTest {
             final var message = "Test error";
             when(downloader.download(LOCATION)).thenThrow(new DownloadException(message));
 
-            service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+            interactor.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 
             assertThat(scan.getError()).contains(message);
         }
@@ -162,7 +162,7 @@ class LicenseInteractorTest {
             when(downloader.download(LOCATION)).thenReturn(directory);
             doThrow(new DetectorException(message, null)).when(detector).scan(directory, scan, THRESHOLD);
 
-            service.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+            interactor.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 
             assertThat(scan.getError()).contains(message);
             assertThat(directory.toFile()).doesNotExist();
@@ -175,7 +175,7 @@ class LicenseInteractorTest {
         void findsScanByUuid() {
             when(store.getScan(SCAN_ID)).thenReturn(Optional.of(SCAN));
 
-            final var result = service.getScan(SCAN_ID);
+            final var result = interactor.getScan(SCAN_ID);
 
             assertThat(result).isPresent();
             assertThat(result.get().detections).isNotEmpty();
@@ -186,7 +186,7 @@ class LicenseInteractorTest {
             when(store.findScans(FROM, UNTIL)).thenReturn(List.of(new Scan(PACKAGE, LOCATION)
                     .addDetection(License.of(LICENSE), 100, null, 1, 2)));
 
-            final var result = service.findScans(FROM, UNTIL);
+            final var result = interactor.findScans(FROM, UNTIL);
 
             assertThat(result).hasSize(1);
             final var pkg = result.get(0);
@@ -196,8 +196,18 @@ class LicenseInteractorTest {
         }
 
         @Test
+        void contestsScan() {
+            final var scan = new Scan(PACKAGE, null);
+            when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
+
+            interactor.contest(SCAN_ID);
+
+            assertThat(scan.isContested()).isTrue();
+        }
+
+        @Test
         void deletesScansForPackage() {
-            service.deleteScans(ORIGIN, NAME, VERSION);
+            interactor.deleteScans(ORIGIN, NAME, VERSION);
 
             verify(store).deleteScans(PACKAGE);
         }

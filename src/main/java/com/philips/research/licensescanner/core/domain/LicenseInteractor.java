@@ -105,6 +105,11 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
+    public void contest(UUID scanId) {
+        store.getScan(scanId).ifPresent(Scan::contest);
+    }
+
+    @Override
     public void deleteScans(String namespace, String name, String version) {
         store.getPackage(namespace, name, version)
                 .ifPresent(store::deleteScans);

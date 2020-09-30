@@ -45,4 +45,9 @@ public class ScanRoute {
 
         return new ScanInfoJson(scan);
     }
+
+    @PostMapping("{uuid}/contest")
+    void contestScan(@PathVariable UUID uuid) {
+        service.contest(uuid);
+    }
 }

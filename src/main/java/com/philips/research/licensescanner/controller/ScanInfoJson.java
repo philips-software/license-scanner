@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class ScanInfoJson extends PackageInfoJson {
-    @NullOr UUID uuid;
+    @NullOr UUID id;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @NullOr Instant timestamp;
     @NullOr URI location;
@@ -30,7 +30,7 @@ class ScanInfoJson extends PackageInfoJson {
 
     public ScanInfoJson(LicenseService.LicenseInfo info) {
         super(info.pkg);
-        uuid = info.uuid;
+        id = info.uuid;
         timestamp = info.timestamp;
         location = info.location;
         license = info.license;

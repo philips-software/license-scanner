@@ -11,8 +11,10 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,6 +23,7 @@ class ScanRouteTest extends AbstractRouteTest {
 
     private static final String SCANS_URL = "/scans";
     private static final String SCANS_ID_URL = SCANS_URL + "/{uuid}";
+    private static final String CONTEST_URL = SCANS_ID_URL + "/contest";
 
     @Test
     void findsScanById() throws Exception {
@@ -62,5 +65,13 @@ class ScanRouteTest extends AbstractRouteTest {
         mockMvc.perform(get(SCANS_URL + "?start={from}&end={until}", from, until))
                 .andExpect(status().isOk())
                 .andExpect(content().json(response.toString()));
+    }
+
+    @Test
+    void contestsScan() throws Exception {
+        mockMvc.perform(post(CONTEST_URL, SCAN_ID))
+                .andExpect(status().isOk());
+
+        verify(service).contest(SCAN_ID);
     }
 }
