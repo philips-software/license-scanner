@@ -82,3 +82,7 @@ class DetectionInfoJson {
         this.confirmations = info.confirmations;
     }
 }
+
+class CurationJson {
+    @NullOr String license;
+}

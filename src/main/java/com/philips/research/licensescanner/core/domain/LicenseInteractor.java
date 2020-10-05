@@ -9,6 +9,7 @@ import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
 import com.philips.research.licensescanner.core.domain.license.Detector;
+import com.philips.research.licensescanner.core.domain.license.License;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +113,12 @@ public class LicenseInteractor implements LicenseService {
     @Override
     public void contest(UUID scanId) {
         store.getScan(scanId).ifPresent(Scan::contest);
+    }
+
+    @Override
+    public void curateLicense(UUID scanId, @NullOr String license) {
+        store.getScan(scanId)
+                .ifPresent(s -> s.confirm((license != null) ? License.of(license) : s.getLicense()));
     }
 
     @Override

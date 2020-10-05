@@ -52,9 +52,16 @@ public interface LicenseService {
     List<LicenseInfo> findScans(Instant from, Instant until);
 
     /**
-     * Constests a scan
+     * Contests a scan
      */
     void contest(UUID scanId);
+
+    /**
+     * Confirms or corrects the license of a scan.
+     *
+     * @param license Updated value or null to confirm existing
+     */
+    void curateLicense(UUID scanId, @NullOr String license);
 
     /**
      * Clear any existing scans for the indicated package.

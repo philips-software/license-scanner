@@ -51,8 +51,14 @@ public class ScanRoute {
         return new ScanInfoJson(scan);
     }
 
+    @PutMapping("{uuid}")
+    void confirmLicense(@PathVariable UUID uuid, @RequestBody CurationJson body) {
+        service.curateLicense(uuid, body.license);
+    }
+
     @PostMapping("{uuid}/contest")
     void contestScan(@PathVariable UUID uuid) {
         service.contest(uuid);
     }
+
 }

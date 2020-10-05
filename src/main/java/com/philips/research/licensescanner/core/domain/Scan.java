@@ -24,7 +24,7 @@ public class Scan {
     private final Map<License, Detection> detections = new HashMap<>();
 
     @SuppressWarnings("JpaAttributeTypeInspection")
-    public License license = License.NONE;
+    private License license = License.NONE;
     private @NullOr String error;
     private boolean contested;
     private boolean confirmed;
@@ -54,18 +54,20 @@ public class Scan {
      * Raises question about the validity of an unconfirmed the license.
      * If the license was already confirmed, nothing happens.
      */
-    public void contest() {
+    public Scan contest() {
         contested = !confirmed;
+        return this;
     }
 
     public boolean isContested() {
         return contested;
     }
 
-    public void confirm(License license) {
+    public Scan confirm(License license) {
         this.license = license;
         confirmed = true;
         contested = false;
+        return this;
     }
 
     public boolean isConfirmed() {

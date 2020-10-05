@@ -42,7 +42,8 @@ class FileJson {
     final List<String> expressions = new ArrayList<>();
     private final Map<String, LicenseJson> licenseDictionary = new HashMap<>();
     @JsonProperty("path")
-    @NullOr String path = "";
+    @NullOr
+    String path = "";
 
     void addLicenseExpressionsTo(Scan scan) {
         buildDictionary();
@@ -119,7 +120,8 @@ class FileJson {
 @JsonIgnoreProperties(ignoreUnknown = true)
 class LicenseJson {
     @JsonProperty("key")
-    @NullOr String key;
+    @NullOr
+    String key;
     @JsonProperty("score")
     double score;
     @JsonProperty("start_line")
@@ -127,7 +129,8 @@ class LicenseJson {
     @JsonProperty("end_line")
     int endLine;
     @JsonProperty("spdx_license_key")
-    @NullOr String spdx;
+    @NullOr
+    String spdx;
 
     String getSpdxIdentifier() {
         return (spdx != null)

@@ -7,6 +7,7 @@ package com.philips.research.licensescanner.controller;
 
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -18,8 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -78,5 +78,15 @@ class ScanRouteTest extends AbstractRouteTest {
                 .andExpect(status().isOk());
 
         verify(service).contest(SCAN_ID);
+    }
+
+    @Test
+    void curatesLicense() throws Exception {
+        mockMvc.perform(put(SCANS_ID_URL, SCAN_ID)
+                .content(new JSONObject().put("license", LICENSE).toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(service).curateLicense(SCAN_ID, LICENSE);
     }
 }

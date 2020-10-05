@@ -211,6 +211,27 @@ class LicenseInteractorTest {
         }
 
         @Test
+        void confirmsLicense() {
+            final var scan = new Scan(PACKAGE, null)
+                    .confirm(License.of(LICENSE));
+            when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
+
+            interactor.curateLicense(SCAN_ID, null);
+
+            assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE));
+        }
+
+        @Test
+        void curatesLicense() {
+            final var scan = new Scan(PACKAGE, null);
+            when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
+
+            interactor.curateLicense(SCAN_ID, LICENSE);
+
+            assertThat(scan.getLicense()).isEqualTo(License.of(LICENSE));
+        }
+
+        @Test
         void deletesScansForPackage() {
             interactor.deleteScans(ORIGIN, NAME, VERSION);
 

@@ -23,6 +23,10 @@ Supported version control systems:
 Supported license scanners:
 - ScanCode Toolkit 3.0.x and 3.1.x
 
+The REST API is accessible on port 8080, and the service includes a user interface
+for curation of scanned licenses. (See [license-scanner-ui](https://github.com/philips-labs/license-scanner-ui))
+Additionally, the integrated H2 database is available on [localhost:8080/h2](http://localhost:8080/h2).
+
 ## Interpretation of detected licenses
 License scanners report detected licenses per source file, which are joined by the 
 service into a single package-level license using the logical "AND" operator.
