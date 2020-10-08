@@ -72,6 +72,7 @@ Should-have
 declared license.
 - [ ] Detect and return other copyright statements.
 - [ ] provide scanning time budget based on number of files.
+- [ ] Remove SPDX licenses that are subsumed (=implied) by remaining licenses 
 
 Others
 - [ ] Integrate with FOSSology scanner.

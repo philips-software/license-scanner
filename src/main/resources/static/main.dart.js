@@ -1,3 +1,13 @@
+/*
+ * This software and associated documentation files are
+ *
+ * Copyright © 2020-2020 Koninklijke Philips N.V.
+ *
+ * and is made available for use within Philips and/or within Philips products.
+ *
+ * All Rights Reserved
+ */
+
 (function dartProgram(){function copyProperties(a,b){var s=Object.keys(a)
 for(var r=0;r<s.length;r++){var q=s[r]
 b[q]=a[q]}}var z=function(){var s=function(){}
