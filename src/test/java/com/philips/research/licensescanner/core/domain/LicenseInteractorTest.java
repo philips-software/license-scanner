@@ -42,6 +42,7 @@ class LicenseInteractorTest {
     private static final String VERSION = "Version";
     private static final String LICENSE = "License";
     private static final URI LOCATION = URI.create("git+git://example.com");
+    private static final File FILE = new File(".");
     private static final Package PACKAGE = new Package(ORIGIN, NAME, VERSION);
     private static final Scan SCAN = new Scan(PACKAGE, LOCATION)
             .addDetection(License.of(LICENSE), 73, new File(""), 1, 2);
@@ -170,7 +171,8 @@ class LicenseInteractorTest {
         void registersScanningFailure() {
             final var message = "Test error";
             when(downloader.download(LOCATION)).thenReturn(directory);
-            doThrow(new DetectorException(message, null)).when(detector).scan(directory, scan, THRESHOLD);
+            doThrow(new DetectorException(message, new IllegalArgumentException()))
+                    .when(detector).scan(directory, scan, THRESHOLD);
 
             interactor.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
 
@@ -194,7 +196,7 @@ class LicenseInteractorTest {
         @Test
         void findsScansForPeriod() {
             when(store.findScans(FROM, UNTIL)).thenReturn(List.of(new Scan(PACKAGE, LOCATION)
-                    .addDetection(License.of(LICENSE), 100, null, 1, 2)));
+                    .addDetection(License.of(LICENSE), 100, FILE, 1, 2)));
 
             final var result = interactor.findScans(FROM, UNTIL);
 
@@ -203,6 +205,26 @@ class LicenseInteractorTest {
             assertThat(pkg.pkg.name).isEqualTo(NAME);
             assertThat(pkg.license).contains(LICENSE);
             assertThat(pkg.location).isEqualTo(LOCATION);
+        }
+
+        @Test
+        void findsErrors() {
+            when(store.scanErrors()).thenReturn(List.of(new Scan(PACKAGE, null).setError("Error")));
+
+            final var result = interactor.findErrors();
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).error).isNotEmpty();
+        }
+
+        @Test
+        void findsContestedScans() {
+            when(store.contested()).thenReturn(List.of(new Scan(PACKAGE, null).contest()));
+
+            final var result = interactor.findContested();
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).isContested).isTrue();
         }
 
         @Test

@@ -35,7 +35,7 @@ public interface LicenseService {
     /**
      * @return License information if the package is known.
      */
-    Optional<LicenseInfo> licenseFor(String namespace, String name, String version);
+    Optional<LicenseDto> licenseFor(String namespace, String name, String version);
 
     /**
      * Queues package for scanning.
@@ -47,14 +47,24 @@ public interface LicenseService {
     /**
      * @return the details for the indicated scan
      */
-    Optional<LicenseInfo> getScan(UUID scanId);
+    Optional<LicenseDto> getScan(UUID scanId);
 
     /**
      * Lists all latest scan results for the indicated period.
      *
      * @return scan results
      */
-    List<LicenseInfo> findScans(Instant from, Instant until);
+    List<LicenseDto> findScans(Instant from, Instant until);
+
+    /**
+     * @return List of scanning errors
+     */
+    List<LicenseDto> findErrors();
+
+    /**
+     * @return List of contested licenses
+     */
+    List<LicenseDto> findContested();
 
     /**
      * Contests a scan
@@ -73,6 +83,7 @@ public interface LicenseService {
      */
     void deleteScans(String namespace, String name, String version);
 
+
     /**
      * Response model for a package identifier.
      */
@@ -87,14 +98,14 @@ public interface LicenseService {
      * Response model for license information.
      */
     @SuppressWarnings("NotNullFieldNotInitialized")
-    class LicenseInfo {
+    class LicenseDto {
         public UUID uuid;
         public Instant timestamp;
         public PackageId pkg;
         public String license;
         public @NullOr URI location;
         public @NullOr String error;
-        public @NullOr List<DetectionInfo> detections;
+        public @NullOr List<DetectionDto> detections;
         public boolean isContested;
         public boolean isConfirmed;
     }
@@ -103,7 +114,7 @@ public interface LicenseService {
      * Response model for license detection information.
      */
     @SuppressWarnings("NotNullFieldNotInitialized")
-    class DetectionInfo {
+    class DetectionDto {
         public String license;
         public String file;
         public int startLine;

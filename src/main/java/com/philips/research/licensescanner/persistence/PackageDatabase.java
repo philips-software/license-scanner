@@ -88,6 +88,16 @@ public class PackageDatabase implements PackageStore {
     }
 
     @Override
+    public List<Scan> scanErrors() {
+        return toScans(scanRepository.findFirst100ByErrorIsNotNullOrderByTimestampDesc());
+    }
+
+    @Override
+    public List<Scan> contested() {
+        return toScans(scanRepository.findFirst100ByContestedOrderByTimestampDesc(true));
+    }
+
+    @Override
     public Optional<Scan> getScan(UUID scanId) {
         return scanRepository.findByUuid(scanId).map(scan -> scan);
     }

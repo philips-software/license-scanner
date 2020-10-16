@@ -34,4 +34,8 @@ interface ScanRepository extends CrudRepository<ScanEntity, Long> {
     Optional<ScanEntity> findByUuid(UUID scanId);
 
     void deleteByPkg(Package pkg);
+
+    List<ScanEntity> findFirst100ByErrorIsNotNullOrderByTimestampDesc();
+
+    List<ScanEntity> findFirst100ByContestedOrderByTimestampDesc(boolean contested);
 }

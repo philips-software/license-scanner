@@ -14,14 +14,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class SearchResultJson {
-    final List<PackageInfoJson> results;
+class SearchResultJson<T> {
+    final List<T> results;
 
-    public SearchResultJson(Stream<PackageInfoJson> results) {
+    public SearchResultJson(Stream<T> results) {
         this.results = results.collect(Collectors.toList());
-    }
-
-    public SearchResultJson() {
-        results = List.of();
     }
 }

@@ -78,40 +78,41 @@ class PackageDatabaseTest {
     }
 
     @Test
-    void findsLatestNonErrorScanResultForPackage() {
-        final var scan = database.createScan(pkg, LOCATION).addDetection(LICENSE, SCORE, FILE, START_LINE, END_LINE);
-        scanRepository.save((ScanEntity) scan);
-        final var error = database.createScan(pkg, null).setError("Testing");
-        scanRepository.save((ScanEntity) error);
-
-        //noinspection OptionalGetWithoutIsPresent
-        final var latest = database.latestScan(pkg).get();
-
-        assertThat(latest.getPackage()).isEqualTo(pkg);
-        assertThat(latest.getLocation()).contains(LOCATION);
-        assertThat(latest.getLicense()).isEqualTo(LICENSE);
-    }
-
-    @Test
     void findsLatestScanError() {
-        final var scan = database.createScan(pkg, null).addDetection(LICENSE, SCORE, FILE, START_LINE, END_LINE);
+        final var scan = database.createScan(pkg, LOCATION).addDetection(LICENSE, SCORE, FILE, START_LINE, END_LINE);
         scan.setError("Boeh!");
         scanRepository.save((ScanEntity) scan);
 
         final var errors = database.scanErrors(pkg);
 
         assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).getError()).isNotNull();
+        assertThat(errors.get(0).getError()).isNotEmpty();
     }
 
     @Test
-    void findsNoLatestScanResultForPackage() {
-        final var decoy = database.createPackage(ORIGIN, "Decoy", VERSION);
-        database.createScan(decoy, LOCATION);
-        final var error = database.createScan(pkg, LOCATION).setError("Testing");
-        scanRepository.save((ScanEntity) error);
+    void findsScanErrors() {
+        final var good = database.createScan(pkg, LOCATION);
+        final var scan = database.createScan(pkg, LOCATION).setError("Error");
+        scanRepository.save((ScanEntity) good);
+        scanRepository.save((ScanEntity) scan);
 
-        assertThat(database.latestScan(pkg)).isEmpty();
+        final var errors = database.scanErrors();
+
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).getError()).isNotEmpty();
+    }
+
+    @Test
+    void findsContestedScans() {
+        final var normal = database.createScan(pkg, LOCATION);
+        final var scan = database.createScan(pkg, LOCATION).contest();
+        scanRepository.save((ScanEntity) normal);
+        scanRepository.save((ScanEntity) scan);
+
+        final var errors = database.contested();
+
+        assertThat(errors).hasSize(1);
+        assertThat(errors.get(0).isContested()).isTrue();
     }
 
     @Test

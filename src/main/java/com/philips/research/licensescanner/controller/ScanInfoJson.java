@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class ScanInfoJson extends PackageInfoJson {
@@ -38,7 +39,7 @@ class ScanInfoJson extends PackageInfoJson {
         this.location = location;
     }
 
-    public ScanInfoJson(LicenseService.LicenseInfo info) {
+    public ScanInfoJson(LicenseService.LicenseDto info) {
         super(info.pkg);
         id = info.uuid;
         timestamp = info.timestamp;
@@ -52,6 +53,10 @@ class ScanInfoJson extends PackageInfoJson {
                     .map(DetectionInfoJson::new)
                     .collect(Collectors.toList());
         }
+    }
+
+    static Stream<ScanInfoJson> toStream(List<LicenseService.LicenseDto> licenses) {
+        return licenses.stream().map(ScanInfoJson::new);
     }
 }
 
@@ -79,7 +84,7 @@ class DetectionInfoJson {
     final int endLine;
     final int confirmations;
 
-    public DetectionInfoJson(LicenseService.DetectionInfo info) {
+    public DetectionInfoJson(LicenseService.DetectionDto info) {
         this.file = info.file;
         this.license = info.license;
         this.startLine = info.startLine;

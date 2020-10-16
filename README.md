@@ -1,42 +1,51 @@
-# License Scanner Service
-## Overview
-The "License Scanner Service" is a backend service for offline scanning and managing
-copyright and license based on package source code. It is used by CI/CD pipelines to 
-obtain curated license information for inclusion in Software Bill of Materials (SBOM) 
-outputs. 
+# License Scanner service
+**Description**: Wrapper around a source code license scanner to make scan results 
+available via an API, and provide a user interface for manual curation of scan result.
 
-The service exposes a REST API for CI/CD build pipeline tools (like 
+Typical usage is the integration with CI/CD build pipeline tools (like 
 [SPDX-Builder](https://github.com/philips-labs/spdx-builder)) to retrieve available 
 license information and trigger asynchronous scanning of (versions of) packages that 
-were not already scanned. A client API is available for a manually curating licenses
-and addressing scanning errors.
+were not already scanned. 
 
-Scanning a package starts by downloading its source code, and then invokes an installed 
-license scanner to extract the license information. (At the moment only [ScanCode
-Toolkit](https://github.com/nexB/scancode-toolkit) is supported, but support for [FOSSology](https://github.com/fossology/fossology) 
-or other scanners should be relatively easy to add.) 
+The actual scanning of software license statements from source code is performed by 
+the [ScanCode Toolkit](https://github.com/nexB/scancode-toolkit) version 3.x command 
+line tool. The service schedules scanning of packages in the background, making 
+scan results available the next time they are requested.
 
-Supported version control systems:
-- Plain web URL download
-- Git 2.24 or higher
+Scanning a package technically starts by downloading its source code, and then 
+invokes an external license scanner to extract the license information. 
 
-Supported license scanners:
-- ScanCode Toolkit 3.0.x and 3.1.x
-
-The REST API is accessible on port 8080, and the service includes a user interface
-for curation of scanned licenses. (See [license-scanner-ui](https://github.com/philips-labs/license-scanner-ui))
-Additionally, the integrated H2 database is available on [localhost:8080/h2](http://localhost:8080/h2).
-
-## Interpretation of detected licenses
 License scanners report detected licenses per source file, which are joined by the 
 service into a single package-level license using the logical "AND" operator.
 The API reports licenses as-is, without checking for validity or compatibility. 
 In case of dual licensing, it is left to the client to choose the appropriate 
 license.
 
+Current supported sources for downloading source code from:
+- Plain web URL download
+- Git 2.24 or higher
+
+**Status**: Research prototype
+
+## Dependencies
+
+The service requires the Java 11 (or later) runtime environment.
+
+The H2 database implementation is part of the application, so no external 
+dependencies are (currently) required for persistent storage.
+
+## Installation
+
+The application is build using the standard Maven build command:
+```
+mvn clean install
+```
+The resulting JAR is created in the `target` directory.
+
 ## Configuration
+
 ### ScanCode Toolkit installation
-ScanCode Toolkit requires to be invoked on Linux and OSX using an absolute
+ScanCode Toolkit must be invoked on Linux and OSX using an absolute
 installation path (see [the ScanCode Toolkit documentation](https://scancode-toolkit.readthedocs.io/en/latest/cli-reference/synopsis.html)).
 When not installed using pip or running on Windows, make sure `extractcode` and 
 `scancode` can be accessed through a script, without providing the installation 
@@ -53,15 +62,42 @@ certainty threshold of 50 (percent) to accept a detected license. This threshold
 can be overridden using the `LICENSE_THRESHOLD` environment variable to set a 
 value between 0 and 100.
 
-## TO DO / Limitations
+## Usage
+
+The service can be started from the command line:
+```
+java -jar license-scanner-service.jar
+```
+
+The service exposes on port 8080:
+* An API to interact with the scanning service
+* A user interface on [localhost:8080/](http://localhost:80080) to monitor license 
+scanning errors and manually curate scanned licenses. (See the separate 
+[license-scanner-ui](https://github.com/philips-labs/license-scanner-ui) 
+user interface project.)
+* A simple database management tool on [localhost:8080/h2](http://localhost:8080/h2)
+with credentials "user" and "password".
+
+If migration of the database fails, a stand-alone can be started from the 
+command line on Linux or Mac using:
+
+    java -jar ~/.m2/repository/com/h2database/h2/<version>/h2-<version>.jar
+    
+(Migrations can be manually fixed or removed in the "flyway_schema_history" 
+table.)
+
+## How to test the software
+
+The unit test suite can be executed via Maven:
+```
+mvn clean test
+```
+
+## Known issues
 (Checked items are under development.)
 
 Must-have
 - [ ] Add package manager type to package identifier. (Or use "purl" instead?)
-- [x] Keep file and line information of scanned licenses in the database.
-- [x] Explicit manual curation of scanned licenses to override false-positives.
-- [x] Tracking and manual resolution of failed scans.
-- [x] User interface for monitoring, management, and manual curation.
 - [ ] Production-grade database (e.g. Postgres).
 - [ ] Authentication of clients.
 
@@ -80,15 +116,14 @@ Others
 - [ ] Multi-server scanning queue (like AMQP) that persists after restart of 
 individual servers in a load-balanced configuration.
 
-## Development
-### Accessing the H2 database
-The H2 database exposes its (simple) web client at path `/h2` with 
-credentials "user" and "password".
+## Contact / Getting help
 
-If migration of the database fails, a stand-alone can be started from the 
-command line on Linux or Mac using:
+Use the issue tracker of this project.
 
-    java -jar ~/.m2/repository/com/h2database/h2/<version>/h2-<version>.jar
-    
-(Migrations can be manually fixed or removed in the "flyway_schema_history" 
-table.)
+## License
+
+See [LICENSE.md](LICENSE.md).
+
+## Credits and references
+
+1. Documentation for [ScanCode Toolkit](https://readthedocs.org/projects/scancode-toolkit).

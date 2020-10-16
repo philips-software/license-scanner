@@ -79,6 +79,16 @@ public interface PackageStore {
     List<Scan> scanErrors(Package pkg);
 
     /**
+     * @return all scanning errors
+     */
+    List<Scan> scanErrors();
+
+    /**
+     * @return all contested scans
+     */
+    List<Scan> contested();
+
+    /**
      * @return the requested scan
      */
     Optional<Scan> getScan(UUID scanId);

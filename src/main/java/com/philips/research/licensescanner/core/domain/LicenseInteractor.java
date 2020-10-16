@@ -60,14 +60,14 @@ public class LicenseInteractor implements LicenseService {
     @Override
     public List<PackageId> findPackages(String namespace, String name, String version) {
         final var packages = store.findPackages(namespace, name, version);
-        return packages.stream().map(this::toPackageId).collect(Collectors.toList());
+        return packages.stream().map(DtoConverter::toPackageId).collect(Collectors.toList());
     }
 
     @Override
-    public Optional<LicenseInfo> licenseFor(String namespace, String name, String version) {
+    public Optional<LicenseDto> licenseFor(String namespace, String name, String version) {
         return store.getPackage(namespace, name, version)
                 .flatMap(store::latestScan)
-                .map(this::toLicenseInfoWithDetections);
+                .map(DtoConverter::toDto);
     }
 
     @Override
@@ -103,15 +103,28 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public Optional<LicenseInfo> getScan(UUID scanId) {
-        return store.getScan(scanId).map(this::toLicenseInfoWithDetections);
+    public Optional<LicenseDto> getScan(UUID scanId) {
+        return store.getScan(scanId).map(DtoConverter::toDto);
     }
 
     @Override
-    public List<LicenseInfo> findScans(Instant from, Instant until) {
-        final var results = store.findScans(from, until);
-        return results.stream()
-                .map(this::toLicenseInfo)
+    public List<LicenseDto> findScans(Instant from, Instant until) {
+        return store.findScans(from, until).stream()
+                .map(DtoConverter::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LicenseDto> findErrors() {
+        return store.scanErrors().stream()
+                .map(DtoConverter::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LicenseDto> findContested() {
+        return store.contested().stream()
+                .map(DtoConverter::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -143,44 +156,5 @@ public class LicenseInteractor implements LicenseService {
         } catch (IOException e) {
             LOG.warn("Failed to (fully) remove directory {}", path);
         }
-    }
-
-    private PackageId toPackageId(Package pkg) {
-        final var id = new PackageId();
-        id.namespace = pkg.getNamespace();
-        id.name = pkg.getName();
-        id.version = pkg.getVersion();
-        return id;
-    }
-
-    private LicenseInfo toLicenseInfo(Scan scan) {
-        final var info = new LicenseInfo();
-        info.uuid = scan.getUuid();
-        info.timestamp = scan.getTimestamp();
-        info.pkg = toPackageId(scan.getPackage());
-        info.license = scan.getLicense().toString();
-        info.location = scan.getLocation().orElse(null);
-        info.error = scan.getError().orElse(null);
-        info.isContested = scan.isContested();
-        info.isConfirmed = scan.isConfirmed();
-        return info;
-    }
-
-    private LicenseInfo toLicenseInfoWithDetections(Scan scan) {
-        final var info = toLicenseInfo(scan);
-        info.detections = scan.getDetections().stream()
-                .map(this::toDetectionInfo)
-                .collect(Collectors.toList());
-        return info;
-    }
-
-    private DetectionInfo toDetectionInfo(Detection detection) {
-        final var info = new DetectionInfo();
-        info.license = detection.getLicense().toString();
-        info.file = detection.getFilePath().toString();
-        info.startLine = detection.getStartLine();
-        info.endLine = detection.getEndLine();
-        info.confirmations = detection.getConfirmations();
-        return info;
     }
 }

@@ -39,13 +39,21 @@ public class ScanRoute {
      * @param end   (Optional) end timestamp: defaults to "now"
      */
     @GetMapping()
-    SearchResultJson latestScans(@NullOr @RequestParam(required = false) Instant start,
-                                 @NullOr @RequestParam(required = false) Instant end) {
+    SearchResultJson<ScanInfoJson> latestScans(@NullOr @RequestParam(required = false) Instant start,
+                                               @NullOr @RequestParam(required = false) Instant end,
+                                               @RequestParam(name = "q", required = false, defaultValue = "") String query) {
+        if (query.startsWith("error")) {
+            return new SearchResultJson<>(ScanInfoJson.toStream(service.findErrors()));
+        }
+        if (query.startsWith("contest")) {
+            return new SearchResultJson<>(ScanInfoJson.toStream(service.findContested()));
+        }
+
         final var scans = service.findScans(
                 start != null ? start : Instant.EPOCH,
                 end != null ? end : Instant.now());
 
-        return new SearchResultJson(scans.stream().map(ScanInfoJson::new));
+        return new SearchResultJson<>(ScanInfoJson.toStream(scans));
     }
 
     @GetMapping("{uuid}")

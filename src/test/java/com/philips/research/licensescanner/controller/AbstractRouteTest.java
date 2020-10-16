@@ -61,18 +61,18 @@ public abstract class AbstractRouteTest {
         return id;
     }
 
-    protected LicenseService.LicenseInfo standardLicenseInfo() {
-        final var info = new LicenseService.LicenseInfo();
+    protected LicenseService.LicenseDto standardLicenseInfo() {
+        final var info = new LicenseService.LicenseDto();
         info.pkg = standardPackageId();
         info.license = LICENSE;
         info.location = LOCATION;
         return info;
     }
 
-    protected LicenseService.LicenseInfo standardLicenseInfoWithDetection() {
+    protected LicenseService.LicenseDto standardLicenseInfoWithDetection() {
         final var info = standardLicenseInfo();
         info.detections = new ArrayList<>();
-        final var detection = new LicenseService.DetectionInfo();
+        final var detection = new LicenseService.DetectionDto();
         detection.license = LICENSE;
         detection.file = FILE;
         detection.startLine = START_LINE;
