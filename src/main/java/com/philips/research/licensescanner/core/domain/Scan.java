@@ -60,7 +60,7 @@ public class Scan {
      * If the license was already confirmed, nothing happens.
      */
     public Scan contest() {
-        contested = !confirmed;
+        contested = !confirmed && (error == null);
         return this;
     }
 
