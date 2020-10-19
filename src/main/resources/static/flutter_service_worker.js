@@ -1,29 +1,20 @@
-/*
- * This software and associated documentation files are
- *
- * Copyright © 2020-2020 Koninklijke Philips N.V.
- *
- * and is made available for use within Philips and/or within Philips products.
- *
- * All Rights Reserved
- */
-
 'use strict';
 const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
   "version.json": "9b5d188250f5ff42f54c7e367803104a",
-"index.html": "3ac573157292878f80a49c474bb4e2b8",
-"/": "3ac573157292878f80a49c474bb4e2b8",
-"main.dart.js": "f5c13dae4f68b1be277f7105cd27b38b",
+"index.html": "e61e2944740edb859ec82a49b351ff74",
+"/": "e61e2944740edb859ec82a49b351ff74",
+"main.dart.js": "07868c81e41be63499b35940299497cc",
 "favicon.png": "10b1bff590c4dd88987bb6ec3da7951e",
 "icons/logo.png": "3d3e02d4e8b8700b8806778bed9fa412",
 "manifest.json": "8cfd56ea9f416981d91d89d29990bab6",
-"assets/AssetManifest.json": "99914b932bd37a50b983c5e7c90ae93b",
-"assets/NOTICES": "588913771bc91d70fcd43699f5b08143",
-"assets/FontManifest.json": "7b2a36307916a9721811788013e65289",
-"assets/fonts/MaterialIcons-Regular.otf": "a68d2a28c526b3b070aefca4bac93d25"
+"assets/AssetManifest.json": "2efbb41d7877d10aac9d091f58ccd7b9",
+"assets/NOTICES": "3ecd95380fee97c44ad65edb2c60cc19",
+"assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
+"assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "b14fcf3ee94e3ace300b192e9e7c8c5d",
+"assets/fonts/MaterialIcons-Regular.otf": "1288c9e28052e028aba623321f7826ac"
 };
 
 // The application shell files that are downloaded before a service worker can
@@ -37,7 +28,7 @@ const CORE = [
 "assets/FontManifest.json"];
 // During install, the TEMP cache is populated with the application shell files.
 self.addEventListener("install", (event) => {
-  skipWaiting();
+  self.skipWaiting();
   return event.waitUntil(
     caches.open(TEMP).then((cache) => {
       return cache.addAll(
@@ -106,6 +97,9 @@ self.addEventListener("activate", function(event) {
 // The fetch handler redirects requests for RESOURCE files to the service
 // worker cache.
 self.addEventListener("fetch", (event) => {
+  if (event.request.method !== 'GET') {
+    return;
+  }
   var origin = self.location.origin;
   var key = event.request.url.substring(origin.length + 1);
   // Redirect URLs to the index.html
@@ -115,9 +109,10 @@ self.addEventListener("fetch", (event) => {
   if (event.request.url == origin || event.request.url.startsWith(origin + '/#') || key == '') {
     key = '/';
   }
-  // If the URL is not the RESOURCE list, skip the cache.
+  // If the URL is not the RESOURCE list then return to signal that the
+  // browser should take over.
   if (!RESOURCES[key]) {
-    return event.respondWith(fetch(event.request));
+    return;
   }
   // If the URL is the index.html, perform an online-first request.
   if (key == '/') {
@@ -141,7 +136,7 @@ self.addEventListener('message', (event) => {
   // SkipWaiting can be used to immediately activate a waiting service worker.
   // This will also require a page refresh triggered by the main worker.
   if (event.data === 'skipWaiting') {
-    skipWaiting();
+    self.skipWaiting();
     return;
   }
   if (event.data === 'downloadOffline') {
@@ -191,10 +186,4 @@ function onlineFirst(event) {
       });
     })
   );
-}
-
-function skipWaiting() {
-  if (self.skipWaiting != undefined) {
-    self.skipWaiting();
-  }
 }
