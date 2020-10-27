@@ -11,8 +11,8 @@
 package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
+import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.license.License;
 import com.philips.research.licensescanner.core.domain.license.LicenseParser;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ScanCodeJsonTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final Package PACKAGE = new Package("ns", "name", "version");
+    private static final Package PACKAGE = new Package(URI.create("pkg:package@version"));
     private static final URI LOCATION = URI.create("http://example.com");
     private static final Path DIRECTORY = Path.of("src", "test", "resources", "scancode");
 

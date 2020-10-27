@@ -43,7 +43,8 @@ class LicenseInteractorTest {
     private static final String LICENSE = "License";
     private static final URI LOCATION = URI.create("git+git://example.com");
     private static final File FILE = new File(".");
-    private static final Package PACKAGE = new Package(ORIGIN, NAME, VERSION);
+    private static final URI PURL = URI.create("pkg:package@version");
+    private static final Package PACKAGE = new Package(PURL);
     private static final Scan SCAN = new Scan(PACKAGE, LOCATION)
             .addDetection(License.of(LICENSE), 73, new File(""), 1, 2);
     private static final UUID SCAN_ID = SCAN.getUuid();
@@ -59,22 +60,19 @@ class LicenseInteractorTest {
 
     @BeforeEach
     void beforeEach() {
-        when(store.getPackage(ORIGIN, NAME, VERSION)).thenReturn(Optional.of(PACKAGE));
+        when(store.getPackage(PURL)).thenReturn(Optional.of(PACKAGE));
     }
 
     @Nested
     class FindPackages {
         @Test
         void findsPackages() {
-            when(store.findPackages(ORIGIN, NAME, VERSION)).thenReturn(List.of(new Package(ORIGIN, NAME, VERSION)));
+            when(store.findPackages(ORIGIN, NAME, VERSION)).thenReturn(List.of(new Package(PURL)));
 
             final var result = interactor.findPackages(ORIGIN, NAME, VERSION);
 
             assertThat(result).hasSize(1);
-            final var pkg = result.get(0);
-            assertThat(pkg.namespace).isEqualTo(ORIGIN);
-            assertThat(pkg.name).isEqualTo(NAME);
-            assertThat(pkg.version).isEqualTo(VERSION);
+            assertThat(result.get(0)).isEqualTo(PURL);
         }
     }
 
@@ -82,9 +80,9 @@ class LicenseInteractorTest {
     class QueryLicenseInformation {
         @Test
         void noLicense_packageNotFound() {
-            when(store.getPackage(ORIGIN, NAME, VERSION)).thenReturn(Optional.empty());
+            when(store.getPackage(PURL)).thenReturn(Optional.empty());
 
-            final var noInfo = interactor.licenseFor(ORIGIN, NAME, VERSION);
+            final var noInfo = interactor.licenseFor(PURL);
 
             assertThat(noInfo).isEmpty();
         }
@@ -93,7 +91,7 @@ class LicenseInteractorTest {
         void noLicense_noScanForPackage() {
             when(store.latestScan(PACKAGE)).thenReturn(Optional.empty());
 
-            final var noInfo = interactor.licenseFor(ORIGIN, NAME, VERSION);
+            final var noInfo = interactor.licenseFor(PURL);
 
             assertThat(noInfo).isEmpty();
         }
@@ -102,7 +100,7 @@ class LicenseInteractorTest {
         void retrievesLicenseForPackage() {
             when(store.latestScan(PACKAGE)).thenReturn(Optional.of(SCAN));
 
-            @SuppressWarnings("OptionalGetWithoutIsPresent") final var info = interactor.licenseFor(ORIGIN, NAME, VERSION).get();
+            @SuppressWarnings("OptionalGetWithoutIsPresent") final var info = interactor.licenseFor(PURL).get();
 
             assertThat(info.license).contains(LICENSE);
             assertThat(info.location).isEqualTo(LOCATION);
@@ -130,7 +128,7 @@ class LicenseInteractorTest {
         void skipsIfAlreadyScanned() {
             when(store.latestScan(PACKAGE)).thenReturn(Optional.of(scan));
 
-            interactor.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+            interactor.scanLicense(PURL, LOCATION);
 
             verify(store, never()).createScan(PACKAGE, LOCATION);
             verify(detector, never()).scan(any(Path.class), any(Scan.class), anyInt());
@@ -141,7 +139,7 @@ class LicenseInteractorTest {
             when(store.latestScan(PACKAGE)).thenReturn(Optional.empty());
             when(store.createScan(PACKAGE, null)).thenReturn(scan);
 
-            interactor.scanLicense(ORIGIN, NAME, VERSION, null);
+            interactor.scanLicense(PURL, null);
 
             assertThat(scan.getError()).isNotEmpty();
             verify(detector, never()).scan(any(Path.class), any(Scan.class), anyInt());
@@ -151,7 +149,7 @@ class LicenseInteractorTest {
         void downloadsAndScansPackage() {
             when(downloader.download(LOCATION)).thenReturn(directory);
 
-            interactor.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+            interactor.scanLicense(PURL, LOCATION);
 
             verify(detector).scan(directory, scan, THRESHOLD);
             assertThat(directory.toFile()).doesNotExist();
@@ -162,7 +160,7 @@ class LicenseInteractorTest {
             final var message = "Test error";
             when(downloader.download(LOCATION)).thenThrow(new DownloadException(message));
 
-            interactor.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+            interactor.scanLicense(PURL, LOCATION);
 
             assertThat(scan.getError()).contains(message);
         }
@@ -174,7 +172,7 @@ class LicenseInteractorTest {
             doThrow(new DetectorException(message, new IllegalArgumentException()))
                     .when(detector).scan(directory, scan, THRESHOLD);
 
-            interactor.scanLicense(ORIGIN, NAME, VERSION, LOCATION);
+            interactor.scanLicense(PURL, LOCATION);
 
             assertThat(scan.getError()).contains(message);
             assertThat(directory.toFile()).doesNotExist();
@@ -202,9 +200,7 @@ class LicenseInteractorTest {
 
             assertThat(result).hasSize(1);
             final var pkg = result.get(0);
-            assertThat(pkg.pkg.name).isEqualTo(NAME);
-            assertThat(pkg.license).contains(LICENSE);
-            assertThat(pkg.location).isEqualTo(LOCATION);
+            assertThat(pkg.purl).isEqualTo(PURL);
         }
 
         @Test
@@ -260,7 +256,7 @@ class LicenseInteractorTest {
 
         @Test
         void deletesScansForPackage() {
-            interactor.deleteScans(ORIGIN, NAME, VERSION);
+            interactor.deleteScans(PURL);
 
             verify(store).deleteScans(PACKAGE);
         }

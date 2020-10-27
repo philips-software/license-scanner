@@ -19,7 +19,7 @@ abstract class DtoConverter {
         final var dto = new LicenseService.LicenseDto();
         dto.timestamp = scan.getTimestamp();
         dto.uuid = scan.getUuid();
-        dto.pkg = toPackageId(scan.getPackage());
+        dto.purl = scan.getPackage().getPurl();
         dto.license = scan.getLicense().toString();
         dto.error = scan.getError().orElse(null);
         dto.isConfirmed = scan.isConfirmed();
@@ -27,14 +27,6 @@ abstract class DtoConverter {
         dto.location = scan.getLocation().orElse(null);
         dto.detections = scan.getDetections().stream().map(DtoConverter::toDto).collect(Collectors.toList());
         return dto;
-    }
-
-    static LicenseService.PackageId toPackageId(Package pkg) {
-        final var id = new LicenseService.PackageId();
-        id.namespace = pkg.getNamespace();
-        id.name = pkg.getName();
-        id.version = pkg.getVersion();
-        return id;
     }
 
     private static LicenseService.DetectionDto toDto(Detection detection) {

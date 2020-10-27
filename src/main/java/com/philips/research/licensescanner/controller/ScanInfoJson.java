@@ -23,8 +23,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class ScanInfoJson extends PackageInfoJson {
-    @NullOr UUID id;
+class ScanInfoJson {
+    final @NullOr UUID id;
+    final URI purl;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @NullOr Instant timestamp;
     @NullOr URI location;
@@ -34,16 +35,19 @@ class ScanInfoJson extends PackageInfoJson {
     boolean contested;
     boolean confirmed;
 
-    public ScanInfoJson(String namespace, String name, String version, @NullOr URI location) {
-        super(namespace, name, version);
+    public ScanInfoJson(URI purl, @NullOr URI location ) {
+        this(null, purl, location);
+    }
+
+    public ScanInfoJson(@NullOr UUID id, URI purl, @NullOr URI location) {
+        this.id = id;
+        this.purl = purl;
         this.location = location;
     }
 
     public ScanInfoJson(LicenseService.LicenseDto info) {
-        super(info.pkg);
-        id = info.uuid;
+        this(info.uuid, info.purl, info.location);
         timestamp = info.timestamp;
-        location = info.location;
         license = info.license;
         error = info.error;
         contested = info.isContested;
@@ -57,23 +61,6 @@ class ScanInfoJson extends PackageInfoJson {
 
     static Stream<ScanInfoJson> toStream(List<LicenseService.LicenseDto> licenses) {
         return licenses.stream().map(ScanInfoJson::new);
-    }
-}
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-class PackageInfoJson {
-    final String namespace;
-    final String name;
-    final String version;
-
-    public PackageInfoJson(LicenseService.PackageId id) {
-        this(id.namespace, id.name, id.version);
-    }
-
-    public PackageInfoJson(String namespace, String name, String version) {
-        this.namespace = namespace;
-        this.name = name;
-        this.version = version;
     }
 }
 

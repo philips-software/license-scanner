@@ -31,9 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ComponentScan(basePackageClasses = {PackageDatabase.class})
 @DataJpaTest
 class PackageDatabaseTest {
-    private static final String ORIGIN = "Origin";
-    private static final String NAME = "Name";
-    private static final String VERSION = "Version";
+    private static final URI PURL = URI.create("pkg:package@version");
     private static final URI LOCATION = URI.create("git+http://example.com");
     private static final License LICENSE = License.of("License");
     private static final int SCORE = 42;
@@ -54,27 +52,30 @@ class PackageDatabaseTest {
 
     @BeforeEach
     void beforeEach() {
-        pkg = database.createPackage(ORIGIN, NAME, VERSION);
+        pkg = database.createPackage(PURL);
     }
 
     @Test
     void getsPackage() {
-        database.createPackage(ORIGIN, NAME, "other");
+        database.createPackage(URI.create("pkg:other@version"));
 
-        final var result = database.getPackage(ORIGIN, NAME, VERSION);
+        final var result = database.getPackage(PURL);
 
         assertThat(result).contains(pkg);
     }
 
     @Test
     void findsFilteredPackages() {
-        database.createPackage(ORIGIN, "Other", VERSION);
-        database.createPackage(ORIGIN, NAME, "Other");
+        final var pkg1 = database.createPackage(URI.create("pkg:namespace/filter@version"));
+        final var pkg2 = database.createPackage(URI.create("pkg:namespace/other@version"));
+        final var pkg3 = database.createPackage(URI.create("pkg:namespace/filter@other"));
 
-        assertThat(database.findPackages(ORIGIN, NAME, VERSION)).containsExactly(pkg);
-        assertThat(database.findPackages("", "", "")).hasSize(3);
-        assertThat(database.findPackages(ORIGIN, NAME, "")).hasSize(2);
-        assertThat(database.findPackages("Other", NAME, VERSION)).isEmpty();
+        assertThat(database.findPackages("duh", "", "")).isEmpty();
+        assertThat(database.findPackages("", "", "oth")).containsExactly(pkg3);
+        assertThat(database.findPackages("spa", "ilt", "")).containsExactlyInAnyOrder(pkg1, pkg3);
+        assertThat(database.findPackages("spa", "", "")).containsExactlyInAnyOrder(pkg1, pkg2, pkg3);
+        assertThat(database.findPackages("", "", "")).hasSize(4);
+        assertThat(database.findPackages("", "ack", "ers")).containsExactly(pkg);
     }
 
     @Test
@@ -117,7 +118,7 @@ class PackageDatabaseTest {
 
     @Test
     void findsLatestScanResultsForPeriod() {
-        final var otherPkg = database.createPackage(ORIGIN, "Other", VERSION);
+        final var otherPkg = database.createPackage(URI.create("pkg:other@version"));
         database.createScan(otherPkg, LOCATION);
         database.createScan(pkg, LOCATION);
         final var from = Instant.now();

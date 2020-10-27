@@ -9,7 +9,14 @@
   -->
 
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" version="2.0">
-    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Package"/>
+    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Package">
+        <attributes>
+            <basic name="purl" access="FIELD">
+                <column insertable="false" updatable="false"/>
+                <lob/>
+            </basic>
+        </attributes>
+    </mapped-superclass>
     <mapped-superclass class="com.philips.research.licensescanner.core.domain.Scan">
         <attributes>
             <basic name="uuid" access="FIELD" optional="false"/>

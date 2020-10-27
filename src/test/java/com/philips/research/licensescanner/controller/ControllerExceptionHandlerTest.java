@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.net.URI;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
@@ -35,17 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
-class ControllerExceptionHandlerTest {
-    private static final String ORIGIN = "Origin";
-    private static final String PACKAGE = "Package";
-    private static final String VERSION = "Version";
-    private static final String PACKAGE_URL = "/packages/{origin}/{package}/{version}";
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @MockBean
-    LicenseService service;
+class ControllerExceptionHandlerTest extends AbstractRouteTest {
+    private static final String PACKAGE_URL = "/packages/{purl}";
 
     @Test
     @Disabled("Need a proper test for this...")
@@ -53,7 +45,7 @@ class ControllerExceptionHandlerTest {
         final var response = new JSONObject()
                 .put("location", "must not be null");
 
-        mockMvc.perform(post(PACKAGE_URL, ORIGIN, PACKAGE, VERSION)
+        mockMvc.perform(post(PACKAGE_URL, encoded(PURL))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
                 .andExpect(status().isBadRequest())
@@ -63,11 +55,11 @@ class ControllerExceptionHandlerTest {
     @Test
     void handlesNotFound() throws Exception {
         final var response = new JSONObject()
-                .put("resource", String.format("%s/%s/%s", ORIGIN, PACKAGE, VERSION));
-        when(service.licenseFor(ORIGIN, PACKAGE, VERSION))
+                .put("resource", PURL.toString());
+        when(service.licenseFor(PURL))
                 .thenReturn(Optional.empty());
 
-        mockMvc.perform(get(PACKAGE_URL, ORIGIN, PACKAGE, VERSION))
+        mockMvc.perform(get(PACKAGE_URL, encoded(PURL)))
                 .andExpect(status().isNotFound())
                 .andExpect(content().json(response.toString()));
     }

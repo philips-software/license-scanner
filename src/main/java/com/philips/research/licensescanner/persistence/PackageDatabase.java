@@ -14,12 +14,15 @@ import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
 import org.springframework.stereotype.Repository;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Spring component implementing the persistence of packages.
@@ -40,25 +43,27 @@ public class PackageDatabase implements PackageStore {
     }
 
     @Override
-    public Package createPackage(String namespace, String name, String version) {
-        final var entity = new PackageEntity(namespace, name, version);
+    public Package createPackage(URI purl) {
+        final var entity = new PackageEntity(purl);
         return packageRepository.save(entity);
     }
 
     @Override
-    public Optional<Package> getPackage(String namespace, String name, String version) {
-        return packageRepository.findByNamespaceAndNameAndVersion(namespace, name, version).map(pkg -> pkg);
+    public Optional<Package> getPackage(URI purl) {
+        final var slim = PackageEntity.toSlim(purl);
+        return packageRepository.findBySlimPurl(slim).map(pkg -> pkg);
     }
 
     @Override
     public List<Package> findPackages(String namespace, String name, String version) {
-        return packageRepository.findTop50ByNamespaceLikeAndNameLikeAndVersionLikeOrderByNamespaceAscNameAscVersionAsc(
-                wildcard(namespace), wildcard(name), wildcard(version));
-    }
-
-    @Override
-    public void deleteScans(Package pkg) {
-        scanRepository.deleteByPkg(pkg);
+        var mask = (name.isBlank()) ? "%" : wildcard(name);
+        if (!namespace.isBlank()) {
+            mask = wildcard(namespace) + "/" + mask;
+        }
+        if (!version.isBlank()) {
+            mask += "@" + wildcard(version);
+        }
+        return new ArrayList<>(packageRepository.findTop50BySlimPurlLikeOrderBySlimPurlAsc(mask));
     }
 
     private String wildcard(String name) {
@@ -66,7 +71,12 @@ public class PackageDatabase implements PackageStore {
     }
 
     @Override
-    public Scan createScan(Package pkg, URI location) {
+    public void deleteScans(Package pkg) {
+        scanRepository.deleteByPkg(pkg);
+    }
+
+    @Override
+    public Scan createScan(Package pkg, @NullOr URI location) {
         final var entity = new ScanEntity((PackageEntity) pkg, location);
         return scanRepository.save(entity);
     }

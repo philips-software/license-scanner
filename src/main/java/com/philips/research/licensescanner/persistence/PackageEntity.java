@@ -10,13 +10,11 @@
 
 package com.philips.research.licensescanner.persistence;
 
-import com.philips.research.licensescanner.core.domain.Package;
 import pl.tlinkowski.annotation.basic.NullOr;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.net.URI;
+import com.philips.research.licensescanner.core.domain.Package;
 
 /**
  * JPA entity for persisting a package.
@@ -25,16 +23,31 @@ import javax.persistence.Table;
 @SuppressWarnings("JpaDataSourceORMInspection")
 @Table(name = "packages")
 class PackageEntity extends Package {
+    private static final URI EMPTY_URI = URI.create("");
+
     @Id
     @GeneratedValue
     @SuppressWarnings({"unused", "RedundantSuppression"})
     private @NullOr Long id;
+    @Column(name = "purl")
+    @Lob
+    private final String slimPurl;
 
     public PackageEntity() {
-        super("", "", "");
+        this(EMPTY_URI);
     }
 
-    PackageEntity(String namespace, String name, String version) {
-        super(namespace, name, version);
+    PackageEntity(URI purl) {
+        super(EMPTY_URI);
+        this.slimPurl = toSlim(purl);
+    }
+
+    static String toSlim(URI purl) {
+        return purl.toString().replaceFirst("^pkg:", "");
+    }
+
+    @Override
+    public URI getPurl() {
+        return URI.create("pkg:" + slimPurl);
     }
 }

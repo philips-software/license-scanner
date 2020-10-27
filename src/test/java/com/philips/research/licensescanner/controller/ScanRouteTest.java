@@ -12,7 +12,6 @@ package com.philips.research.licensescanner.controller;
 
 import com.philips.research.licensescanner.core.LicenseService;
 import org.json.JSONObject;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -31,18 +30,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class ScanRouteTest extends AbstractRouteTest {
     private static final UUID SCAN_ID = UUID.randomUUID();
-    private static final LicenseService.PackageId PACKAGE_ID = new LicenseService.PackageId();
 
     private static final String SCANS_URL = "/scans";
     private static final String SCANS_ID_URL = SCANS_URL + "/{uuid}";
     private static final String CONTEST_URL = SCANS_ID_URL + "/contest";
-
-    @BeforeAll
-    static void beforeAll() {
-        PACKAGE_ID.namespace = "Namespace";
-        PACKAGE_ID.name = "Name";
-        PACKAGE_ID.version = "Version";
-    }
 
     @Test
     void findsScanById() throws Exception {
@@ -90,7 +81,7 @@ class ScanRouteTest extends AbstractRouteTest {
     void findsErrors() throws Exception {
         final var dto = new LicenseService.LicenseDto();
         dto.uuid = SCAN_ID;
-        dto.pkg = PACKAGE_ID;
+        dto.purl = PURL;
         when(service.findErrors()).thenReturn(List.of(dto));
 
         mockMvc.perform(get(SCANS_URL + "?q=errors"))
@@ -102,7 +93,7 @@ class ScanRouteTest extends AbstractRouteTest {
     void findsContested() throws Exception {
         final var dto = new LicenseService.LicenseDto();
         dto.uuid = SCAN_ID;
-        dto.pkg = PACKAGE_ID;
+        dto.purl = PURL;
         when(service.findContested()).thenReturn(List.of(dto));
 
         mockMvc.perform(get(SCANS_URL + "?q=contested"))

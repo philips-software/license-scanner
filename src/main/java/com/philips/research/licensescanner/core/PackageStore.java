@@ -10,8 +10,8 @@
 
 package com.philips.research.licensescanner.core;
 
+import com.philips.research.licensescanner.core.domain.*;
 import com.philips.research.licensescanner.core.domain.Package;
-import com.philips.research.licensescanner.core.domain.Scan;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
@@ -27,21 +27,18 @@ public interface PackageStore {
     /**
      * @return a new package instance
      */
-    Package createPackage(String namespace, String name, String version);
+    Package createPackage(URI purl);
 
     /**
      * Finds a single package.
      *
      * @return the package (if any)
      */
-    Optional<Package> getPackage(String namespace, String name, String version);
+    Optional<Package> getPackage(URI purl);
 
     /**
-     * Finds all packages (partly) containing the indicated fields.
+     * Finds all packages (partly) containing the indicated mask.
      *
-     * @param namespace (fragment of) namespace
-     * @param name      (fragment of) name
-     * @param version   (fragment of) version
      * @return all matching packages
      */
     List<Package> findPackages(String namespace, String name, String version);

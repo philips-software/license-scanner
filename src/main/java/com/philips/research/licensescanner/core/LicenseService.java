@@ -23,26 +23,27 @@ import java.util.UUID;
  */
 public interface LicenseService {
     /**
-     * Finds all packages matching the provided parameters.
+     * Finds all packages matching the provided mask.
      *
-     * @param namespace (optional) fraction of the namespace
-     * @param name      (optional) fraction of the name
-     * @param version   (optional) fraction of the version
-     * @return list of matching packages
+     * @param namespace (optional) namespace mask
+     * @param name (optional) name mask
+     * @param version (optional) version mask
+     *
+     * @return list of matching package URLs
      */
-    List<PackageId> findPackages(String namespace, String name, String version);
+    List<URI> findPackages(String namespace, String name, String version);
 
     /**
      * @return License information if the package is known.
      */
-    Optional<LicenseDto> licenseFor(String namespace, String name, String version);
+    Optional<LicenseDto> licenseFor(URI packageUrl);
 
     /**
      * Queues package for scanning.
      *
      * @param vcsId Version control coordinates
      */
-    void scanLicense(String namespace, String name, String version, @NullOr URI vcsId);
+    void scanLicense(URI packageUrl, @NullOr URI vcsId);
 
     /**
      * @return the details for the indicated scan
@@ -81,18 +82,8 @@ public interface LicenseService {
     /**
      * Clear any existing scans for the indicated package.
      */
-    void deleteScans(String namespace, String name, String version);
+    void deleteScans(URI packageUrl);
 
-
-    /**
-     * Response model for a package identifier.
-     */
-    @SuppressWarnings("NotNullFieldNotInitialized")
-    class PackageId {
-        public String namespace;
-        public String name;
-        public String version;
-    }
 
     /**
      * Response model for license information.
@@ -101,7 +92,7 @@ public interface LicenseService {
     class LicenseDto {
         public UUID uuid;
         public Instant timestamp;
-        public PackageId pkg;
+        public URI purl;
         public String license;
         public @NullOr URI location;
         public @NullOr String error;

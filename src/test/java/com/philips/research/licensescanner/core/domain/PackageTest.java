@@ -17,7 +17,7 @@ class PackageTest {
     @Test
     void implementsEquals() {
         EqualsVerifier.forClass(Package.class)
-                .withNonnullFields("namespace", "name", "version")
+                .withNonnullFields("purl")
                 .verify();
     }
 }

@@ -58,14 +58,15 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public List<PackageId> findPackages(String namespace, String name, String version) {
-        final var packages = store.findPackages(namespace, name, version);
-        return packages.stream().map(DtoConverter::toPackageId).collect(Collectors.toList());
+    public List<URI> findPackages(String namespace, String name, String version) {
+        return store.findPackages(namespace, name, version).stream()
+                .map(Package::getPurl)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<LicenseDto> licenseFor(String namespace, String name, String version) {
-        return store.getPackage(namespace, name, version)
+    public Optional<LicenseDto> licenseFor(URI purl) {
+        return store.getPackage(purl)
                 .flatMap(store::latestScan)
                 .map(DtoConverter::toDto);
     }
@@ -73,19 +74,19 @@ public class LicenseInteractor implements LicenseService {
     @Override
     @Async("licenseDetectionExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void scanLicense(String namespace, String name, String version, @NullOr URI location) {
+    public void scanLicense(URI purl, @NullOr URI location) {
         @NullOr Path path = null;
         @NullOr Scan scan = null;
         try {
-            LOG.info("Scan license for {}:{} {} from {}", namespace, name, version, location);
-            final var pkg = getOrCreatePackage(namespace, name, version);
+            LOG.info("Scan license for {} from {}", purl, location);
+            final var pkg = getOrCreatePackage(purl);
             if (store.latestScan(pkg).isEmpty()) {
                 scan = store.createScan(pkg, location);
                 if (location != null) {
                     //TODO Check hash after download
                     path = downloader.download(location);
                     detector.scan(path, scan, licenseThreshold);
-                    LOG.info("Detected license for {}:{} {} is '{}'", namespace, name, version, scan.getLicense());
+                    LOG.info("Detected license for {} is '{}'", purl, scan.getLicense());
                 } else {
                     scan.setError("No location provided");
                 }
@@ -140,13 +141,13 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public void deleteScans(String namespace, String name, String version) {
-        store.getPackage(namespace, name, version)
+    public void deleteScans(URI purl) {
+        store.getPackage(purl)
                 .ifPresent(store::deleteScans);
     }
 
-    private Package getOrCreatePackage(String origin, String name, String version) {
-        return store.getPackage(origin, name, version).orElseGet(() -> store.createPackage(origin, name, version));
+    private Package getOrCreatePackage(URI purl) {
+        return store.getPackage(purl).orElseGet(() -> store.createPackage(purl));
     }
 
     private void deleteDirectory(Path path) {

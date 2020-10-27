@@ -26,16 +26,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class PackageRouteTest extends AbstractRouteTest {
+    private static final String NAMESPACE = "Namespace";
+    private static final String NAME = "Name";
+    private static final String VERSION = "Version";
     private static final String BASE_URL = "/packages";
-    private static final String PACKAGE_URL = BASE_URL + "/{origin}/{pkg}/{version}";
+    private static final String PACKAGE_URL = BASE_URL + "/{purl}";
 
     @Nested
     class FindPackages {
         @Test
         void findsPackageByAllFields() throws Exception {
-            final var response = searchResult(new JSONObject().put("name", NAME));
+            final var response = searchResult(new JSONArray().put( PURL));
             when(service.findPackages(NAMESPACE, NAME, VERSION))
-                    .thenReturn(List.of(standardPackageId()));
+                    .thenReturn(List.of(PURL));
 
             mockMvc.perform(get(BASE_URL + "?namespace={ns}&name={name}&version={version}", NAMESPACE, NAME, VERSION))
                     .andExpect(status().isOk())
@@ -44,9 +47,9 @@ class PackageRouteTest extends AbstractRouteTest {
 
         @Test
         void findsPackagesByOptionalFields() throws Exception {
-            final var response = searchResult(new JSONObject().put("name", NAME));
+            final var response = searchResult(new JSONArray().put(PURL));
             when(service.findPackages("", "", ""))
-                    .thenReturn(List.of(standardPackageId()));
+                    .thenReturn(List.of(PURL));
 
             mockMvc.perform(get(BASE_URL))
                     .andExpect(status().isOk())
@@ -61,33 +64,20 @@ class PackageRouteTest extends AbstractRouteTest {
             final var response = new JSONObject()
                     .put("license", LICENSE)
                     .put("detections", new JSONArray().put(new JSONObject().put("file", FILE)));
-            when(service.licenseFor(NAMESPACE, NAME, VERSION))
+            when(service.licenseFor(PURL))
                     .thenReturn(Optional.of(standardLicenseInfoWithDetection()));
 
-            mockMvc.perform(get(PACKAGE_URL, NAMESPACE, NAME, VERSION))
+            mockMvc.perform(get(PACKAGE_URL, encoded(PURL)))
                     .andExpect(status().isOk())
                     .andExpect(content().json(response.toString()));
         }
 
         @Test
-        void getsExistingScanResultForEmptyNamespace() throws Exception {
-            final var info = standardLicenseInfo();
-            info.pkg.namespace = "";
-            when(service.licenseFor(anyString(), anyString(), anyString()))
-                    .thenReturn(Optional.of(info));
-
-            mockMvc.perform(get(PACKAGE_URL, "", NAME, VERSION))
-                    .andExpect(status().isOk());
-
-            verify(service).licenseFor("", NAME, VERSION);
-        }
-
-        @Test
         void notFound_getUnknownPackage() throws Exception {
-            when(service.licenseFor(NAMESPACE, NAME, VERSION))
+            when(service.licenseFor(PURL))
                     .thenReturn(Optional.empty());
 
-            mockMvc.perform(get(PACKAGE_URL, NAMESPACE, NAME, VERSION))
+            mockMvc.perform(get(PACKAGE_URL, encoded(PURL)))
                     .andExpect(status().isNotFound());
         }
 
@@ -95,59 +85,47 @@ class PackageRouteTest extends AbstractRouteTest {
         void returnsEarlierScanResult_scannedBefore() throws Exception {
             final var body = new JSONObject().put("location", "http://somewhere.com/else");
             final var response = new JSONObject().put("location", LOCATION);
-            when(service.licenseFor(NAMESPACE, NAME, VERSION))
+            when(service.licenseFor(PURL))
                     .thenReturn(Optional.of(standardLicenseInfo()));
 
-            mockMvc.perform(post(PACKAGE_URL, NAMESPACE, NAME, VERSION)
+            mockMvc.perform(post(PACKAGE_URL, encoded(PURL))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(body.toString()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(response.toString()));
 
-            verify(service, never()).scanLicense(NAMESPACE, NAME, VERSION, LOCATION);
-        }
-
-        @Test
-        void scansPackagesWithoutNamespace() throws Exception {
-            final var body = new JSONObject().put("location", LOCATION);
-
-            mockMvc.perform(post(PACKAGE_URL, "", NAME, VERSION)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(body.toString()))
-                    .andExpect(status().isOk());
-
-            verify(service).scanLicense("", NAME, VERSION, LOCATION);
+            verify(service, never()).scanLicense(PURL, LOCATION);
         }
 
         @Test
         void schedulesNewScan_noScanExists() throws Exception {
             final var body = new JSONObject().put("location", LOCATION);
-            final var response = new JSONObject().put("name", NAME);
+            final var response = new JSONObject().put("purl", PURL.toString());
 
-            mockMvc.perform(post(PACKAGE_URL, NAMESPACE, NAME, VERSION)
+            mockMvc.perform(post(PACKAGE_URL, encoded(PURL))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(body.toString()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(response.toString()));
 
-            verify(service).scanLicense(NAMESPACE, NAME, VERSION, LOCATION);
+            verify(service).scanLicense(PURL, LOCATION);
         }
 
         @Test
         void forcesRescanning() throws Exception {
             final var body = new JSONObject().put("location", LOCATION);
-            final var response = new JSONObject().put("name", NAME);
-            when(service.licenseFor(NAMESPACE, NAME, VERSION))
+            final var response = new JSONObject().put("purl", PURL.toString());
+            when(service.licenseFor(PURL))
                     .thenReturn(Optional.of(standardLicenseInfo()));
 
-            mockMvc.perform(post(PACKAGE_URL + "?force=yes", NAMESPACE, NAME, VERSION)
+            mockMvc.perform(post(PACKAGE_URL + "?force=yes", encoded(PURL))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(body.toString()))
                     .andExpect(status().isOk())
                     .andExpect(content().json(response.toString()));
 
-            verify(service).deleteScans(NAMESPACE, NAME, VERSION);
-            verify(service).scanLicense(NAMESPACE, NAME, VERSION, LOCATION);
+            verify(service).deleteScans(PURL);
+            verify(service).scanLicense(PURL, LOCATION);
         }
     }
 }

@@ -25,6 +25,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -32,10 +34,8 @@ import java.util.Arrays;
 @AutoConfigureMockMvc
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 public abstract class AbstractRouteTest {
-    protected static final String NAMESPACE = "Namespace";
-    protected static final String NAME = "Name";
-    protected static final String VERSION = "Version";
     protected static final URI LOCATION = URI.create("git+ssh://example.com@1234");
+    protected static final URI PURL = URI.create("pkg:package@version");
     protected static final String LICENSE = "MIT OR Apache-2.0";
     protected static final String FILE = "path/to/file";
     protected static final int START_LINE = 12;
@@ -53,17 +53,9 @@ public abstract class AbstractRouteTest {
         Mockito.reset(service);
     }
 
-    protected LicenseService.PackageId standardPackageId() {
-        final var id = new LicenseService.PackageId();
-        id.namespace = NAMESPACE;
-        id.name = NAME;
-        id.version = VERSION;
-        return id;
-    }
-
     protected LicenseService.LicenseDto standardLicenseInfo() {
         final var info = new LicenseService.LicenseDto();
-        info.pkg = standardPackageId();
+        info.purl = PURL;
         info.license = LICENSE;
         info.location = LOCATION;
         return info;
@@ -85,6 +77,14 @@ public abstract class AbstractRouteTest {
     protected JSONObject searchResult(JSONObject... objects) throws Exception {
         var array = new JSONArray();
         Arrays.stream(objects).forEach(array::put);
+        return searchResult(array);
+    }
+
+    protected JSONObject searchResult(JSONArray array) throws Exception {
         return new JSONObject().put("results", array);
+    }
+
+    protected static String encoded(Object object) {
+        return URLEncoder.encode(object.toString(), StandardCharsets.UTF_8);
     }
 }

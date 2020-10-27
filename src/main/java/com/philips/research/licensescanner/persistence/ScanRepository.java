@@ -10,8 +10,8 @@
 
 package com.philips.research.licensescanner.persistence;
 
-import com.philips.research.licensescanner.core.domain.Package;
 import org.springframework.data.repository.CrudRepository;
+import com.philips.research.licensescanner.core.domain.Package;
 
 import java.time.Instant;
 import java.util.List;

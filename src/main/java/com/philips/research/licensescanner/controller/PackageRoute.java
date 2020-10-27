@@ -13,9 +13,11 @@ package com.philips.research.licensescanner.controller;
 import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pl.tlinkowski.annotation.basic.NullOr;
 
 import javax.validation.Valid;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * REST API for interacting with packages.
@@ -33,21 +35,14 @@ public class PackageRoute {
     /**
      * Gets scan results for a single package.
      *
+     * @param purl URL-encoded package URL
      * @return scan result
      */
-    @GetMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
-    ScanInfoJson getLatestScanForPackage(@NullOr @PathVariable(required = false) String namespace,
-                                         @PathVariable String name,
-                                         @PathVariable String version) {
-        if (namespace == null) {
-            namespace = "";
-        }
-        if (version.isBlank()) {
-            version = "";
-        }
-        final var resource = String.format("%s/%s/%s", namespace, name, version);
-        final var license = service.licenseFor(namespace, name, version)
-                .orElseThrow(() -> new ResourceNotFoundException(resource));
+    @GetMapping({"{purl}"})
+    ScanInfoJson getLatestScanForPackage(@PathVariable String purl) {
+        final URI uri = decodePackageUrl(purl);
+        final var license = service.licenseFor(uri)
+                .orElseThrow(() -> new ResourceNotFoundException(uri));
 
         return new ScanInfoJson(license);
     }
@@ -55,19 +50,15 @@ public class PackageRoute {
     /**
      * Finds all registered packages matching the provided search criteria.
      *
-     * @param namespace (Optional) part of the namespace
-     * @param name      (Optional) part of the name
-     * @param version   (Optional) part of the version
      * @return list of scanning results matching the query
      */
     @GetMapping
-    SearchResultJson findPackages(
-            @RequestParam(required = false, defaultValue = "") String namespace,
-            @RequestParam(required = false, defaultValue = "") String name,
-            @RequestParam(required = false, defaultValue = "") String version) {
+    SearchResultJson<URI> findPackages(@RequestParam(required = false, defaultValue = "") String namespace,
+                                       @RequestParam(required = false, defaultValue = "") String name,
+                                       @RequestParam(required = false, defaultValue = "") String version) {
         final var packages = service.findPackages(namespace, name, version);
 
-        return new SearchResultJson(packages.stream().map(PackageInfoJson::new));
+        return new SearchResultJson<>(packages.stream());
     }
 
     /**
@@ -78,30 +69,32 @@ public class PackageRoute {
      * @param force forces re-scanning despite an existing scan result
      * @return scan result
      */
-    @PostMapping({"{name}/{version}", "{namespace}/{name}/{version}"})
-    ScanInfoJson scanPackage(@NullOr @PathVariable(required = false) String namespace,
-                             @PathVariable String name,
-                             @PathVariable String version,
+    @PostMapping("{purl}")
+    ScanInfoJson scanPackage(@PathVariable String purl,
                              @Valid @RequestBody ScanRequestJson body,
                              @RequestParam(name = "force", required = false) boolean force) {
-        if (namespace == null) {
-            namespace = "";
-        }
-        if (version.isBlank()) {
-            version = "";
-        }
+        final URI uri = decodePackageUrl(purl);
 
         if (force) {
-            service.deleteScans(namespace, name, version);
+            service.deleteScans(uri);
         } else {
-            final var license = service.licenseFor(namespace, name, version);
+            final var license = service.licenseFor(uri);
             if (license.isPresent()) {
                 return new ScanInfoJson(license.get());
             }
         }
-        service.scanLicense(namespace, name, version, body.location);
+        service.scanLicense(uri, body.location);
 
-        return new ScanInfoJson(namespace, name, version, body.location);
+        return new ScanInfoJson(uri, body.location);
+    }
+
+    private static URI decodePackageUrl(String purl) {
+        try {
+            final var decoded = URLDecoder.decode(purl, StandardCharsets.UTF_8);
+            return URI.create(decoded);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not decode package URL '" + purl + "'");
+        }
     }
 }
 

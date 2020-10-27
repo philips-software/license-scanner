@@ -21,7 +21,7 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ScanTest {
-    private static final Package PACKAGE = new Package("Origin", "Package", "Version");
+    private static final Package PACKAGE = new Package(URI.create("pkg:package@version"));
     private static final License LICENSE = License.of("License");
     private static final URI LOCATION = URI.create("git+ssh://example.come");
     private static final int START_LINE = 10;

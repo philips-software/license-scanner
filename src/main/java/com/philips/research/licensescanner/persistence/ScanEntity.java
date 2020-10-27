@@ -38,7 +38,7 @@ class ScanEntity extends Scan {
         this(null, null);
     }
 
-    ScanEntity(PackageEntity pkg, URI location) {
+    ScanEntity(PackageEntity pkg, @NullOr URI location) {
         super(pkg, location);
     }
 

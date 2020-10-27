@@ -10,8 +10,8 @@
 
 package com.philips.research.licensescanner.core.domain.license.scancode;
 
-import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
+import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.download.AnonymousHandler;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;
@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ScanCodeDetectorTest {
     private static final int THRESHOLD = 50;
-    private static final Package PACKAGE = new Package("ns", "name", "version");
+    private static final Package PACKAGE = new Package(URI.create("pkg:package@version"));
     private static final URI LOCATION = URI.create("here");
 
     private final Detector detector = new ScanCodeDetector();

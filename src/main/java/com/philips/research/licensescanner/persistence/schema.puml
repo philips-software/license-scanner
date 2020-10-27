@@ -7,9 +7,7 @@ skinparam linetype ortho
 entity packages {
     *id: bigint <<generated>>
     ---
-    namespace: varchar
-    name: varchar
-    version: varchar
+    purl: varchar
 }
 
 entity scans {
