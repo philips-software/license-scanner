@@ -10,8 +10,8 @@
 
 package com.philips.research.licensescanner.core.domain.license.scancode;
 
-import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.Package;
+import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.download.AnonymousHandler;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;

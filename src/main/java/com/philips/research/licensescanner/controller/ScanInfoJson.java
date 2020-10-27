@@ -35,7 +35,7 @@ class ScanInfoJson {
     boolean contested;
     boolean confirmed;
 
-    public ScanInfoJson(URI purl, @NullOr URI location ) {
+    public ScanInfoJson(URI purl, @NullOr URI location) {
         this(null, purl, location);
     }
 

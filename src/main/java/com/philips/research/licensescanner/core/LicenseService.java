@@ -26,9 +26,8 @@ public interface LicenseService {
      * Finds all packages matching the provided mask.
      *
      * @param namespace (optional) namespace mask
-     * @param name (optional) name mask
-     * @param version (optional) version mask
-     *
+     * @param name      (optional) name mask
+     * @param version   (optional) version mask
      * @return list of matching package URLs
      */
     List<URI> findPackages(String namespace, String name, String version);

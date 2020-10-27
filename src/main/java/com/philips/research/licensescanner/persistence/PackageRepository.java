@@ -11,10 +11,7 @@
 package com.philips.research.licensescanner.persistence;
 
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
-import com.philips.research.licensescanner.core.domain.Package;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 

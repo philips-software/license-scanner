@@ -11,8 +11,8 @@
 package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.Package;
+import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.license.License;
 import com.philips.research.licensescanner.core.domain.license.LicenseParser;
 import org.junit.jupiter.api.Test;

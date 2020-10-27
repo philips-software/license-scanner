@@ -36,7 +36,7 @@ class PackageRouteTest extends AbstractRouteTest {
     class FindPackages {
         @Test
         void findsPackageByAllFields() throws Exception {
-            final var response = searchResult(new JSONArray().put( PURL));
+            final var response = searchResult(new JSONArray().put(PURL));
             when(service.findPackages(NAMESPACE, NAME, VERSION))
                     .thenReturn(List.of(PURL));
 

@@ -48,6 +48,10 @@ public abstract class AbstractRouteTest {
     @Autowired
     protected MockMvc mockMvc;
 
+    protected static String encoded(Object object) {
+        return URLEncoder.encode(object.toString(), StandardCharsets.UTF_8);
+    }
+
     @BeforeEach
     void beforeEach() {
         Mockito.reset(service);
@@ -82,9 +86,5 @@ public abstract class AbstractRouteTest {
 
     protected JSONObject searchResult(JSONArray array) throws Exception {
         return new JSONObject().put("results", array);
-    }
-
-    protected static String encoded(Object object) {
-        return URLEncoder.encode(object.toString(), StandardCharsets.UTF_8);
     }
 }

@@ -32,6 +32,15 @@ public class PackageRoute {
         this.service = service;
     }
 
+    private static URI decodePackageUrl(String purl) {
+        try {
+            final var decoded = URLDecoder.decode(purl, StandardCharsets.UTF_8);
+            return URI.create(decoded);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not decode package URL '" + purl + "'");
+        }
+    }
+
     /**
      * Gets scan results for a single package.
      *
@@ -86,15 +95,6 @@ public class PackageRoute {
         service.scanLicense(uri, body.location);
 
         return new ScanInfoJson(uri, body.location);
-    }
-
-    private static URI decodePackageUrl(String purl) {
-        try {
-            final var decoded = URLDecoder.decode(purl, StandardCharsets.UTF_8);
-            return URI.create(decoded);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Could not decode package URL '" + purl + "'");
-        }
     }
 }
 

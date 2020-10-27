@@ -10,8 +10,6 @@
 
 package com.philips.research.licensescanner.core.domain;
 
-import pl.tlinkowski.annotation.basic.NullOr;
-
 import java.net.URI;
 import java.util.Objects;
 

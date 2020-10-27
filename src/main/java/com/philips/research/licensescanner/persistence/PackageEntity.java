@@ -10,11 +10,11 @@
 
 package com.philips.research.licensescanner.persistence;
 
+import com.philips.research.licensescanner.core.domain.Package;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import javax.persistence.*;
 import java.net.URI;
-import com.philips.research.licensescanner.core.domain.Package;
 
 /**
  * JPA entity for persisting a package.
@@ -24,14 +24,13 @@ import com.philips.research.licensescanner.core.domain.Package;
 @Table(name = "packages")
 class PackageEntity extends Package {
     private static final URI EMPTY_URI = URI.create("");
-
+    @Column(name = "purl")
+    @Lob
+    private final String slimPurl;
     @Id
     @GeneratedValue
     @SuppressWarnings({"unused", "RedundantSuppression"})
     private @NullOr Long id;
-    @Column(name = "purl")
-    @Lob
-    private final String slimPurl;
 
     public PackageEntity() {
         this(EMPTY_URI);
