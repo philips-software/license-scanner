@@ -103,7 +103,7 @@ Must-have
 
 Should-have
 - [ ] Support (confirmed) declared non-SPDX custom licenses.
-- [ ] Verify checksum for downloaded artifact before scanning.
+- [ ] Verify checksum of downloaded artifact before scanning.
 - [ ] API to "challenge" a package license based on a mismatch with the 
 declared license.
 - [ ] Detect and return other copyright statements.

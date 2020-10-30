@@ -44,6 +44,7 @@ class ScanTest {
         assertThat(scan.isConfirmed()).isFalse();
         assertThat(scan.getError()).isEmpty();
         assertThat(scan.getDetections()).isEmpty();
+        assertThat(scan.getDetection(LICENSE)).isEmpty();
     }
 
     @Test
@@ -87,7 +88,8 @@ class ScanTest {
 
         assertThat(scan.getLicense()).isEqualTo(LICENSE);
         assertThat(scan.getDetections()).hasSize(1);
-        final var detection = scan.getDetections().get(0);
+        //noinspection OptionalGetWithoutIsPresent
+        final var detection = scan.getDetection(LICENSE).get();
         assertThat(detection.getScore()).isEqualTo(SCORE);
         assertThat(detection.getFilePath()).isEqualTo(FILE);
         assertThat(detection.getStartLine()).isEqualTo(START_LINE);
@@ -100,7 +102,7 @@ class ScanTest {
         scan.addDetection(LICENSE, SCORE, FILE, START_LINE, END_LINE);
 
         assertThat(scan.getDetections()).hasSize(1);
-        final var detection = scan.getDetections().get(0);
+        final var detection = scan.getDetection(LICENSE).get();
         assertThat(detection.getConfirmations()).isEqualTo(2);
     }
 }

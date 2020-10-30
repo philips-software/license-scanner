@@ -41,6 +41,7 @@ class LicenseInteractorTest {
     private static final String NAME = "Package";
     private static final String VERSION = "Version";
     private static final String LICENSE = "License";
+    private static final String OTHER = "Other";
     private static final URI LOCATION = URI.create("git+git://example.com");
     private static final File FILE = new File(".");
     private static final URI PURL = URI.create("pkg:package@version");
@@ -259,6 +260,33 @@ class LicenseInteractorTest {
             interactor.deleteScans(PURL);
 
             verify(store).deleteScans(PACKAGE);
+        }
+
+        @Test
+        @SuppressWarnings("OptionalGetWithoutIsPresent")
+        void ignoresDetection() {
+            final var scan = new Scan(PACKAGE, null)
+                    .addDetection(License.of(OTHER), 100, FILE, 1, 2)
+                    .addDetection(License.of(LICENSE), 100, FILE, 1, 2);
+            when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
+
+            interactor.ignore(SCAN_ID, LICENSE);
+
+            assertThat(scan.getDetection(License.of(OTHER)).get().isIgnored()).isFalse();
+            assertThat(scan.getDetection(License.of(LICENSE)).get().isIgnored()).isTrue();
+        }
+
+        @Test
+        @SuppressWarnings("OptionalGetWithoutIsPresent")
+        void restoresIgnoredDetection() {
+            final var scan = new Scan(PACKAGE, null)
+                    .addDetection(License.of(LICENSE), 100, FILE, 1, 2);
+            scan.getDetection(License.of(LICENSE)).get().setIgnored(true);
+            when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
+
+            interactor.restore(SCAN_ID, LICENSE);
+
+            assertThat(scan.getDetection(License.of(LICENSE)).get().isIgnored()).isFalse();
         }
     }
 }

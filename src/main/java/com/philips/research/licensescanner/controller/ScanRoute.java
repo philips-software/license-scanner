@@ -74,4 +74,13 @@ public class ScanRoute {
         service.contest(uuid);
     }
 
+    @PostMapping("{uuid}/ignore/{license}")
+    void ignoreDetection(@PathVariable UUID uuid, @PathVariable String license,
+                         @RequestParam(name = "revert", required = false) boolean revert) {
+        if (!revert) {
+            service.ignore(uuid, license);
+        } else {
+            service.restore(uuid, license);
+        }
+    }
 }

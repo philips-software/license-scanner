@@ -83,6 +83,19 @@ public interface LicenseService {
      */
     void deleteScans(URI packageUrl);
 
+    /**
+     * Raise false-positive detection
+     *
+     * @param license detection to ignore
+     */
+    void ignore(UUID scanId, String license);
+
+    /**
+     * Restore false-positive detection
+     *
+     * @param license detection to restore
+     */
+    void restore(UUID scanId, String license);
 
     /**
      * Response model for license information.

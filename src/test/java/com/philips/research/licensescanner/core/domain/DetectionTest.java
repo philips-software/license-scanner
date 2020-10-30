@@ -32,6 +32,7 @@ class DetectionTest {
         assertThat(detection.getLicense()).isEqualTo(LICENSE);
         assertThat(detection.getFilePath()).isNotNull();
         assertThat(detection.getScore()).isZero();
+        assertThat(detection.isIgnored()).isFalse();
     }
 
     @Test
@@ -66,6 +67,13 @@ class DetectionTest {
         assertThat(detection.getStartLine()).isEqualTo(11);
         assertThat(detection.getEndLine()).isEqualTo(21);
         assertThat(detection.getConfirmations()).isEqualTo(2);
+    }
+
+    @Test
+    void marksFalsePositive() {
+        detection.setIgnored(true);
+
+        assertThat(detection.isIgnored()).isTrue();
     }
 
     @Test

@@ -134,8 +134,9 @@ class LicenseJson {
     @JsonProperty("end_line")
     int endLine;
     @JsonProperty("spdx_license_key")
-    @NullOr
-    String spdx;
+    @NullOr String spdx;
+    @JsonProperty("matched_rule")
+    @NullOr MatchedRule matchedRule;
 
     String getSpdxIdentifier() {
         return (spdx != null)
@@ -146,5 +147,11 @@ class LicenseJson {
     public int lines() {
         return 1 + endLine - startLine;
     }
+}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+class MatchedRule {
+    @JsonProperty("is_license_text")
+    boolean isLicenseText;
 }
 

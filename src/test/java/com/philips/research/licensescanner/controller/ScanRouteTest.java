@@ -34,6 +34,7 @@ class ScanRouteTest extends AbstractRouteTest {
     private static final String SCANS_URL = "/scans";
     private static final String SCANS_ID_URL = SCANS_URL + "/{uuid}";
     private static final String CONTEST_URL = SCANS_ID_URL + "/contest";
+    private static final String IGNORE_DETECTION_URL = SCANS_ID_URL + "/ignore/{license}";
 
     @Test
     void findsScanById() throws Exception {
@@ -117,5 +118,21 @@ class ScanRouteTest extends AbstractRouteTest {
                 .andExpect(status().isOk());
 
         verify(service).curateLicense(SCAN_ID, LICENSE);
+    }
+
+    @Test
+    void ignoresFalsePositiveDetection() throws Exception {
+        mockMvc.perform(post(IGNORE_DETECTION_URL, SCAN_ID, LICENSE))
+                .andExpect(status().isOk());
+
+        verify(service).ignore(SCAN_ID, LICENSE);
+    }
+
+    @Test
+    void undoesFalsePositiveDetection() throws Exception {
+        mockMvc.perform(post(IGNORE_DETECTION_URL + "?revert=yes", SCAN_ID, LICENSE))
+                .andExpect(status().isOk());
+
+        verify(service).restore(SCAN_ID, LICENSE);
     }
 }

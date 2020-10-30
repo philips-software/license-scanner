@@ -146,6 +146,26 @@ public class LicenseInteractor implements LicenseService {
                 .ifPresent(store::deleteScans);
     }
 
+    @Override
+    public void ignore(UUID scanId, String license) {
+        ignoreDetection(scanId, license, true);
+    }
+
+    @Override
+    public void restore(UUID scanId, String license) {
+        ignoreDetection(scanId, license, false);
+    }
+
+    private void ignoreDetection(UUID scanId, String license, boolean ignored) {
+        final var lic = License.of(license);
+        store.getScan(scanId)
+                .flatMap(s -> s.getDetection(lic))
+                .ifPresent(d -> {
+                    d.setIgnored(ignored);
+                    LOG.info("Scan {}: license {} is now {}", scanId, license, ignored ? "ignored" : "included");
+                });
+    }
+
     private Package getOrCreatePackage(URI purl) {
         return store.getPackage(purl).orElseGet(() -> store.createPackage(purl));
     }

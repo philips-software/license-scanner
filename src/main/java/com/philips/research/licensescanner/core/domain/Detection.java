@@ -29,6 +29,7 @@ public class Detection {
     private File filePath = NO_FILE;
     private int startLine;
     private int endLine;
+    private boolean ignored;
 
     public Detection(License license) {
         this.license = license;
@@ -78,6 +79,14 @@ public class Detection {
         return endLine;
     }
 
+    public boolean isIgnored() {
+        return ignored;
+    }
+
+    public void setIgnored(boolean ignored) {
+        this.ignored = ignored;
+    }
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
@@ -90,4 +99,5 @@ public class Detection {
     public final int hashCode() {
         return Objects.hash(license);
     }
+
 }

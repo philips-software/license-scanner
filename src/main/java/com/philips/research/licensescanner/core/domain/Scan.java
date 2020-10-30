@@ -96,6 +96,10 @@ public class Scan {
         return new ArrayList<>(detections.values());
     }
 
+    public Optional<Detection> getDetection(License license) {
+        return Optional.ofNullable(detections.get(license))     ;
+    }
+
     public Scan addDetection(License license, int score, File file, int startLine, int endLine) {
         var detection = detections.get(license);
         if (detection == null) {
