@@ -97,7 +97,7 @@ public class Scan {
     }
 
     public Optional<Detection> getDetection(License license) {
-        return Optional.ofNullable(detections.get(license))     ;
+        return Optional.ofNullable(detections.get(license));
     }
 
     public Scan addDetection(License license, int score, File file, int startLine, int endLine) {

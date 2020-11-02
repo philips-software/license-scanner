@@ -123,5 +123,6 @@ public interface LicenseService {
         public int startLine;
         public int endLine;
         public int confirmations;
+        public boolean ignored;
     }
 }

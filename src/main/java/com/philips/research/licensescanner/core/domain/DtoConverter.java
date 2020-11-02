@@ -36,6 +36,7 @@ abstract class DtoConverter {
         dto.startLine = detection.getStartLine();
         dto.endLine = detection.getEndLine();
         dto.confirmations = detection.getConfirmations();
+        dto.ignored = detection.isIgnored();
         return dto;
     }
 }

@@ -70,6 +70,7 @@ class DetectionInfoJson {
     final int startLine;
     final int endLine;
     final int confirmations;
+    final boolean ignored;
 
     public DetectionInfoJson(LicenseService.DetectionDto info) {
         this.file = info.file;
@@ -77,6 +78,7 @@ class DetectionInfoJson {
         this.startLine = info.startLine;
         this.endLine = info.endLine;
         this.confirmations = info.confirmations;
+        this.ignored = info.ignored;
     }
 }
 

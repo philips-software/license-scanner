@@ -1,0 +1,69 @@
+@startuml
+
+participant "License\nConsumer" as Consumer
+participant "Scanner\nService" as Service
+participant "License\nScanner" as Scanner
+actor Curator
+
+group Previously unknown package
+    Consumer -> Service: licenseForPackage(pkg)
+        activate Consumer
+        activate Service
+        Service --> Consumer: <none>
+        deactivate Consumer
+
+        Service -> Service: downloadSource(pkg)
+        activate Service
+        deactivate Service
+        Service -> Scanner **: scanSources(sources)
+        activate Scanner
+        return license
+        destroy Scanner
+
+        Service -> Service: persistLicense(pkg, license)
+        activate Service
+        deactivate Service
+    deactivate Service
+    ...
+    Consumer -> Service: licenseForPackage(pkg)
+        activate Consumer
+        activate Service
+        return license
+    deactivate Consumer
+end group
+
+group Consumer expected different license
+    Consumer -> Service: contestLicense(pkg)
+    deactivate Consumer
+    activate Service
+    Service -> Service: markContested(pkg)
+    activate Service
+    deactivate Service
+    deactivate Service
+    ...
+    Curator -> Service: getContestedPackages()
+    activate Curator
+    activate Service
+    Service --> Curator: pkg
+    deactivate Service
+    note over Curator
+        Investigates detections
+        and source code files.
+    end note
+    Curator -> Service: confirm(pkg, confirmedLicense)
+    deactivate Curator
+    activate Service
+    Service -> Service: persistLicense(pkg, confirmedLicense)
+    activate Service
+    deactivate Service
+    deactivate Service
+    ...
+    Consumer -> Service: licenseForPackage(pkg)
+        activate Consumer
+        activate Service
+        Service -> Consumer: confirmedLicense
+        deactivate Service
+    deactivate Consumer
+end group
+
+@enduml
