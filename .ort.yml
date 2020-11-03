@@ -1,0 +1,8 @@
+excludes:
+  scopes:
+    - pattern: "provided"
+      reason: "PROVIDED_DEPENDENCY_OF"
+      comment: "Environment dependencies"
+    - pattern: "test"
+      reason: "PROVIDED_DEPENDENCY_OF"
+      comment: "Test dependencies"
