@@ -31,25 +31,36 @@ public class GitHandler implements DownloadHandler {
     @Override
     public void download(Path directory, URI location) {
         var path = location.getSchemeSpecificPart();
-        var revision = "";
+        var version = "";
         final var pos = path.indexOf('@');
         if (pos >= 0) {
-            revision = path.substring(pos + 1);
+            version = path.substring(pos + 1);
             path = path.substring(0, pos);
+        }
+        if (location.getScheme().equals("ssh")) {
+            path = path.replace("//", "//git@");
         }
         final var uri = URI.create(location.getScheme() + ':' + path);
 
         git.setDirectory(directory.toFile());
 
-        checkout(directory, uri, revision);
+        checkout(directory, uri, version);
     }
 
-    private void checkout(Path target, URI repository, String revision) {
+    private void checkout(Path target, URI repository, String version) {
+        if (version.isBlank()) {
+            checkoutMainBranch(target, repository);
+        } else {
+            checkoutBranchOrTag(target, repository, version);
+        }
+    }
+
+    private void checkoutMainBranch(Path target, URI repository) {
         try {
-            checkoutBranchOrTag(target, repository, revision);
-        } catch (DownloadException e) {
-            LOG.info("Checkout by branch/tag failed; attempting checkout by commit");
-            checkoutCommit(target, repository, revision);
+            LOG.info("Checkout main branch from {} to {}", repository, target);
+            git.execute("clone", "--depth=1", repository, target);
+        } catch (ShellException e) {
+            throw new DownloadException("Checkout of main branch failed", e);
         }
     }
 
@@ -58,7 +69,8 @@ public class GitHandler implements DownloadHandler {
             LOG.info("Checkout branch/tag '{}' from {} to {}", branchOrTag, repository, target);
             git.execute("clone", "--depth=1", repository, "--branch", branchOrTag, target);
         } catch (ShellException e) {
-            throw new DownloadException("Checkout by branch/tag failed", e);
+            LOG.info("Checkout by branch/tag failed; attempting checkout by commit instead");
+            checkoutCommit(target, repository, branchOrTag);
         }
     }
 
