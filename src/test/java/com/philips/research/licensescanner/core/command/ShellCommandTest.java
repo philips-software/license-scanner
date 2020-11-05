@@ -20,14 +20,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ShellCommandTest {
     @Test
     void executesCommand() {
-        // Throws if not executed in Maven root directory
         new ShellCommand("git")
                 .execute("version");
     }
 
     @Test
     void executesCommandInDirectory() {
-        // Throws if not executed in Maven "src" directory
         new ShellCommand("ls")
                 .setDirectory(new File("src"))
                 .execute("-lah");
@@ -51,6 +49,6 @@ class ShellCommandTest {
     void throws_commandTimedOut() {
         assertThatThrownBy(() -> new ShellCommand("sleep").execute("5").setTimeout(Duration.ofSeconds(0)).execute())
                 .isInstanceOf(ShellException.class)
-                .hasMessageContaining("Aborted 'sleep' after 0 seconds");
+                .hasMessageContaining("Aborted 'sleep' after");
     }
 }
