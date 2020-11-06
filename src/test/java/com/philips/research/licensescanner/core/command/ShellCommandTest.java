@@ -15,20 +15,20 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.time.Duration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 
 class ShellCommandTest {
     @Test
     void executesCommand() {
-        // Throws if not executed in Maven root directory
-        new ShellCommand("cd")
-                .execute("src");
+        new ShellCommand("ls")
+                .execute("-lah");
     }
 
     @Test
     void executesCommandInDirectory() {
-        // Throws if not executed in Maven "src" directory
-        new ShellCommand("cd")
+        new ShellCommand("ls")
                 .setDirectory(new File("src"))
                 .execute("test");
     }
@@ -49,8 +49,8 @@ class ShellCommandTest {
 
     @Test
     void throws_commandTimedOut() {
-        assertThatThrownBy(() -> new ShellCommand("read").setTimeout(Duration.ofSeconds(0)).execute())
+        assertThatThrownBy(() -> new ShellCommand("sleep").execute("5").setTimeout(Duration.ofSeconds(0)).execute())
                 .isInstanceOf(ShellException.class)
-                .hasMessageContaining("Aborted 'read' after");
+                .hasMessageContaining("Aborted 'sleep' after");
     }
 }
