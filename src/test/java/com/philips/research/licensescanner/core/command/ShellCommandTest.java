@@ -15,20 +15,22 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.time.Duration;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 
 class ShellCommandTest {
     @Test
     void executesCommand() {
-        new ShellCommand("git")
-                .execute("version");
+        new ShellCommand("ls")
+                .execute("-lah");
     }
 
     @Test
     void executesCommandInDirectory() {
         new ShellCommand("ls")
                 .setDirectory(new File("src"))
-                .execute("-lah");
+                .execute("test");
     }
 
     @Test
