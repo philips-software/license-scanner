@@ -32,9 +32,6 @@ public class GitHandler implements DownloadHandler {
 
     @Override
     public void download(Path directory, URI location) {
-        // Just for testing
-        LOG.info("VCS URI: " + location);
-
         var path = location.getRawSchemeSpecificPart();
         var version = "";
         final var pos = path.indexOf('@');

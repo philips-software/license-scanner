@@ -20,13 +20,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class AnonymousHandlerTest extends DownloadHandlerTestBase {
     private static final Path PATH = Path.of("src", "test", "resources");
+    private static final String SAMPLE_ZIP = "sample.zip";
+    private static final String SAMPLE_TXT = "dummy.txt";
     private final DownloadHandler handler = new AnonymousHandler();
 
     @Test
     void downloadsFromFileURI() {
-        handler.download(tempDir, PATH.resolve("dummy.txt").toUri());
+        handler.download(tempDir, PATH.resolve(SAMPLE_TXT).toUri());
 
-        assertThat(tempDir.resolve("dummy.txt").toFile().exists()).isTrue();
+        assertThat(tempDir.resolve(SAMPLE_TXT).toFile().exists()).isTrue();
     }
 
     @Test
@@ -45,8 +47,8 @@ class AnonymousHandlerTest extends DownloadHandlerTestBase {
 
     @Test
     void extractsArchivesAfterDownload() {
-        handler.download(tempDir, PATH.resolve("sample.zip").toUri());
+        handler.download(tempDir, PATH.resolve(SAMPLE_ZIP).toUri());
 
-        assertThat(tempDir.resolve("sample.zip-extract").resolve("sample").resolve("sample.txt").toFile()).exists();
+        assertThat(tempDir.resolve(SAMPLE_ZIP).resolve("sample").resolve("sample.txt").toFile()).exists();
     }
 }

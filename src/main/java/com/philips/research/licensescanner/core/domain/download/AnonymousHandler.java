@@ -69,6 +69,6 @@ public class AnonymousHandler implements DownloadHandler {
         //noinspection SpellCheckingInspection
         new ShellCommand("extractcode").setDirectory(directory.toFile())
                 .setTimeout(MAX_EXTRACT_DURATION)
-                .execute("--verbose", ".");
+                .execute("--verbose", "--shallow", "--replace-originals", ".");
     }
 }
