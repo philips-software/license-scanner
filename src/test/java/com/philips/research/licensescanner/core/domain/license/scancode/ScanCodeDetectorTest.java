@@ -49,7 +49,7 @@ class ScanCodeDetectorTest {
     }
 
     @Test
-    void decompressesAndScansDirectory() {
+    void ScansDownloadedDirectory() {
         detector.scan(tempDir, scan, THRESHOLD);
 
         assertThat(scan.getLicense()).isNotEqualTo(License.NONE);

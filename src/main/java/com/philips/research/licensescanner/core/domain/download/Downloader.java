@@ -107,6 +107,6 @@ public class Downloader {
             scheme = scheme.substring(pos + 1);
         }
 
-        return URI.create(scheme + ":" + location.getSchemeSpecificPart());
+        return URI.create(scheme + ":" + location.getRawSchemeSpecificPart());
     }
 }

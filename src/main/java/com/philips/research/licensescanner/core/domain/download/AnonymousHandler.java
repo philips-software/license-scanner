@@ -10,6 +10,7 @@
 
 package com.philips.research.licensescanner.core.domain.download;
 
+import com.philips.research.licensescanner.core.command.ShellCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,16 +22,19 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
+import java.time.Duration;
 
 /**
  *
  */
 public class AnonymousHandler implements DownloadHandler {
     private static final Logger LOG = LoggerFactory.getLogger(AnonymousHandler.class);
+    private static final Duration MAX_EXTRACT_DURATION = Duration.ofMinutes(10);
 
     @Override
     public void download(Path directory, URI location) {
         copyFile(target(directory, location), location);
+        extractArchives(directory);
     }
 
     private File target(Path directory, URI location) {
@@ -59,5 +63,12 @@ public class AnonymousHandler implements DownloadHandler {
         final var path = uri.getPath();
         final var pos = path.lastIndexOf('/');
         return (pos >= 0) ? path.substring(pos + 1) : path;
+    }
+
+    private void extractArchives(Path directory) {
+        //noinspection SpellCheckingInspection
+        new ShellCommand("extractcode").setDirectory(directory.toFile())
+                .setTimeout(MAX_EXTRACT_DURATION)
+                .execute("--verbose", ".");
     }
 }

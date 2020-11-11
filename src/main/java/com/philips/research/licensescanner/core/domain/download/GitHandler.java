@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
 
@@ -30,17 +32,17 @@ public class GitHandler implements DownloadHandler {
 
     @Override
     public void download(Path directory, URI location) {
-        var path = location.getSchemeSpecificPart();
+        // Just for testing
+        LOG.info("VCS URI: " + location);
+
+        var path = location.getRawSchemeSpecificPart();
         var version = "";
         final var pos = path.indexOf('@');
         if (pos >= 0) {
             version = path.substring(pos + 1);
             path = path.substring(0, pos);
         }
-        if (location.getScheme().equals("ssh")) {
-            path = path.replace("//", "//git@");
-        }
-        final var uri = URI.create(location.getScheme() + ':' + path);
+        final var uri = URI.create(location.getScheme() + ':' + URLDecoder.decode(path, StandardCharsets.UTF_8));
 
         git.setDirectory(directory.toFile());
 
