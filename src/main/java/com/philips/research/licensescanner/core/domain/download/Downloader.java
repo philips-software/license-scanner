@@ -10,13 +10,10 @@
 
 package com.philips.research.licensescanner.core.domain.download;
 
-import com.philips.research.licensescanner.ApplicationConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,14 +21,15 @@ import java.util.Map;
 /**
  * Version control handler API.
  */
-interface DownloadHandler {
+interface VcsHandler {
     /**
      * Downloads package sources.
      *
      * @param directory target directory to store the sources
      * @param location  download location using the format {@code <transport>://<host_name>[/<path_to_repository>][@<revision_tag_or_branch>][#<sub_path>]}
+     * @return base directory of the download result
      */
-    void download(Path directory, URI location);
+    Path download(Path directory, URI location);
 }
 
 /**
@@ -39,15 +37,12 @@ interface DownloadHandler {
  */
 @Component
 public class Downloader {
-    private final Path baseDirectory;
-    private final Map<String, DownloadHandler> registry = new HashMap<>();
+    private final Map<String, VcsHandler> registry = new HashMap<>();
 
     @Autowired
-    public Downloader(ApplicationConfiguration configuration) {
-        this.baseDirectory = configuration.getTempDir();
-
-        register("", new AnonymousHandler());
-        register("git", new GitHandler());
+    public Downloader() {
+        register("", new AnonymousVcsHandler());
+        register("git", new GitVcsHandler());
     }
 
     /**
@@ -55,7 +50,7 @@ public class Downloader {
      *
      * @param tool tool identifier
      */
-    void register(String tool, DownloadHandler handler) {
+    void register(String tool, VcsHandler handler) {
         registry.put(tool, handler);
     }
 
@@ -66,22 +61,15 @@ public class Downloader {
      * @return path to the downloaded sources
      * @throws DownloadException if downloading failed or no handler matches the location.
      */
-    public Path download(URI location) {
-        final var handler = validHandler(location.getScheme());
-        final var directory = newDirectory();
+    public Path download(Path directory, URI location) {
+        final var handler = validHandler(location);
         final var uri = downloadUri(location);
 
-        try {
-            handler.download(directory, uri);
-        } finally {
-            //noinspection ResultOfMethodCallIgnored
-            directory.toFile().delete();
-        }
-
-        return directory;
+        return handler.download(directory, uri);
     }
 
-    private DownloadHandler validHandler(String scheme) {
+    private VcsHandler validHandler(URI location) {
+        final var scheme = location.getScheme();
         final var pos = scheme.indexOf('+');
         final var tool = (pos >= 0) ? scheme.substring(0, pos) : "";
 
@@ -92,21 +80,12 @@ public class Downloader {
         return handler;
     }
 
-    private Path newDirectory() {
-        try {
-            return Files.createTempDirectory(baseDirectory, "license-");
-        } catch (IOException e) {
-            throw new DownloadException("Failed to create a working directory", e);
-        }
-    }
-
     private URI downloadUri(URI location) {
-        var scheme = location.getScheme();
         final var pos = location.getScheme().indexOf('+');
         if (pos >= 0) {
-            scheme = scheme.substring(pos + 1);
+            return URI.create(location.toString().substring(pos + 1));
         }
 
-        return URI.create(scheme + ":" + location.getRawSchemeSpecificPart());
+        return location;
     }
 }

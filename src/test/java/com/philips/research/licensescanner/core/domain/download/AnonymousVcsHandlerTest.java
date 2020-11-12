@@ -18,17 +18,24 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class AnonymousHandlerTest extends DownloadHandlerTestBase {
-    private static final Path PATH = Path.of("src", "test", "resources");
+class AnonymousVcsHandlerTest extends VcsHandlerTestBase {
+    private static final Path RESOURCES_PATH = Path.of("src", "test", "resources");
     private static final String SAMPLE_ZIP = "sample.zip";
     private static final String SAMPLE_TXT = "dummy.txt";
-    private final DownloadHandler handler = new AnonymousHandler();
+    private final VcsHandler handler = new AnonymousVcsHandler();
+
+    @Test
+    void throws_targetDirectoryDoesNotExist() {
+        assertThatThrownBy(() -> handler.download(Path.of("DoesNotExist"), RESOURCES_PATH.toUri()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Not a directory");
+    }
 
     @Test
     void downloadsFromFileURI() {
-        handler.download(tempDir, PATH.resolve(SAMPLE_TXT).toUri());
+        handler.download(tempDir, RESOURCES_PATH.resolve(SAMPLE_TXT).toUri());
 
-        assertThat(tempDir.resolve(SAMPLE_TXT).toFile().exists()).isTrue();
+        assertThat(tempDir.resolve(SAMPLE_TXT).toFile()).exists();
     }
 
     @Test
@@ -47,8 +54,16 @@ class AnonymousHandlerTest extends DownloadHandlerTestBase {
 
     @Test
     void extractsArchivesAfterDownload() {
-        handler.download(tempDir, PATH.resolve(SAMPLE_ZIP).toUri());
+        final var dir = handler.download(tempDir, RESOURCES_PATH.resolve(SAMPLE_ZIP).toUri());
 
         assertThat(tempDir.resolve(SAMPLE_ZIP).resolve("sample").resolve("sample.txt").toFile()).exists();
+        assertThat(dir).isEqualTo(tempDir.resolve(SAMPLE_ZIP));
+    }
+
+    @Test
+    void indicatesPathFromLocation() {
+        final var dir = handler.download(tempDir, RESOURCES_PATH.toUri().resolve("#sample%2Fpath"));
+
+        assertThat(dir).isEqualTo(tempDir.resolve("sample").resolve("path"));
     }
 }
