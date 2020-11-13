@@ -52,6 +52,14 @@ class GitVcsHandlerTest extends VcsHandlerTestBase {
 
     @Test
     @Disabled("Build server does not have an SSH key on GitHub")
+    void supportsUserSpecificSshURL() throws IOException {
+        handler.download(tempDir, URI.create("ssh://git%40github.com/excalith/git-cheats.git@v1.0.0"));
+
+        assertHash("61b307521005e98474243b8546a62a56e8e561b2");
+    }
+
+    @Test
+    @Disabled("Build server does not have an SSH key on GitHub")
     void supportsUserSpecificSshURI() throws IOException {
         handler.download(tempDir, URI.create("ssh:git%40github.com:excalith/git-cheats.git@v1.0.0"));
 

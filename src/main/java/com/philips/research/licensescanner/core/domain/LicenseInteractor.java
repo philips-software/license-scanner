@@ -17,6 +17,7 @@ import com.philips.research.licensescanner.core.domain.download.DownloadExceptio
 import com.philips.research.licensescanner.core.domain.download.Downloader;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;
+import com.philips.research.licensescanner.core.domain.license.LicenseParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,7 +186,7 @@ public class LicenseInteractor implements LicenseService {
     }
 
     private void ignoreDetection(UUID scanId, String license, boolean ignored) {
-        final var lic = License.of(license);
+        final var lic = LicenseParser.parse(license);
         store.getScan(scanId)
                 .flatMap(s -> s.getDetection(lic))
                 .ifPresent(d -> {

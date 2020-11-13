@@ -51,11 +51,11 @@ public class GitVcsHandler implements VcsHandler {
     }
 
     private String gitSchemeFrom(URI location) {
-        final @NullOr String scheme = location.getScheme();
-        if (scheme == null || scheme.equals("ssh")) {
+        final String plain = location.toString();
+        if (location.getScheme() == null || plain.startsWith("ssh:git") || plain.startsWith("git@")) {
             return "";
         }
-        return scheme + ':';
+        return location.getScheme() + ':';
     }
 
     private String versionFrom(URI location) {
@@ -105,7 +105,7 @@ public class GitVcsHandler implements VcsHandler {
 
     private void checkoutCommit(Path target, String repository, String commitHash) {
         try {
-            LOG.info("Checkout commit '{}' from {} to {}", commitHash, repository, target);
+            LOG.info("Checking out commit '{}' from {} to {}", commitHash, repository, target);
             git.execute("clone", repository, target).execute("checkout", commitHash);
         } catch (ShellException e) {
             throw new DownloadException("Checkout by commit failed", e);
