@@ -79,7 +79,7 @@ public class LicenseInteractor implements LicenseService {
     public void scanLicense(URI purl, @NullOr URI location) {
         @NullOr Scan scan = null;
         try {
-            LOG.info("Scan license for {} from {}", purl, location);
+            LOG.info("Scan license for {} from {}", purl, (location != null) ? location : "(no location)");
             final var pkg = getOrCreatePackage(purl);
             if (store.latestScan(pkg).isEmpty()) {
                 scan = store.createScan(pkg, location);

@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class AnonymousVcsHandlerTest extends VcsHandlerTestBase {
     private static final Path RESOURCES_PATH = Path.of("src", "test", "resources");
     private static final String SAMPLE_ZIP = "sample.zip";
-    private static final String SAMPLE_TXT = "dummy.txt";
+    private static final String SAMPLE_FILE = "sample.txt";
     private final VcsHandler handler = new AnonymousVcsHandler();
 
     @Test
@@ -33,9 +33,10 @@ class AnonymousVcsHandlerTest extends VcsHandlerTestBase {
 
     @Test
     void downloadsFromFileURI() {
-        handler.download(tempDir, RESOURCES_PATH.resolve(SAMPLE_TXT).toUri());
+        final var dir = handler.download(tempDir, RESOURCES_PATH.resolve(SAMPLE_FILE).toUri());
 
-        assertThat(tempDir.resolve(SAMPLE_TXT).toFile()).exists();
+        assertThat(tempDir.resolve(SAMPLE_FILE).toFile()).exists();
+        assertThat(dir).isEqualTo(tempDir);
     }
 
     @Test

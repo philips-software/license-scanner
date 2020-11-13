@@ -12,9 +12,9 @@ package com.philips.research.licensescanner.controller;
 
 import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
  * REST API for interacting with packages.
  */
 @RestController
+@Validated
 @RequestMapping("/packages")
 public class PackageRoute {
     private final LicenseService service;
@@ -80,7 +81,7 @@ public class PackageRoute {
      */
     @PostMapping("{purl}")
     ScanInfoJson scanPackage(@PathVariable String purl,
-                             @Valid @RequestBody ScanRequestJson body,
+                             @RequestBody ScanRequestJson body,
                              @RequestParam(name = "force", required = false) boolean force) {
         final URI uri = decodePackageUrl(purl);
 

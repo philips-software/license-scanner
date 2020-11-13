@@ -13,6 +13,7 @@ package com.philips.research.licensescanner.controller;
 
 import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.tlinkowski.annotation.basic.NullOr;
 
@@ -23,6 +24,7 @@ import java.util.UUID;
  * REST API for interacting with scan results.
  */
 @RestController
+@Validated
 @RequestMapping("/scans")
 public class ScanRoute {
     private final LicenseService service;
