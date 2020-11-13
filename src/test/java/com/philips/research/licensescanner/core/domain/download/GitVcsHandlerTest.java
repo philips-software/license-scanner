@@ -10,7 +10,6 @@
 
 package com.philips.research.licensescanner.core.domain.download;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -51,9 +50,8 @@ class GitVcsHandlerTest extends VcsHandlerTestBase {
     }
 
     @Test
-    @Disabled("This requires the build server to have a public SSH key registered with GitHub")
     void supportsUserSpecificSshURI() throws IOException {
-        handler.download(tempDir, URI.create("ssh://git%40github.com/excalith/git-cheats.git@v1.0.0"));
+        handler.download(tempDir, URI.create("ssh:git%40github.com:excalith/git-cheats.git@v1.0.0"));
 
         assertHash("61b307521005e98474243b8546a62a56e8e561b2");
     }

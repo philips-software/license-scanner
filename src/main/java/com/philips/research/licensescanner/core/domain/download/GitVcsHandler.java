@@ -35,23 +35,27 @@ public class GitVcsHandler implements VcsHandler {
     public Path download(Path directory, URI location) {
         git.setDirectory(directory.toFile());
 
-        checkout(directory, uriFrom(location), versionFrom(location));
+        checkout(directory, repositoryFrom(location), versionFrom(location));
 
         final @NullOr String fragment = location.getFragment();
         return (fragment != null) ? directory.resolve(fragment) : directory;
     }
 
-    private URI uriFrom(URI location) {
-        try {
-            final var raw = location.getRawSchemeSpecificPart();
-            final var pos = raw.indexOf('@');
-            final var path = (pos >= 0)
-                    ? URLDecoder.decode(raw.substring(0, pos), StandardCharsets.UTF_8)
-                    : location.getPath();
-            return new URI(location.getScheme(), path, null);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Malformed Git URI", e);
+    private String repositoryFrom(URI location) {
+        final var raw = location.getRawSchemeSpecificPart();
+        final var pos = raw.indexOf('@');
+        final var path = (pos >= 0)
+                ? URLDecoder.decode(raw.substring(0, pos), StandardCharsets.UTF_8)
+                : location.getSchemeSpecificPart();
+        return gitSchemeFrom(location) + path;
+    }
+
+    private String gitSchemeFrom(URI location) {
+        final @NullOr String scheme = location.getScheme();
+        if (scheme == null || scheme.equals("ssh")) {
+            return "";
         }
+        return scheme + ':';
     }
 
     private String versionFrom(URI location) {
@@ -60,7 +64,7 @@ public class GitVcsHandler implements VcsHandler {
         return (pos >= 0) ? raw.substring(pos + 1) : "";
     }
 
-    private void checkout(Path target, URI repository, String version) {
+    private void checkout(Path target, String repository, String version) {
         if (version.isBlank()) {
             checkoutDefaultBranch(target, repository);
         } else {
@@ -68,16 +72,16 @@ public class GitVcsHandler implements VcsHandler {
         }
     }
 
-    private void checkoutDefaultBranch(Path target, URI repository) {
+    private void checkoutDefaultBranch(Path target, String repository) {
         try {
-            LOG.info("Checkout main branch from {} to {}", repository, target);
+            LOG.info("Checkout default branch from {} to {}", repository, target);
             git.execute("clone", "--depth=1", repository, target);
         } catch (ShellException e) {
-            throw new DownloadException("Checkout of main branch failed", e);
+            throw new DownloadException("Checkout of default branch failed", e);
         }
     }
 
-    private void checkoutVersion(Path target, URI repository, String version) {
+    private void checkoutVersion(Path target, String repository, String version) {
         try {
             checkoutBranchOrTag(target, repository, version, 'v' + version);
         } catch (DownloadException e) {
@@ -86,7 +90,7 @@ public class GitVcsHandler implements VcsHandler {
         }
     }
 
-    private void checkoutBranchOrTag(Path target, URI repository, String... tags) {
+    private void checkoutBranchOrTag(Path target, String repository, String... tags) {
         for (var tag : tags) {
             try {
                 git.execute("clone", "--depth=1", repository, "--branch", tag, target);
@@ -99,7 +103,7 @@ public class GitVcsHandler implements VcsHandler {
         throw new DownloadException("Failed to checkout by branch/tag");
     }
 
-    private void checkoutCommit(Path target, URI repository, String commitHash) {
+    private void checkoutCommit(Path target, String repository, String commitHash) {
         try {
             LOG.info("Checkout commit '{}' from {} to {}", commitHash, repository, target);
             git.execute("clone", repository, target).execute("checkout", commitHash);
