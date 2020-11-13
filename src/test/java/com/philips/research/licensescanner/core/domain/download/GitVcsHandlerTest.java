@@ -10,6 +10,7 @@
 
 package com.philips.research.licensescanner.core.domain.download;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ class GitVcsHandlerTest extends VcsHandlerTestBase {
     }
 
     @Test
+    @Disabled("Build server does not have an SSH key on GitHub")
     void supportsUserSpecificSshURI() throws IOException {
         handler.download(tempDir, URI.create("ssh:git%40github.com:excalith/git-cheats.git@v1.0.0"));
 
