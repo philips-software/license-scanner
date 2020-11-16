@@ -10,7 +10,6 @@
 
 package com.philips.research.licensescanner.controller;
 
-import com.philips.research.licensescanner.core.LicenseService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +20,7 @@ import org.springframework.http.MediaType;
 import java.util.List;
 import java.util.Optional;
 
-import static com.philips.research.licensescanner.core.LicenseService.*;
+import static com.philips.research.licensescanner.core.LicenseService.StatisticsDto;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
