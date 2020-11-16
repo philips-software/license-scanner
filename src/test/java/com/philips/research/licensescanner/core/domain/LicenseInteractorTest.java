@@ -292,5 +292,18 @@ class LicenseInteractorTest {
 
             assertThat(scan.getDetection(License.of(LICENSE)).get().isIgnored()).isFalse();
         }
+
+        @Test
+        void collectsStatistics() {
+            when(store.countLicenses()).thenReturn(100);
+            when(store.countContested()).thenReturn(42);
+            when(store.countErrors()).thenReturn(10);
+
+            final var stats = interactor.statistics();
+
+            assertThat(stats.licenses).isEqualTo(100);
+            assertThat(stats.contested).isEqualTo(42);
+            assertThat(stats.errors).isEqualTo(10);
+        }
     }
 }

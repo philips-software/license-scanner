@@ -98,6 +98,11 @@ public interface LicenseService {
     void restore(UUID scanId, String license);
 
     /**
+     * @return scanning statistics
+     */
+    StatisticsDto statistics();
+
+    /**
      * Response model for license information.
      */
     @SuppressWarnings("NotNullFieldNotInitialized")
@@ -124,5 +129,14 @@ public interface LicenseService {
         public int endLine;
         public int confirmations;
         public boolean ignored;
+    }
+
+    /**
+     * Response model for statistics information.
+     */
+    class StatisticsDto {
+        public int errors;
+        public int contested;
+        public int licenses;
     }
 }

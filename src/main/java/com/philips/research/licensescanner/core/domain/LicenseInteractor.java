@@ -185,6 +185,15 @@ public class LicenseInteractor implements LicenseService {
         ignoreDetection(scanId, license, false);
     }
 
+    @Override
+    public StatisticsDto statistics() {
+        final var dto = new StatisticsDto();
+        dto.licenses = store.countLicenses();
+        dto.contested = store.countContested();
+        dto.errors = store.countErrors();
+        return dto;
+    }
+
     private void ignoreDetection(UUID scanId, String license, boolean ignored) {
         final var lic = LicenseParser.parse(license);
         store.getScan(scanId)

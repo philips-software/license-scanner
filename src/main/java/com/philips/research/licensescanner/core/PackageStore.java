@@ -94,4 +94,20 @@ public interface PackageStore {
      * Finds all latest scans in a period.
      */
     List<Scan> findScans(Instant from, Instant until);
+
+    /**
+     * @return total number of successful license scans
+     */
+    int countLicenses();
+
+    /**
+     * @return total number of scanning errors
+     */
+    int countErrors();
+
+    /**
+     * @return total number of contested licenses
+     */
+    int countContested();
+
 }

@@ -159,4 +159,38 @@ class PackageDatabaseTest {
 
         assertThat(found.getUuid()).isEqualTo(uuid);
     }
+
+    @Test
+    void countsNumberOfDetectedLicenses() {
+        database.createScan(pkg, LOCATION).setError("Error!");
+        database.createScan(pkg, LOCATION).confirm(LICENSE);
+        database.createScan(pkg, LOCATION).confirm(LICENSE);
+
+        final var count = database.countLicenses();
+
+        assertThat(count).isEqualTo(2);
+    }
+
+    @Test
+    void countsNumberOfScanningErrors() {
+        database.createScan(pkg, LOCATION).confirm(LICENSE);
+        database.createScan(pkg, LOCATION).setError("Error!");
+        database.createScan(pkg, LOCATION).setError("Error!");
+
+        final var count = database.countErrors();
+
+        assertThat(count).isEqualTo(2);
+    }
+
+    @Test
+    void countsNumberOfContestedLicenses() {
+        database.createScan(pkg, LOCATION).setError("Error");
+        database.createScan(pkg, LOCATION).confirm(LICENSE);
+        database.createScan(pkg, LOCATION).contest();
+        database.createScan(pkg, LOCATION).contest();
+
+        final var count = database.countContested();
+
+        assertThat(count).isEqualTo(2);
+    }
 }

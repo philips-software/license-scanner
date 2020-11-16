@@ -10,8 +10,10 @@
 
 package com.philips.research.licensescanner.controller;
 
+import com.philips.research.licensescanner.core.LicenseService;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -19,6 +21,7 @@ import org.springframework.http.MediaType;
 import java.util.List;
 import java.util.Optional;
 
+import static com.philips.research.licensescanner.core.LicenseService.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,6 +37,11 @@ class PackageRouteTest extends AbstractRouteTest {
 
     @Nested
     class FindPackages {
+        @BeforeEach()
+        void beforeEach() {
+            when(service.statistics()).thenReturn(new StatisticsDto());
+        }
+
         @Test
         void findsPackageByAllFields() throws Exception {
             final var response = searchResult(new JSONArray().put(PURL));

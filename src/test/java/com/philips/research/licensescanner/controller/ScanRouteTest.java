@@ -11,6 +11,7 @@
 package com.philips.research.licensescanner.controller;
 
 import com.philips.research.licensescanner.core.LicenseService;
+import com.philips.research.licensescanner.core.LicenseService.StatisticsDto;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -57,6 +58,7 @@ class ScanRouteTest extends AbstractRouteTest {
     @Test
     void findsLatestScan() throws Exception {
         final var response = searchResult(new JSONObject().put("license", LICENSE));
+        when(service.statistics()).thenReturn(new StatisticsDto());
         when(service.findScans(eq(Instant.EPOCH), any(Instant.class)))
                 .thenReturn(List.of(standardLicenseInfo()));
 
@@ -70,6 +72,7 @@ class ScanRouteTest extends AbstractRouteTest {
         final var from = Instant.now();
         final var until = from.plus(Duration.ofHours(3));
         final var response = searchResult(new JSONObject().put("license", LICENSE));
+        when(service.statistics()).thenReturn(new StatisticsDto());
         when(service.findScans(from, until))
                 .thenReturn(List.of(standardLicenseInfo()));
 
@@ -83,6 +86,7 @@ class ScanRouteTest extends AbstractRouteTest {
         final var dto = new LicenseService.LicenseDto();
         dto.uuid = SCAN_ID;
         dto.purl = PURL;
+        when(service.statistics()).thenReturn(new StatisticsDto());
         when(service.findErrors()).thenReturn(List.of(dto));
 
         mockMvc.perform(get(SCANS_URL + "?q=errors"))
@@ -95,6 +99,7 @@ class ScanRouteTest extends AbstractRouteTest {
         final var dto = new LicenseService.LicenseDto();
         dto.uuid = SCAN_ID;
         dto.purl = PURL;
+        when(service.statistics()).thenReturn(new StatisticsDto());
         when(service.findContested()).thenReturn(List.of(dto));
 
         mockMvc.perform(get(SCANS_URL + "?q=contested"))

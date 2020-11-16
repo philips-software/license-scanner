@@ -38,4 +38,10 @@ interface ScanRepository extends CrudRepository<ScanEntity, Long> {
     List<ScanEntity> findFirst100ByErrorIsNotNullOrderByTimestampDesc();
 
     List<ScanEntity> findFirst100ByContestedOrderByTimestampDesc(boolean contested);
+
+    int countByErrorIsNull();
+
+    int countByErrorIsNotNull();
+
+    int countByContested(boolean value);
 }

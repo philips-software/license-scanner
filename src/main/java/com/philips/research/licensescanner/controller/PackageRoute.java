@@ -68,8 +68,9 @@ public class PackageRoute {
                                        @RequestParam(required = false, defaultValue = "") String name,
                                        @RequestParam(required = false, defaultValue = "") String version) {
         final var packages = service.findPackages(namespace, name, version);
+        final var stats = service.statistics();
 
-        return new SearchResultJson<>(packages.stream());
+        return new SearchResultJson<>(stats, packages.stream());
     }
 
     /**
