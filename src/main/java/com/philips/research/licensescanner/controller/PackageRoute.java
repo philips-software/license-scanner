@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
  */
 @RestController
 @Validated
+@CrossOrigin(origins = "*")
 @RequestMapping("/packages")
 public class PackageRoute {
     private final LicenseService service;

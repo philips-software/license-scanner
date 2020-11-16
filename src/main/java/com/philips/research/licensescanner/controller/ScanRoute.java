@@ -25,6 +25,7 @@ import java.util.UUID;
  */
 @RestController
 @Validated
+@CrossOrigin(origins = "*")
 @RequestMapping("/scans")
 public class ScanRoute {
     private final LicenseService service;
