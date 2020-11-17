@@ -12,7 +12,7 @@ package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
-import com.philips.research.licensescanner.core.domain.download.AnonymousHandler;
+import com.philips.research.licensescanner.core.domain.download.AnonymousVcsHandler;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;
 import org.junit.jupiter.api.AfterEach;
@@ -40,7 +40,7 @@ class ScanCodeDetectorTest {
     public void beforeEach() throws Exception {
         tempDir = Files.createTempDirectory("test");
         var location = Path.of("src", "test", "resources", "sample.zip").toUri();
-        new AnonymousHandler().download(tempDir, location);
+        new AnonymousVcsHandler().download(tempDir, location);
     }
 
     @AfterEach
@@ -49,7 +49,7 @@ class ScanCodeDetectorTest {
     }
 
     @Test
-    void decompressesAndScansDirectory() {
+    void ScansDownloadedDirectory() {
         detector.scan(tempDir, scan, THRESHOLD);
 
         assertThat(scan.getLicense()).isNotEqualTo(License.NONE);

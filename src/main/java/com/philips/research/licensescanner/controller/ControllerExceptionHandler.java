@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,4 +60,18 @@ public class ControllerExceptionHandler {
                         (error) -> ((FieldError) error).getField(),
                         DefaultMessageSourceResolvable::getDefaultMessage));
     }
+
+    /**
+     * Handles request type validation failures.
+     *
+     * @return BAD_REQUEST with a list of the detected validation failures.
+     */
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseBody
+    public Map<String, String> handleArgumentTypExceptions(MethodArgumentTypeMismatchException exception) {
+        //noinspection ConstantConditions
+        return Map.of(exception.getName(), exception.getValue().toString());
+    }
+
 }

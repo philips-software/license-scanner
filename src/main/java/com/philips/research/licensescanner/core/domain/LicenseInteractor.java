@@ -10,15 +10,17 @@
 
 package com.philips.research.licensescanner.core.domain;
 
+import com.philips.research.licensescanner.ApplicationConfiguration;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
+import com.philips.research.licensescanner.core.domain.download.DownloadException;
 import com.philips.research.licensescanner.core.domain.download.Downloader;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;
+import com.philips.research.licensescanner.core.domain.license.LicenseParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -28,6 +30,7 @@ import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
@@ -46,15 +49,15 @@ public class LicenseInteractor implements LicenseService {
     private final PackageStore store;
     private final Downloader downloader;
     private final Detector detector;
-    private final int licenseThreshold;
+    private final ApplicationConfiguration configuration;
 
     @Autowired
     public LicenseInteractor(PackageStore store, Downloader downloader, Detector detector,
-                             @Value("${licenses.threshold-percent}") int licenseThreshold) {
+                             ApplicationConfiguration configuration) {
         this.store = store;
         this.downloader = downloader;
         this.detector = detector;
-        this.licenseThreshold = licenseThreshold;
+        this.configuration = configuration;
     }
 
     @Override
@@ -75,17 +78,14 @@ public class LicenseInteractor implements LicenseService {
     @Async("licenseDetectionExecutor")
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void scanLicense(URI purl, @NullOr URI location) {
-        @NullOr Path path = null;
         @NullOr Scan scan = null;
         try {
-            LOG.info("Scan license for {} from {}", purl, location);
+            LOG.info("Scan license for {} from {}", purl, (location != null) ? location : "(no location)");
             final var pkg = getOrCreatePackage(purl);
             if (store.latestScan(pkg).isEmpty()) {
                 scan = store.createScan(pkg, location);
                 if (location != null) {
-                    //TODO Check hash after download
-                    path = downloader.download(location);
-                    detector.scan(path, scan, licenseThreshold);
+                    scanPackage(location, scan);
                     LOG.info("Detected license for {} is '{}'", purl, scan.getLicense());
                 } else {
                     scan.setError("No location provided");
@@ -96,10 +96,39 @@ public class LicenseInteractor implements LicenseService {
             if (scan != null) {
                 scan.setError(e.getMessage());
             }
+        }
+    }
+
+    private void scanPackage(URI location, Scan scan) {
+        @NullOr Path tempDir = null;
+        try {
+            tempDir = createWorkingDirectory();
+            //TODO Check hash after download
+            final var path = downloader.download(tempDir, location);
+            detector.scan(path, scan, configuration.getThresholdPercent());
         } finally {
-            if (path != null) {
-                deleteDirectory(path);
-            }
+            deleteDirectory(tempDir);
+        }
+    }
+
+    private Path createWorkingDirectory() {
+        try {
+            return Files.createTempDirectory(configuration.getTempDir(), "license-");
+        } catch (IOException e) {
+            throw new DownloadException("Failed to create a working directory", e);
+        }
+    }
+
+    private void deleteDirectory(@NullOr Path path) {
+        if (path == null) {
+            return;
+        }
+
+        try {
+            LOG.info("Removing working directory {}", path);
+            FileSystemUtils.deleteRecursively(path);
+        } catch (IOException e) {
+            LOG.warn("Failed to (fully) remove directory {}", path);
         }
     }
 
@@ -156,8 +185,17 @@ public class LicenseInteractor implements LicenseService {
         ignoreDetection(scanId, license, false);
     }
 
+    @Override
+    public StatisticsDto statistics() {
+        final var dto = new StatisticsDto();
+        dto.licenses = store.countLicenses();
+        dto.contested = store.countContested();
+        dto.errors = store.countErrors();
+        return dto;
+    }
+
     private void ignoreDetection(UUID scanId, String license, boolean ignored) {
-        final var lic = License.of(license);
+        final var lic = LicenseParser.parse(license);
         store.getScan(scanId)
                 .flatMap(s -> s.getDetection(lic))
                 .ifPresent(d -> {
@@ -170,12 +208,4 @@ public class LicenseInteractor implements LicenseService {
         return store.getPackage(purl).orElseGet(() -> store.createPackage(purl));
     }
 
-    private void deleteDirectory(Path path) {
-        try {
-            LOG.info("Removing working directory {}", path);
-            FileSystemUtils.deleteRecursively(path);
-        } catch (IOException e) {
-            LOG.warn("Failed to (fully) remove directory {}", path);
-        }
-    }
 }

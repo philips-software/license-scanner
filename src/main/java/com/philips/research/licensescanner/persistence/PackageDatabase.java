@@ -117,6 +117,21 @@ public class PackageDatabase implements PackageStore {
         return toScans(list);
     }
 
+    @Override
+    public int countLicenses() {
+        return scanRepository.countByErrorIsNull();
+    }
+
+    @Override
+    public int countErrors() {
+        return scanRepository.countByErrorIsNotNull();
+    }
+
+    @Override
+    public int countContested() {
+        return scanRepository.countByContested(true);
+    }
+
     private List<Scan> toScans(List<ScanEntity> list) {
         //noinspection unchecked
         return (List<Scan>) (Object) list;

@@ -10,6 +10,7 @@
 
 package com.philips.research.licensescanner.core.domain;
 
+import com.philips.research.licensescanner.ApplicationConfiguration;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.DownloadException;
@@ -17,10 +18,7 @@ import com.philips.research.licensescanner.core.domain.download.Downloader;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.DetectorException;
 import com.philips.research.licensescanner.core.domain.license.License;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
@@ -42,6 +40,7 @@ class LicenseInteractorTest {
     private static final String VERSION = "Version";
     private static final String LICENSE = "License";
     private static final String OTHER = "Other";
+    private static final String MESSAGE = "Test message";
     private static final URI LOCATION = URI.create("git+git://example.com");
     private static final File FILE = new File(".");
     private static final URI PURL = URI.create("pkg:package@version");
@@ -53,11 +52,25 @@ class LicenseInteractorTest {
     private static final Instant FROM = UNTIL.minus(Duration.ofDays(5));
     private static final int THRESHOLD = 70;
 
+    @SuppressWarnings("NotNullFieldNotInitialized")
+    private static Path workDirectory;
+
     private final Downloader downloader = mock(Downloader.class);
     private final Detector detector = mock(Detector.class);
     private final PackageStore store = mock(PackageStore.class);
+    private final ApplicationConfiguration configuration = new ApplicationConfiguration();
 
-    private final LicenseService interactor = new LicenseInteractor(store, downloader, detector, THRESHOLD);
+    private final LicenseService interactor = new LicenseInteractor(store, downloader, detector, configuration);
+
+    @BeforeAll
+    static void beforeAll() throws Exception {
+        workDirectory = Files.createTempDirectory("test");
+    }
+
+    @AfterAll
+    static void afterAll() throws Exception {
+        FileSystemUtils.deleteRecursively(workDirectory);
+    }
 
     @BeforeEach
     void beforeEach() {
@@ -112,17 +125,11 @@ class LicenseInteractorTest {
     class PackageScanning {
         private final Scan scan = new Scan(PACKAGE, LOCATION);
 
-        Path directory;
-
         @BeforeEach
-        void beforeEach() throws Exception {
-            directory = Files.createTempDirectory("test");
+        void beforeEach() {
             when(store.createScan(PACKAGE, LOCATION)).thenReturn(scan);
-        }
-
-        @AfterEach
-        void afterEach() throws Exception {
-            FileSystemUtils.deleteRecursively(directory);
+            configuration.setTempDir(workDirectory);
+            configuration.setThresholdPercent(THRESHOLD);
         }
 
         @Test
@@ -148,35 +155,32 @@ class LicenseInteractorTest {
 
         @Test
         void downloadsAndScansPackage() {
-            when(downloader.download(LOCATION)).thenReturn(directory);
+            final var scanDir = workDirectory.resolve("subpath");
+            when(downloader.download(any(Path.class), eq(LOCATION))).thenReturn(scanDir);
 
             interactor.scanLicense(PURL, LOCATION);
 
-            verify(detector).scan(directory, scan, THRESHOLD);
-            assertThat(directory.toFile()).doesNotExist();
+            verify(detector).scan(scanDir, scan, THRESHOLD);
         }
 
         @Test
         void registersDownloadFailure() {
-            final var message = "Test error";
-            when(downloader.download(LOCATION)).thenThrow(new DownloadException(message));
+            when(downloader.download(any(Path.class), eq(LOCATION))).thenThrow(new DownloadException(MESSAGE));
 
             interactor.scanLicense(PURL, LOCATION);
 
-            assertThat(scan.getError()).contains(message);
+            assertThat(scan.getError()).contains(MESSAGE);
         }
 
         @Test
         void registersScanningFailure() {
-            final var message = "Test error";
-            when(downloader.download(LOCATION)).thenReturn(directory);
-            doThrow(new DetectorException(message, new IllegalArgumentException()))
-                    .when(detector).scan(directory, scan, THRESHOLD);
+            when(downloader.download(any(Path.class), eq(LOCATION))).thenReturn(workDirectory);
+            doThrow(new DetectorException(MESSAGE, new IllegalArgumentException()))
+                    .when(detector).scan(workDirectory, scan, THRESHOLD);
 
             interactor.scanLicense(PURL, LOCATION);
 
-            assertThat(scan.getError()).contains(message);
-            assertThat(directory.toFile()).doesNotExist();
+            assertThat(scan.getError()).contains(MESSAGE);
         }
     }
 
@@ -287,6 +291,19 @@ class LicenseInteractorTest {
             interactor.restore(SCAN_ID, LICENSE);
 
             assertThat(scan.getDetection(License.of(LICENSE)).get().isIgnored()).isFalse();
+        }
+
+        @Test
+        void collectsStatistics() {
+            when(store.countLicenses()).thenReturn(100);
+            when(store.countContested()).thenReturn(42);
+            when(store.countErrors()).thenReturn(10);
+
+            final var stats = interactor.statistics();
+
+            assertThat(stats.licenses).isEqualTo(100);
+            assertThat(stats.contested).isEqualTo(42);
+            assertThat(stats.errors).isEqualTo(10);
         }
     }
 }

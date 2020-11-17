@@ -13,6 +13,7 @@ package com.philips.research.licensescanner.controller;
 
 import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.tlinkowski.annotation.basic.NullOr;
 
@@ -23,6 +24,8 @@ import java.util.UUID;
  * REST API for interacting with scan results.
  */
 @RestController
+@Validated
+@CrossOrigin(origins = "*")
 @RequestMapping("/scans")
 public class ScanRoute {
     private final LicenseService service;
@@ -42,18 +45,19 @@ public class ScanRoute {
     SearchResultJson<ScanInfoJson> latestScans(@NullOr @RequestParam(required = false) Instant start,
                                                @NullOr @RequestParam(required = false) Instant end,
                                                @RequestParam(name = "q", required = false, defaultValue = "") String query) {
+        final var stats = service.statistics();
+
         if (query.startsWith("error")) {
-            return new SearchResultJson<>(ScanInfoJson.toStream(service.findErrors()));
+            return new SearchResultJson<>(stats, ScanInfoJson.toStream(service.findErrors()));
         }
         if (query.startsWith("contest")) {
-            return new SearchResultJson<>(ScanInfoJson.toStream(service.findContested()));
+            return new SearchResultJson<>(stats, ScanInfoJson.toStream(service.findContested()));
         }
-
         final var scans = service.findScans(
                 start != null ? start : Instant.EPOCH,
                 end != null ? end : Instant.now());
 
-        return new SearchResultJson<>(ScanInfoJson.toStream(scans));
+        return new SearchResultJson<>(stats, ScanInfoJson.toStream(scans));
     }
 
     @GetMapping("{uuid}")
