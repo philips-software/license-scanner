@@ -14447,9 +14447,11 @@ a7C:function a7C(a){this.a=a},
 a7s:function a7s(a,b){this.a=a
 this.b=b},
 a7D:function a7D(a){this.a=a},
-a7r:function a7r(a,b,c){this.a=a
-this.b=b
-this.c=c},
+a7r:function a7r(a,b,c,d){var _=this
+_.a=a
+_.b=b
+_.c=c
+_.d=d},
 C3:function C3(a,b){this.c=a
 this.a=b}},G={
 b6:function(a,b,c,d,e,f,g){var s=new G.ht(c,e,a,C.vH,b,d,C.a8,C.A,new R.bD(H.c([],t.x8),t.jc),new R.bD(H.c([],t.l),t.wi))
@@ -62711,7 +62713,7 @@ case 1:s=s.ga2i()
 return new S.mw(s,new N.f8(s,r))
 default:s=s.ga5g()
 return new S.mw(s,new N.f8(s,r))}},
-lW:function(a,b,c){return new U.rz(new Q.a7r(a,b,c),null,null,t.dq)}}
+lW:function(a,b,c){return new U.rz(new Q.a7r(this,a,b,c),null,null,t.dq)}}
 Q.a7u.prototype={
 $0:function(){return A.auv("Copyright \xa9 2020-2020 Koninklijke Philips N.V\nAll Rights Reserved","License Scanner",this.b)},
 $C:"$0",
@@ -62756,7 +62758,9 @@ $C:"$0",
 $R:0,
 $S:418}
 Q.a7r.prototype={
-$3:function(a,b,c){return new U.o0(this.a,this.b.$1(b),this.c,null)},
+$3:function(a,b,c){var s=this.c.$1(b)
+s=s>0?C.f.i(s):null
+return new U.o0(this.b,s,this.d,null)},
 $C:"$3",
 $R:3,
 $S:419}
@@ -62849,7 +62853,7 @@ ax:function(){this.aJ()
 this.d=this.EB()},
 A:function(a,b){var s,r,q,p=this,o=null,n=Y.kp(b,!1,t.h9),m=Q.hI(o,L.cv(C.rC,o,o),o,!1,o,L.aH("Detected license",o,o,o,o,o,o)),l=p.a.c,k=p.d
 k=k.length!==0?L.aH(k,o,o,o,o,K.a9(b).a0.f,o):L.aH("(No license detected)",o,o,o,o,A.eb(o,o,o,o,o,o,o,o,o,o,o,o,C.nc,o,o,o,!0,o,o,o,o,o,o),o)
-s=U.w4(L.aH("CLEAR ALL",o,o,o,o,o,o),new D.a46(p,n),o)
+s=U.w4(L.aH("IGNORE",o,o,o,o,o,o),new D.a46(p,n),o)
 r=L.aH("CONFIRM",o,o,o,o,o,o)
 q=t._
 return M.d2(C.v,!0,o,V.ls(T.dC(H.c([m,new T.b2(C.A2,new N.rP(l,new D.a47(p),o),o),new T.b2(C.aZ,k,o),K.B_(o,H.c([s,U.w4(r,p.d.length===0?o:new D.a48(p,n,b),o)],q),o,o)],q),C.a1,C.a7,C.V),o,o,o,o,o,o),C.r,o,0,o,o,o,o,C.bD)},
@@ -63084,8 +63088,8 @@ $1:function(a){var s=null
 return J.em(a)?T.hv(L.aH("(No matches found)",s,s,s,s,s,s),s,s):new E.FC(a,s)},
 $S:436}
 U.o0.prototype={
-A:function(a,b){var s=null,r=L.cv(this.c,s,s),q=this.d,p=L.aH(J.be(q),s,s,s,s,A.eb(s,s,C.l,s,s,s,s,s,s,s,s,s,s,s,s,s,!0,s,s,s,s,s,s),s)
-return new V.re(p,this.e,r,new Z.OA(s,s,10,20),C.qw,K.AL(10),q>0,s)}}
+A:function(a,b){var s=null,r=L.cv(this.c,s,s),q=this.d,p=L.aH(J.be(q),s,s,s,s,A.eb(s,s,C.l,s,s,s,s,s,s,s,s,9,s,s,s,s,!0,s,s,s,s,s,s),s)
+return new V.re(p,this.e,r,new Z.OA(s,s,10,20),C.qw,K.AL(10),q!=null,s)}}
 O.j_.prototype={
 A:function(a,b){var s=null,r=this.c,q=r.c
 if(q!=null){r=N.ao6(q)
