@@ -1,46 +1,90 @@
 # License Scanner service
-**Description**: Wrapper around a source code license scanner to make scan results 
-available via an API, and provide a user interface for manual curation of scan result.
+Backend service to scan licenses from the source code of (open source) packages. 
+
+**Status**: _Experimental research prototype_
 
 Typical usage is the integration with CI/CD build pipeline tools (like 
-[SPDX-Builder](https://github.com/philips-labs/spdx-builder)) to retrieve available 
-license information and trigger asynchronous scanning of (versions of) packages that 
-were not already scanned. 
+[SPDX-Builder](https://github.com/philips-labs/spdx-builder)) to obtain validated
+license information. Prior scan results are provided if the package has been
+scanned before. Packages that were not yet scanned are automatically 
+scheduled for download and scanning. A [web user interface](https://github.com/philips-labs/license-scanner-ui)
+is provisioned by the the service for monitoring the scanning process and 
+manually curate scan results.
 
-The actual scanning of software license statements from source code is performed by 
-the [ScanCode Toolkit](https://github.com/nexB/scancode-toolkit) version 3.x command 
-line tool. The service schedules scanning of packages in the background, making 
-scan results available the next time they are requested.
+Clients interact with the service via a REST API to provide the license for 
+the specified package. If the package was scanned before, the license is
+returned immediately. Else a scan of the package is scheduled if a source code
+location was provided, so a future request for the package can be answered. 
+When a client detects a mismatch between the license declared by (e.g.) a package 
+manager and the license detected by the scanner, it can "contest" the license. 
+This marks the scanned license for human curation. After manual inspection, 
+the (corrected) license is "confirmed" to indicate the next requesting client 
+that the provided license is reliable. If the scan failed due to an incorrect
+source code location or other technical issue, the user can manually correct 
+the location and restart the scan.
 
-Scanning a package technically starts by downloading its source code, and then 
-invokes an external license scanner to extract the license information. 
+The [ScanCode Toolkit version 3.x](https://github.com/nexB/scancode-toolkit)
+command line tool performs the actual source code scan. The service schedules 
+download of package source code in the background, invokes the scanner, and 
+makes detected license information available the next time it is requested by
+a client via the REST API.
 
-License scanners report detected licenses per source file, which are joined by the 
-service into a single package-level license using the logical "AND" operator.
+ScanCode Toolkit reports detected licenses per source file, which are joined by 
+the service into a single package-level license using the logical "AND" operator.
 The API reports licenses as-is, without checking for validity or compatibility. 
 In case of dual licensing, it is left to the client to choose the appropriate 
 license.
 
-Current supported sources for downloading source code from:
-- Plain web URL download
-- Git 2.24 or higher
+The service persists per detected license: 
+- The total number of detections in the code
+- A sample file with a (largest) range of lines that indicated the license
+- The license itself, specified in (where possible) [SDPX identifiers](https://spdx.org/licenses)
 
-**Status**: Research prototype
+Manual curation allows for marking individual detections as false-positives,
+and adjusting the confirmed license accordingly. In the user interface the
+button next to the source location opens a web URL that is derived from the 
+VCS URI (see below) to manually browse the referenced source archive or download
+the source code archive.
+
+Packages are specified by their [package URL](https://github.com/package-url/purl-spec)
+to ensure unique identification across package managers.
+
+The location of source code is specified using a VCS location URI according
+to the format defined in the [SPDX specification](https://spdx.github.io/spdx-spec/3-package-information/#37-package-download-location):
+```
+<vcs_tool>+<transport>://<host_name>[/<path_to_repository>][@<revision_tag_or_branch>][#<sub_path>]
+```
+where all fields are URL-encoded to escape reserved characters (like "@" to "%40").
+
+Current supported sources for downloading source code from:
+- Plain web (and file) URL download
+- Installed command-line Git client (version 2.24 or higher)
+
+In case of a plain download, the downloaded archive is automatically extracted
+before starting the scan.
+
+The Git download assumes the default branch if no explicit version is provided.
+Else it attempts to check out the source code in the following ways:
+1. Branch/tag checkout using the literal version
+2. Branch/tag checkout prepending "v" to the literal version
+3. Revision checkout using the literal version as commit hash
 
 ## Dependencies
 
 The service requires the Java 11 (or later) runtime environment.
 
-The H2 database implementation is part of the application, so no external 
-dependencies are (currently) required for persistent storage.
+Scan results are persisted to disk in a local H2 database. The H2 database 
+driver is part of the application, so no external dependencies are 
+(currently) required for persistent storage.
 
 ## Installation
 
-The application is build using the standard Maven build command:
+The application is built from source code using the standard Gradle build command:
 ```
-mvn clean install
+gradlew build
 ```
-The resulting JAR is created in the `target` directory.
+The `build/distributions` directory contains archives for distribution of the
+Java application, including startup scripts. 
 
 ## Configuration
 
@@ -64,12 +108,10 @@ value between 0 and 100.
 
 ## Usage
 
-The service can be started from the command line:
-```
-java -jar license-scanner-service.jar
-```
+The service can be started from the command line using the startup scripts in the
+`bin` directory of the distribution archive.
 
-The service exposes on port 8080:
+After startup, the service exposes on port 8080:
 * An API to interact with the scanning service
 * A user interface on [localhost:8080/](http://localhost:80080) to monitor license 
 scanning errors and manually curate scanned licenses. (See the separate 
@@ -83,38 +125,30 @@ command line on Linux or Mac using:
 
     java -jar ~/.m2/repository/com/h2database/h2/<version>/h2-<version>.jar
     
-(Migrations can be manually fixed or removed in the "flyway_schema_history" 
+(Failed migrations can be manually fixed or removed in the "flyway_schema_history" 
 table.)
 
 ## How to test the software
 
-The unit test suite can be executed via Maven:
+The unit test suite can be executed via Gradle:
 ```
-mvn clean test
+gradlew test
 ```
 
 ## Known issues
 (Checked items are under development.)
 
 Must-have
-- [ ] Add package manager type to package identifier. (Or use "purl" instead?)
 - [ ] Production-grade database (e.g. Postgres).
-- [ ] Authentication of clients.
+- [ ] Authentication of clients. (Not sure)
 
 Should-have
-- [ ] Support (confirmed) declared non-SPDX custom licenses.
 - [ ] Verify checksum of downloaded artifact before scanning.
-- [ ] API to "challenge" a package license based on a mismatch with the 
-declared license.
-- [ ] Detect and return other copyright statements.
-- [ ] provide scanning time budget based on number of files.
-- [ ] Remove SPDX licenses that are subsumed (=implied) by remaining licenses 
+- [ ] Detect and return copyright statements.
 
 Others
-- [ ] Integrate with FOSSology scanner.
-- [ ] Include SPDX version handling.
 - [ ] Multi-server scanning queue (like AMQP) that persists after restart of 
-individual servers in a load-balanced configuration.
+  individual servers in a load-balanced configuration.
 
 ## Contact / Getting help
 
@@ -126,4 +160,6 @@ See [LICENSE.md](LICENSE.md).
 
 ## Credits and references
 
-1. Documentation for [ScanCode Toolkit](https://readthedocs.org/projects/scancode-toolkit).
+This service could not be made without the ScanCode Toolkit project. See the
+[documentation of ScanCode Toolkit](https://readthedocs.org/projects/scancode-toolkit)
+for details on its invocation and how it detects licenses in source code files.
