@@ -32,7 +32,7 @@ class ScanInfoJson {
     @NullOr String license;
     @NullOr String error;
     @NullOr List<DetectionInfoJson> detections;
-    boolean contested;
+    @NullOr String contesting;
     boolean confirmed;
 
     public ScanInfoJson(URI purl, @NullOr URI location) {
@@ -50,7 +50,7 @@ class ScanInfoJson {
         timestamp = info.timestamp;
         license = info.license;
         error = info.error;
-        contested = info.isContested;
+        contesting = info.contesting;
         confirmed = info.isConfirmed;
         if (info.detections != null) {
             this.detections = info.detections.stream()
@@ -82,6 +82,6 @@ class DetectionInfoJson {
     }
 }
 
-class CurationJson {
+class LicenseJson {
     @NullOr String license;
 }

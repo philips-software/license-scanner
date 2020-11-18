@@ -27,7 +27,9 @@
                 <lob/>
             </basic>
             <basic name="confirmed" access="FIELD" optional="false"/>
-            <basic name="contested" access="FIELD" optional="false"/>
+            <basic name="contesting" access="FIELD">
+                <lob/>
+            </basic>
             <basic name="location" access="FIELD">
                 <lob/>
             </basic>

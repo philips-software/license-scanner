@@ -14411,7 +14411,7 @@ q.d=r.h(a,"license")
 q.e=r.h(a,"location")
 q.f=r.h(a,"error")
 q.y=r.h(a,"confirmed")
-q.x=r.h(a,"contested")
+q.x=r.h(a,"contesting")
 s=r.h(a,"detections")
 if(s!=null)q.r=J.lh(s,new Q.Yq(),t.qP).eu(0)
 return q},
@@ -14422,8 +14422,8 @@ _.a=a
 _.b=b
 _.c=c
 _.d=""
-_.r=_.f=_.e=null
-_.y=_.x=!1},
+_.x=_.r=_.f=_.e=null
+_.y=!1},
 Yq:function Yq(){},
 Yr:function Yr(){},
 Ys:function Ys(){},
@@ -19985,7 +19985,7 @@ apL:function(a){var s=null
 if(a.d==null)return L.cv(C.rE,s,s)
 if(a.f!=null)return L.cv(C.nh,C.lh,s)
 if(a.y)return L.cv(C.rF,C.CC,s)
-if(a.x)return L.cv(C.AA,C.iT,s)
+if(a.x!=null)return L.cv(C.AA,C.iT,s)
 return L.cv(C.rC,C.cB,s)},
 p3:function p3(a,b,c){this.c=a
 this.d=b
@@ -62826,13 +62826,15 @@ ax:function(){this.aJ()
 this.d.sc9(0,this.a.c.d)},
 n:function(a){this.d.L$=null
 this.aL(0)},
-A:function(a,b){var s=this,r=null,q=Y.kp(b,!0,t.h9),p=t._,o=H.c([],p)
-o.push(Q.hI(r,L.cv(C.rF,r,r),r,!1,r,L.aH("Declared license",r,r,r,r,r,r)))
-o.push(new T.b2(C.aZ,Z.acP(!0,s.d,C.AJ,r),r))
-if(s.a.c.x)o.push(new T.b2(C.ik,T.kx(H.c([L.cv(C.AF,C.iT,r),L.aH("License was contested",r,r,r,r,A.eb(r,r,C.iT,r,r,r,r,r,r,r,r,r,r,r,r,r,!0,r,r,r,r,r,r),r)],p),C.a1,C.hn,C.V),r))
-if(s.a.c.y)o.push(new T.b2(C.ik,T.kx(H.c([L.cv(C.rB,C.cB,r),L.aH("License was confirmed",r,r,r,r,A.eb(r,r,C.cB,r,r,r,r,r,r,r,r,r,r,r,r,r,!0,r,r,r,r,r,r),r)],p),C.a1,C.hn,C.V),r))
-o.push(K.B_(r,H.c([U.w4(L.aH("CONFIRM",r,r,r,r,r,r),new E.a3M(s,q,b),r)],p),r,r))
-return V.ls(T.dC(o,C.a1,C.a7,C.V),r,r,r,r,r,r)}}
+A:function(a,b){var s,r,q=this,p=null,o=Y.kp(b,!0,t.h9),n=t._,m=H.c([],n)
+m.push(Q.hI(p,L.cv(C.rF,p,p),p,!1,p,L.aH("Declared license",p,p,p,p,p,p)))
+m.push(new T.b2(C.aZ,Z.acP(!0,q.d,C.AJ,p),p))
+s=q.a.c.x
+if(s!=null){r=L.cv(C.AF,C.iT,p)
+s=s.length!==0?"Contested by: "+s:"License was contested"
+m.push(new T.b2(C.ik,T.kx(H.c([r,L.aH(s,p,p,p,p,A.eb(p,p,C.iT,p,p,p,p,p,p,p,p,p,p,p,p,p,!0,p,p,p,p,p,p),p)],n),C.a1,C.hn,C.V),p))}if(q.a.c.y)m.push(new T.b2(C.ik,T.kx(H.c([L.cv(C.rB,C.cB,p),L.aH("License was confirmed",p,p,p,p,A.eb(p,p,C.cB,p,p,p,p,p,p,p,p,p,p,p,p,p,!0,p,p,p,p,p,p),p)],n),C.a1,C.hn,C.V),p))
+m.push(K.B_(p,H.c([U.w4(L.aH("CONFIRM",p,p,p,p,p,p),new E.a3M(q,o,b),p)],n),p,p))
+return V.ls(T.dC(m,C.a1,C.a7,C.V),p,p,p,p,p,p)}}
 E.a3M.prototype={
 $0:function(){var s,r=this.a,q=r.a.c
 r=r.d.a.a

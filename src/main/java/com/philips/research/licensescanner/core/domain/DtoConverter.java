@@ -11,6 +11,7 @@
 package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.core.LicenseService;
+import com.philips.research.licensescanner.core.domain.license.License;
 
 import java.util.stream.Collectors;
 
@@ -23,7 +24,7 @@ abstract class DtoConverter {
         dto.license = scan.getLicense().toString();
         dto.error = scan.getError().orElse(null);
         dto.isConfirmed = scan.isConfirmed();
-        dto.isContested = scan.isContested();
+        dto.contesting = scan.getContesting().map(License::toString).orElse(null);
         dto.location = scan.getLocation().orElse(null);
         dto.detections = scan.getDetections().stream().map(DtoConverter::toDto).collect(Collectors.toList());
         return dto;

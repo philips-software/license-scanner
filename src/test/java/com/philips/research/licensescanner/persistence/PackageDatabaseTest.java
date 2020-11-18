@@ -106,14 +106,14 @@ class PackageDatabaseTest {
     @Test
     void findsContestedScans() {
         final var normal = database.createScan(pkg, LOCATION);
-        final var scan = database.createScan(pkg, LOCATION).contest();
+        final var scan = database.createScan(pkg, LOCATION).contest(LICENSE);
         scanRepository.save((ScanEntity) normal);
         scanRepository.save((ScanEntity) scan);
 
         final var errors = database.contested();
 
         assertThat(errors).hasSize(1);
-        assertThat(errors.get(0).isContested()).isTrue();
+        assertThat(errors.get(0).getContesting()).contains(LICENSE);
     }
 
     @Test
@@ -186,8 +186,8 @@ class PackageDatabaseTest {
     void countsNumberOfContestedLicenses() {
         database.createScan(pkg, LOCATION).setError("Error");
         database.createScan(pkg, LOCATION).confirm(LICENSE);
-        database.createScan(pkg, LOCATION).contest();
-        database.createScan(pkg, LOCATION).contest();
+        database.createScan(pkg, LOCATION).contest(LICENSE);
+        database.createScan(pkg, LOCATION).contest(LICENSE);
 
         final var count = database.countContested();
 

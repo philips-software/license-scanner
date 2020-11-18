@@ -112,7 +112,18 @@ class ScanRouteTest extends AbstractRouteTest {
         mockMvc.perform(post(CONTEST_URL, SCAN_ID))
                 .andExpect(status().isOk());
 
-        verify(service).contest(SCAN_ID);
+        verify(service).contest(SCAN_ID, null);
+    }
+
+    @Test
+    void contestsScanWithSuggestion() throws Exception {
+        final var json = new JSONObject().put("license", LICENSE);
+
+        mockMvc.perform(post(CONTEST_URL, SCAN_ID)
+                .content(json.toString()).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(service).contest(SCAN_ID, LICENSE);
     }
 
     @Test

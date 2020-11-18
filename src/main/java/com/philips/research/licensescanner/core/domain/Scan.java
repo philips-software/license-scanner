@@ -31,7 +31,7 @@ public class Scan {
     @SuppressWarnings("JpaAttributeTypeInspection")
     private License license = License.NONE;
     private @NullOr String error;
-    private boolean contested;
+    private @NullOr License contesting;
     private boolean confirmed;
 
     public Scan(Package pkg, @NullOr URI location) {
@@ -59,19 +59,26 @@ public class Scan {
      * Raises question about the validity of an unconfirmed the license.
      * If the license was already confirmed, nothing happens.
      */
-    public Scan contest() {
-        contested = !confirmed && (error == null);
+    public Scan contest(License license) {
+        if (!confirmed && (error == null) && isImprovingContestingLicense(license)) {
+            contesting = license;
+        }
         return this;
     }
 
-    public boolean isContested() {
-        return contested;
+    private boolean isImprovingContestingLicense(License license) {
+        return !license.equals(License.NONE) || contesting == null || contesting.equals(License.NONE);
+    }
+
+    public Optional<License> getContesting() {
+        return Optional.ofNullable(contesting);
     }
 
     public Scan confirm(License license) {
         this.license = license;
         confirmed = true;
-        contested = false;
+        contesting = null;
+        error = null;
         return this;
     }
 

@@ -103,7 +103,7 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public List<Scan> contested() {
-        return toScans(scanRepository.findFirst100ByContestedOrderByTimestampDesc(true));
+        return toScans(scanRepository.findFirst100ByContestingIsNotNullOrderByTimestampDesc());
     }
 
     @Override
@@ -129,7 +129,7 @@ public class PackageDatabase implements PackageStore {
 
     @Override
     public int countContested() {
-        return scanRepository.countByContested(true);
+        return scanRepository.countByContestingIsNotNull();
     }
 
     private List<Scan> toScans(List<ScanEntity> list) {

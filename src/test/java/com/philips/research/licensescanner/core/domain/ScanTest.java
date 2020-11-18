@@ -40,7 +40,7 @@ class ScanTest {
         assertThat(scan.getPackage()).isEqualTo(PACKAGE);
         assertThat(scan.getLicense()).isEqualTo(License.NONE);
         assertThat(scan.getLocation()).contains(LOCATION);
-        assertThat(scan.isContested()).isFalse();
+        assertThat(scan.getContesting()).isEmpty();
         assertThat(scan.isConfirmed()).isFalse();
         assertThat(scan.getError()).isEmpty();
         assertThat(scan.getDetections()).isEmpty();
@@ -49,30 +49,45 @@ class ScanTest {
 
     @Test
     void contestsScan() {
-        scan.contest();
+        scan.contest(LICENSE);
 
-        assertThat(scan.isContested()).isTrue();
+        assertThat(scan.getContesting()).contains(LICENSE);
     }
 
     @Test
-    void noContest_licenseWasConfirmed() {
+    void ignoresContestWithLessDetail() {
+        scan.contest(LICENSE);
+        scan.contest(License.NONE);
+    }
+
+    @Test
+    void noContest_licenseWasAlreadyConfirmed() {
         scan.confirm(LICENSE);
 
-        scan.contest();
+        scan.contest(License.of("Contest"));
 
-        assertThat(scan.isContested()).isFalse();
+        assertThat(scan.getContesting()).isEmpty();
     }
 
     @Test
     void confirmsContestedScan() {
         final var license = License.of("Confirmed");
-        scan.contest();
+        scan.contest(LICENSE);
 
         scan.confirm(license);
 
         assertThat(scan.isConfirmed()).isTrue();
         assertThat(scan.getLicense()).isEqualTo(license);
-        assertThat(scan.isContested()).isFalse();
+        assertThat(scan.getContesting()).isEmpty();
+    }
+
+    @Test
+    void clearsErrorOnConfirm() {
+        scan.setError("Something went wrong");
+
+        scan.confirm(LICENSE);
+
+        assertThat(scan.getError()).isEmpty();
     }
 
     @Test

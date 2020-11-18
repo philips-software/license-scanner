@@ -69,13 +69,15 @@ public class ScanRoute {
     }
 
     @PutMapping("{uuid}")
-    void confirmLicense(@PathVariable UUID uuid, @RequestBody CurationJson body) {
+    void confirmLicense(@PathVariable UUID uuid, @RequestBody LicenseJson body) {
         service.curateLicense(uuid, body.license);
     }
 
     @PostMapping("{uuid}/contest")
-    void contestScan(@PathVariable UUID uuid) {
-        service.contest(uuid);
+    void contestScan(@PathVariable UUID uuid, @RequestBody(required = false) @NullOr LicenseJson body) {
+        final @NullOr String license = (body != null) ? body.license : null;
+
+        service.contest(uuid, license);
     }
 
     @PostMapping("{uuid}/ignore/{license}")

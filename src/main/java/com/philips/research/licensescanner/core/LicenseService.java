@@ -68,8 +68,11 @@ public interface LicenseService {
 
     /**
      * Contests a scan
+     *
+     * @param scanId  contested scan
+     * @param license suggested replacement
      */
-    void contest(UUID scanId);
+    void contest(UUID scanId, @NullOr String license);
 
     /**
      * Confirms or corrects the license of a scan.
@@ -114,7 +117,7 @@ public interface LicenseService {
         public @NullOr URI location;
         public @NullOr String error;
         public @NullOr List<DetectionDto> detections;
-        public boolean isContested;
+        public @NullOr String contesting;
         public boolean isConfirmed;
     }
 

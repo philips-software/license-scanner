@@ -31,9 +31,6 @@ class ScanInfoJsonTest {
     private static final URI PURL = URI.create("pkg:package@version");
     private static final UUID ID = UUID.randomUUID();
     private static final String LICENSE = "License";
-    private static final String NAMESPACE = "Namespace";
-    private static final String NAME = "Name";
-    private static final String VERSION = "Version";
     private static final ObjectMapper MAPPER = new JacksonConfiguration().objectMapper();
 
     @Test
@@ -42,7 +39,7 @@ class ScanInfoJsonTest {
         dto.uuid = ID;
         dto.timestamp = TIMESTAMP;
         dto.location = LOCATION;
-        dto.isContested = true;
+        dto.contesting = LICENSE;
         dto.isConfirmed = true;
         dto.error = ERROR;
         dto.detections = List.of();

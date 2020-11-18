@@ -12,6 +12,7 @@ package com.philips.research.licensescanner.persistence;
 
 import com.philips.research.licensescanner.core.domain.license.License;
 import com.philips.research.licensescanner.core.domain.license.LicenseParser;
+import pl.tlinkowski.annotation.basic.NullOr;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -23,12 +24,12 @@ import javax.persistence.Converter;
 @SuppressWarnings({"unused", "RedundantSuppression"})
 public class LicenseConverter implements AttributeConverter<License, String> {
     @Override
-    public String convertToDatabaseColumn(License license) {
-        return license.toString();
+    public @NullOr String convertToDatabaseColumn(@NullOr License license) {
+        return (license != null) ? license.toString() : null;
     }
 
     @Override
-    public License convertToEntityAttribute(String string) {
-        return LicenseParser.parse(string);
+    public @NullOr License convertToEntityAttribute(@NullOr String string) {
+        return (string != null) ? LicenseParser.parse(string) : null;
     }
 }

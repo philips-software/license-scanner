@@ -159,8 +159,9 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public void contest(UUID scanId) {
-        store.getScan(scanId).ifPresent(Scan::contest);
+    public void contest(UUID scanId, @NullOr String license) {
+        final var contesting = (license != null) ? LicenseParser.parse(license) : License.NONE;
+        store.getScan(scanId).ifPresent(scan -> scan.contest(contesting));
     }
 
     @Override

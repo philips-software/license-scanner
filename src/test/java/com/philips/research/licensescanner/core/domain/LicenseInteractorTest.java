@@ -220,12 +220,12 @@ class LicenseInteractorTest {
 
         @Test
         void findsContestedScans() {
-            when(store.contested()).thenReturn(List.of(new Scan(PACKAGE, null).contest()));
+            when(store.contested()).thenReturn(List.of(new Scan(PACKAGE, null).contest(License.of(LICENSE))));
 
             final var result = interactor.findContested();
 
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).isContested).isTrue();
+            assertThat(result.get(0).contesting).isEqualTo(LICENSE);
         }
 
         @Test
@@ -233,9 +233,19 @@ class LicenseInteractorTest {
             final var scan = new Scan(PACKAGE, null);
             when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
 
-            interactor.contest(SCAN_ID);
+            interactor.contest(SCAN_ID, LICENSE);
 
-            assertThat(scan.isContested()).isTrue();
+            assertThat(scan.getContesting()).contains(License.of(LICENSE));
+        }
+
+        @Test
+        void contestsScanWithoutAlternative() {
+            final var scan = new Scan(PACKAGE, null);
+            when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
+
+            interactor.contest(SCAN_ID, null);
+
+            assertThat(scan.getContesting()).contains(License.NONE);
         }
 
         @Test
