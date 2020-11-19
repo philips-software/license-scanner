@@ -50,7 +50,7 @@ class ScanInfoJsonTest {
                 .put("id", ID.toString())
                 .put("timestamp", DateTimeFormatter.ISO_INSTANT.format(TIMESTAMP))
                 .put("location", LOCATION.toString())
-                .put("contested", true)
+                .put("contesting", LICENSE)
                 .put("confirmed", true)
                 .put("error", ERROR)
                 .put("detections", new JSONArray())

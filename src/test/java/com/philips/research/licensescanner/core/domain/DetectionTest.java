@@ -44,6 +44,7 @@ class DetectionTest {
         assertThat(detection.getFilePath()).isEqualTo(FILE);
         assertThat(detection.getStartLine()).isEqualTo(START_LINE);
         assertThat(detection.getEndLine()).isEqualTo(END_LINE);
+        assertThat(detection.getLineCount()).isEqualTo(END_LINE - START_LINE + 1);
     }
 
     @Test

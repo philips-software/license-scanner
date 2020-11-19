@@ -13,11 +13,12 @@ package com.philips.research.licensescanner.core.domain;
 import com.philips.research.licensescanner.ApplicationConfiguration;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
+import com.philips.research.licensescanner.core.domain.download.DownloadCache;
 import com.philips.research.licensescanner.core.domain.download.DownloadException;
-import com.philips.research.licensescanner.core.domain.download.Downloader;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.DetectorException;
 import com.philips.research.licensescanner.core.domain.license.License;
+import com.philips.research.licensescanner.core.domain.license.LicenseParser;
 import org.junit.jupiter.api.*;
 import org.springframework.util.FileSystemUtils;
 
@@ -41,7 +42,8 @@ class LicenseInteractorTest {
     private static final String LICENSE = "License";
     private static final String OTHER = "Other";
     private static final String MESSAGE = "Test message";
-    private static final URI LOCATION = URI.create("git+git://example.com");
+    private static final String SUBDIRECTORY = "sub/directory";
+    private static final URI LOCATION = URI.create("git+git://example.com@1.2.3#" + SUBDIRECTORY);
     private static final File FILE = new File(".");
     private static final URI PURL = URI.create("pkg:package@version");
     private static final Package PACKAGE = new Package(PURL);
@@ -55,12 +57,12 @@ class LicenseInteractorTest {
     @SuppressWarnings("NotNullFieldNotInitialized")
     private static Path workDirectory;
 
-    private final Downloader downloader = mock(Downloader.class);
+    private final DownloadCache cache = mock(DownloadCache.class);
     private final Detector detector = mock(Detector.class);
     private final PackageStore store = mock(PackageStore.class);
     private final ApplicationConfiguration configuration = new ApplicationConfiguration();
 
-    private final LicenseService interactor = new LicenseInteractor(store, downloader, detector, configuration);
+    private final LicenseService interactor = new LicenseInteractor(store, cache, detector, configuration);
 
     @BeforeAll
     static void beforeAll() throws Exception {
@@ -155,32 +157,66 @@ class LicenseInteractorTest {
 
         @Test
         void downloadsAndScansPackage() {
-            final var scanDir = workDirectory.resolve("subpath");
-            when(downloader.download(any(Path.class), eq(LOCATION))).thenReturn(scanDir);
+            final var scanDir = workDirectory.resolve("download");
+            when(cache.obtain(LOCATION)).thenReturn(scanDir);
 
             interactor.scanLicense(PURL, LOCATION);
 
-            verify(detector).scan(scanDir, scan, THRESHOLD);
+            verify(detector).scan(scanDir.resolve(SUBDIRECTORY), scan, THRESHOLD);
+            verify(cache).release(LOCATION);
         }
 
         @Test
         void registersDownloadFailure() {
-            when(downloader.download(any(Path.class), eq(LOCATION))).thenThrow(new DownloadException(MESSAGE));
+            when(cache.obtain(LOCATION)).thenThrow(new DownloadException(MESSAGE));
 
             interactor.scanLicense(PURL, LOCATION);
 
             assertThat(scan.getError()).contains(MESSAGE);
+            verify(cache).release(LOCATION);
         }
 
         @Test
         void registersScanningFailure() {
-            when(downloader.download(any(Path.class), eq(LOCATION))).thenReturn(workDirectory);
+            when(cache.obtain(LOCATION)).thenReturn(workDirectory);
             doThrow(new DetectorException(MESSAGE, new IllegalArgumentException()))
-                    .when(detector).scan(workDirectory, scan, THRESHOLD);
+                    .when(detector).scan(any(), any(), anyInt());
 
             interactor.scanLicense(PURL, LOCATION);
 
             assertThat(scan.getError()).contains(MESSAGE);
+            verify(cache).release(LOCATION);
+        }
+    }
+
+    @Nested
+    class ReadDetectionFileFragments {
+        private static final int START_LINE = 5;
+        private static final int END_LINE = 6;
+        private static final int MARGIN = 2;
+        private final File SAMPLE_FILE = new File("sample.txt");
+
+        @Test
+        void nothing_scanDoesNotExist() {
+            assertThat(interactor.sourceFragment(UUID.randomUUID(), LICENSE, 0)).isEmpty();
+        }
+
+        @Test
+        void returnsFileFragmentForDetection() {
+            final var scan = new Scan(PACKAGE, LOCATION)
+                    .addDetection(LicenseParser.parse(LICENSE), 100, SAMPLE_FILE, START_LINE, END_LINE);
+            when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
+            when(cache.obtain(LOCATION)).thenReturn(Path.of("src", "test", "resources"));
+
+            //noinspection OptionalGetWithoutIsPresent
+            final var dto = interactor.sourceFragment(SCAN_ID, LICENSE, MARGIN).get();
+
+            assertThat(dto.filename).isEqualTo(SAMPLE_FILE.toString());
+            assertThat(dto.firstLine).isEqualTo(START_LINE - MARGIN);
+            assertThat(dto.focusStart).isEqualTo(MARGIN);
+            assertThat(dto.focusEnd).isEqualTo(END_LINE - START_LINE + MARGIN);
+            assertThat(dto.lines).hasSize((END_LINE - START_LINE + 1) + 2 * MARGIN);
+            assertThat(dto.lines).contains("Line 3", "Line 8");
         }
     }
 

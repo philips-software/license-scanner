@@ -13,8 +13,7 @@ package com.philips.research.licensescanner.core.domain;
 import com.philips.research.licensescanner.ApplicationConfiguration;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
-import com.philips.research.licensescanner.core.domain.download.DownloadException;
-import com.philips.research.licensescanner.core.domain.download.Downloader;
+import com.philips.research.licensescanner.core.domain.download.DownloadCache;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;
 import com.philips.research.licensescanner.core.domain.license.LicenseParser;
@@ -25,7 +24,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.FileSystemUtils;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.io.IOException;
@@ -47,15 +45,15 @@ public class LicenseInteractor implements LicenseService {
     private static final Logger LOG = LoggerFactory.getLogger(LicenseInteractor.class);
 
     private final PackageStore store;
-    private final Downloader downloader;
+    private final DownloadCache cache;
     private final Detector detector;
     private final ApplicationConfiguration configuration;
 
     @Autowired
-    public LicenseInteractor(PackageStore store, Downloader downloader, Detector detector,
+    public LicenseInteractor(PackageStore store, DownloadCache cache, Detector detector,
                              ApplicationConfiguration configuration) {
         this.store = store;
-        this.downloader = downloader;
+        this.cache = cache;
         this.detector = detector;
         this.configuration = configuration;
     }
@@ -100,35 +98,17 @@ public class LicenseInteractor implements LicenseService {
     }
 
     private void scanPackage(URI location, Scan scan) {
-        @NullOr Path tempDir = null;
+        @NullOr Path path = null;
+        final var purl = scan.getPackage().getPurl();
         try {
-            tempDir = createWorkingDirectory();
-            //TODO Check hash after download
-            final var path = downloader.download(tempDir, location);
+            path = cache.obtain(location);
+            final var fragment = location.getFragment();
+            if (fragment != null) {
+                path = path.resolve(fragment);
+            }
             detector.scan(path, scan, configuration.getThresholdPercent());
         } finally {
-            deleteDirectory(tempDir);
-        }
-    }
-
-    private Path createWorkingDirectory() {
-        try {
-            return Files.createTempDirectory(configuration.getTempDir(), "license-");
-        } catch (IOException e) {
-            throw new DownloadException("Failed to create a working directory", e);
-        }
-    }
-
-    private void deleteDirectory(@NullOr Path path) {
-        if (path == null) {
-            return;
-        }
-
-        try {
-            LOG.info("Removing working directory {}", path);
-            FileSystemUtils.deleteRecursively(path);
-        } catch (IOException e) {
-            LOG.warn("Failed to (fully) remove directory {}", path);
+            cache.release(location);
         }
     }
 
@@ -186,6 +166,42 @@ public class LicenseInteractor implements LicenseService {
         ignoreDetection(scanId, license, false);
     }
 
+    private void ignoreDetection(UUID scanId, String license, boolean ignored) {
+        final var lic = LicenseParser.parse(license);
+        getDetection(scanId, lic)
+                .ifPresent(d -> {
+                    d.setIgnored(ignored);
+                    LOG.info("Scan {}: license {} is now {}", scanId, license, ignored ? "ignored" : "included");
+                });
+    }
+
+    @Override
+    public Optional<FileFragmentDto> sourceFragment(UUID scanId, String license, int margin) {
+        return store.getScan(scanId)
+                .flatMap(scan -> scan.getDetection(LicenseParser.parse(license))
+                        .flatMap(det -> scan.getLocation()
+                                .flatMap(location -> {
+                                    final var dto = new FileFragmentDto();
+                                    dto.filename = det.getFilePath().toString();
+                                    final var offset = Math.max(0, det.getStartLine() - margin - 1);
+                                    dto.firstLine = det.getStartLine() - offset;
+                                    dto.focusStart = offset;
+                                    dto.focusEnd = det.getEndLine() - det.getStartLine() + margin;
+                                    try {
+                                        final var path = cache.obtain(location).resolve(dto.filename);
+                                        dto.lines = Files.lines(path)
+                                                .skip(offset)
+                                                .limit(Math.min(margin, det.getStartLine() - 1) + det.getLineCount() + margin)
+                                                .collect(Collectors.toList());
+                                    } catch (IOException e) {
+                                        throw new IllegalStateException("Could not load detection file " + dto.filename + " from " + location, e);
+                                    }
+                                    return Optional.of(dto);
+                                })
+                        )
+                );
+    }
+
     @Override
     public StatisticsDto statistics() {
         final var dto = new StatisticsDto();
@@ -195,18 +211,12 @@ public class LicenseInteractor implements LicenseService {
         return dto;
     }
 
-    private void ignoreDetection(UUID scanId, String license, boolean ignored) {
-        final var lic = LicenseParser.parse(license);
-        store.getScan(scanId)
-                .flatMap(s -> s.getDetection(lic))
-                .ifPresent(d -> {
-                    d.setIgnored(ignored);
-                    LOG.info("Scan {}: license {} is now {}", scanId, license, ignored ? "ignored" : "included");
-                });
-    }
-
     private Package getOrCreatePackage(URI purl) {
         return store.getPackage(purl).orElseGet(() -> store.createPackage(purl));
     }
 
+    private Optional<Detection> getDetection(UUID scanId, License lic) {
+        return store.getScan(scanId)
+                .flatMap(s -> s.getDetection(lic));
+    }
 }

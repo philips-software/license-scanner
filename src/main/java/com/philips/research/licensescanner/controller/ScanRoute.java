@@ -82,11 +82,19 @@ public class ScanRoute {
 
     @PostMapping("{uuid}/ignore/{license}")
     void ignoreDetection(@PathVariable UUID uuid, @PathVariable String license,
-                         @RequestParam(name = "revert", required = false) boolean revert) {
+                         @RequestParam(required = false) boolean revert) {
         if (!revert) {
             service.ignore(uuid, license);
         } else {
             service.restore(uuid, license);
         }
+    }
+
+    @GetMapping("{uuid}/source/{license}")
+    FragmentJson detectionSource(@PathVariable UUID uuid, @PathVariable String license,
+                                 @RequestParam(required = false, defaultValue = "5") int margin) {
+        final var dto = service.sourceFragment(uuid, license, margin)
+                .orElseThrow(() -> new ResourceNotFoundException("" + uuid + "/" + license));
+        return new FragmentJson(dto);
     }
 }

@@ -143,6 +143,8 @@ Must-have
 - [ ] Authentication of clients. (Not sure)
 
 Should-have
+- [x] Caching downloads across (subdirectory) scans.
+- [ ] Download by commit hash instead of git clone, because this is much faster.
 - [ ] Verify checksum of downloaded artifact before scanning.
 - [ ] Detect and return copyright statements.
 

@@ -36,6 +36,7 @@ class ScanRouteTest extends AbstractRouteTest {
     private static final String SCANS_ID_URL = SCANS_URL + "/{uuid}";
     private static final String CONTEST_URL = SCANS_ID_URL + "/contest";
     private static final String IGNORE_DETECTION_URL = SCANS_ID_URL + "/ignore/{license}";
+    private static final String DETECTION_SOURCE_URL = SCANS_ID_URL + "/source/{license}";
 
     @Test
     void findsScanById() throws Exception {
@@ -150,5 +151,24 @@ class ScanRouteTest extends AbstractRouteTest {
                 .andExpect(status().isOk());
 
         verify(service).restore(SCAN_ID, LICENSE);
+    }
+
+    @Test
+    void readsDetectionSource() throws Exception {
+        final var dto = new LicenseService.FileFragmentDto();
+        dto.filename = FILE;
+        when(service.sourceFragment(SCAN_ID, LICENSE, 7)).thenReturn(Optional.of(dto));
+
+        mockMvc.perform(get(DETECTION_SOURCE_URL + "?margin=7", SCAN_ID, LICENSE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.file").value(FILE));
+    }
+
+    @Test
+    void notFound_noDetectionSource() throws Exception {
+        mockMvc.perform(get(DETECTION_SOURCE_URL, SCAN_ID, LICENSE))
+                .andExpect(status().isNotFound());
+
+        verify(service).sourceFragment(SCAN_ID, LICENSE, 5);
     }
 }

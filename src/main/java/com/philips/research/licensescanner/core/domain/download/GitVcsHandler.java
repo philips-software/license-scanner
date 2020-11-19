@@ -14,7 +14,6 @@ import com.philips.research.licensescanner.core.command.ShellCommand;
 import com.philips.research.licensescanner.core.command.ShellException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
 import java.net.URLDecoder;
@@ -37,8 +36,7 @@ public class GitVcsHandler implements VcsHandler {
 
         checkout(directory, repositoryFrom(location), versionFrom(location));
 
-        final @NullOr String fragment = location.getFragment();
-        return (fragment != null) ? directory.resolve(fragment) : directory;
+        return directory;
     }
 
     private String repositoryFrom(URI location) {

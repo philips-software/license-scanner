@@ -33,7 +33,7 @@ class GitVcsHandlerTest extends VcsHandlerTestBase {
         final var path = handler.download(tempDir, URI.create("https://github.com/excalith%2Fgit-cheats.git@v1.0.0#some%2Fpath"));
 
         assertHash("61b307521005e98474243b8546a62a56e8e561b2");
-        assertThat(path).isEqualTo(tempDir.resolve("some").resolve("path"));
+        assertThat(path).isEqualTo(tempDir);
     }
 
     @Test

@@ -101,6 +101,14 @@ public interface LicenseService {
     void restore(UUID scanId, String license);
 
     /**
+     * @param scanId  identifier of the scan containing the detection
+     * @param license identifier for the detecction
+     * @param margin  number of lines around the proof fragment
+     * @return file fragment for the detected license
+     */
+    Optional<FileFragmentDto> sourceFragment(UUID scanId, String license, int margin);
+
+    /**
      * @return scanning statistics
      */
     StatisticsDto statistics();
@@ -141,5 +149,13 @@ public interface LicenseService {
         public int errors;
         public int contested;
         public int licenses;
+    }
+
+    class FileFragmentDto {
+        public String filename;
+        public int firstLine;
+        public int focusStart;
+        public int focusEnd;
+        public List<String> lines;
     }
 }

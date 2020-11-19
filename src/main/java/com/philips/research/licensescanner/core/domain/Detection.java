@@ -79,6 +79,10 @@ public class Detection {
         return endLine;
     }
 
+    public int getLineCount() {
+        return endLine - startLine + 1;
+    }
+
     public boolean isIgnored() {
         return ignored;
     }

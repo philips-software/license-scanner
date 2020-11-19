@@ -27,8 +27,8 @@ public class ApplicationConfiguration {
     @NotNull
     @SuppressWarnings("NotNullFieldNotInitialized")
     private Path tempDir;
-
     private int thresholdPercent = 50;
+    private int cacheSize = 10;
 
     /**
      * @return The common working directory.
@@ -40,11 +40,27 @@ public class ApplicationConfiguration {
     /**
      * @param directory An existing directory on this system.
      */
-    public void setTempDir(Path directory) {
+    public ApplicationConfiguration setTempDir(Path directory) {
         if (!directory.toFile().isDirectory()) {
             throw new ValidationException(directory + " is not a valid working directory");
         }
         this.tempDir = directory;
+        return this;
+    }
+
+    /**
+     * @return size of the source download cache
+     */
+    public int getCacheSize() {
+        return cacheSize;
+    }
+
+    /**
+     * Configures the number of cached packages
+     */
+    public ApplicationConfiguration setCacheSize(int cacheSize) {
+        this.cacheSize = cacheSize;
+        return this;
     }
 
     /**
