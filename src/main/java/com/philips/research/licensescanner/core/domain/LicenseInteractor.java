@@ -184,9 +184,9 @@ public class LicenseInteractor implements LicenseService {
                                     final var dto = new FileFragmentDto();
                                     dto.filename = det.getFilePath().toString();
                                     final var offset = Math.max(0, det.getStartLine() - margin - 1);
-                                    dto.firstLine = det.getStartLine() - offset;
-                                    dto.focusStart = offset;
-                                    dto.focusEnd = det.getEndLine() - det.getStartLine() + margin;
+                                    dto.firstLine = offset + 1;
+                                    dto.focusStart = det.getStartLine() - offset - 1;
+                                    dto.focusEnd = det.getEndLine() - offset;
                                     try {
                                         final var path = cache.obtain(location).resolve(dto.filename);
                                         dto.lines = Files.lines(path)

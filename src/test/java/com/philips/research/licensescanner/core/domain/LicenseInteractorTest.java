@@ -212,9 +212,10 @@ class LicenseInteractorTest {
             final var dto = interactor.sourceFragment(SCAN_ID, LICENSE, MARGIN).get();
 
             assertThat(dto.filename).isEqualTo(SAMPLE_FILE.toString());
+            int offset = START_LINE - MARGIN - 1;
             assertThat(dto.firstLine).isEqualTo(START_LINE - MARGIN);
-            assertThat(dto.focusStart).isEqualTo(MARGIN);
-            assertThat(dto.focusEnd).isEqualTo(END_LINE - START_LINE + MARGIN);
+            assertThat(dto.focusStart).isEqualTo(START_LINE - offset - 1);
+            assertThat(dto.focusEnd).isEqualTo(END_LINE - offset);
             assertThat(dto.lines).hasSize((END_LINE - START_LINE + 1) + 2 * MARGIN);
             assertThat(dto.lines).contains("Line 3", "Line 8");
         }

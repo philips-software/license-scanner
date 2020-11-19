@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.FileSystemUtils;
 import pl.tlinkowski.annotation.basic.NullOr;
 
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -103,6 +104,18 @@ public class DownloadCache {
             return new URI(location.getScheme(), location.getRawSchemeSpecificPart(), null);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("location is not a valid URL");
+        }
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        try{
+            try {
+                LOG.info("Cleaning up cache directory");
+                FileSystemUtils.deleteRecursively(workDirectory);
+            } catch (IOException e) {
+                LOG.error("Failed to remove cache directory {}", workDirectory);
+            }
         }
     }
 
