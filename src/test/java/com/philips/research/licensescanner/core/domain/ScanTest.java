@@ -11,6 +11,7 @@
 package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.core.domain.license.License;
+import com.philips.research.licensescanner.core.domain.license.LicenseParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -41,7 +42,7 @@ class ScanTest {
         assertThat(scan.getLicense()).isEqualTo(License.NONE);
         assertThat(scan.getLocation()).contains(LOCATION);
         assertThat(scan.getContesting()).isEmpty();
-        assertThat(scan.isConfirmed()).isFalse();
+        assertThat(scan.isOverride()).isFalse();
         assertThat(scan.getError()).isEmpty();
         assertThat(scan.getDetections()).isEmpty();
         assertThat(scan.getDetection(LICENSE)).isEmpty();
@@ -76,7 +77,7 @@ class ScanTest {
 
         scan.confirm(license);
 
-        assertThat(scan.isConfirmed()).isTrue();
+        assertThat(scan.isOverride()).isTrue();
         assertThat(scan.getLicense()).isEqualTo(license);
         assertThat(scan.getContesting()).isEmpty();
     }
@@ -119,5 +120,38 @@ class ScanTest {
         assertThat(scan.getDetections()).hasSize(1);
         final var detection = scan.getDetection(LICENSE).get();
         assertThat(detection.getConfirmations()).isEqualTo(2);
+    }
+
+    @Test
+    void setsLicenseFromDetections() {
+        final var skip = License.of("Skip me");
+        scan.addDetection(License.of("A"), SCORE, FILE, START_LINE, END_LINE);
+        scan.addDetection(skip, SCORE, FILE, START_LINE, END_LINE);
+        scan.getDetection(skip).ifPresent(detection -> detection.setIgnored(true));
+        scan.addDetection(License.of("B"), SCORE, FILE, START_LINE, END_LINE);
+
+        assertThat(scan.getLicense()).isEqualTo(LicenseParser.parse("A and B"));
+    }
+
+    @Test
+    void clearsContesting_detectedMatches() {
+        scan.contest(LICENSE);
+
+        scan.addDetection(LICENSE, SCORE, FILE, START_LINE, END_LINE);
+
+        assertThat(scan.getContesting()).isEmpty();
+    }
+
+    @Test
+    void clearsContesting_updatedDetectionMatches() {
+        final var other = License.of("Other");
+        scan.addDetection(other, SCORE, FILE, START_LINE, END_LINE);
+        scan.addDetection(LICENSE, SCORE, FILE, START_LINE, END_LINE);
+        scan.contest(LICENSE);
+
+        //noinspection OptionalGetWithoutIsPresent
+        scan.ignore(other, true);
+
+        assertThat(scan.getContesting()).isEmpty();
     }
 }

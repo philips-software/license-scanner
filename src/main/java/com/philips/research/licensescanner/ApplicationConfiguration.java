@@ -28,7 +28,7 @@ public class ApplicationConfiguration {
     @SuppressWarnings("NotNullFieldNotInitialized")
     private Path tempDir;
     private int thresholdPercent = 50;
-    private int cacheSize = 10;
+    private int cacheSize = 20;
 
     /**
      * @return The common working directory.

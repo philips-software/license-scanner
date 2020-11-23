@@ -52,6 +52,6 @@ class ScanCodeDetectorTest {
     void ScansDownloadedDirectory() {
         detector.scan(tempDir, scan, THRESHOLD);
 
-        assertThat(scan.getLicense()).isNotEqualTo(License.NONE);
+        assertThat(scan.getDetections()).isNotEmpty();
     }
 }

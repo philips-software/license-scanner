@@ -39,6 +39,7 @@ public class DownloadCache {
         this.cacheSize = configuration.getCacheSize();
         try {
             workDirectory = Files.createTempDirectory(configuration.getTempDir(), "licenses-");
+            LOG.info("Cache directory is " + workDirectory);
         } catch (IOException e) {
             throw new DownloadException("Failed to create a working directory", e);
         }
@@ -108,14 +109,12 @@ public class DownloadCache {
     }
 
     @PreDestroy
-    public void cleanup() {
-        try{
-            try {
-                LOG.info("Cleaning up cache directory");
-                FileSystemUtils.deleteRecursively(workDirectory);
-            } catch (IOException e) {
-                LOG.error("Failed to remove cache directory {}", workDirectory);
-            }
+    public void destroy() {
+        try {
+            LOG.info("Cleaning up the cache directory");
+            FileSystemUtils.deleteRecursively(workDirectory);
+        } catch (IOException e) {
+            LOG.error("Failed to remove cache directory {}", workDirectory);
         }
     }
 

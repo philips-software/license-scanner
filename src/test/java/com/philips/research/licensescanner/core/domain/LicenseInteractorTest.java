@@ -203,15 +203,17 @@ class LicenseInteractorTest {
 
         @Test
         void returnsFileFragmentForDetection() {
-            final var scan = new Scan(PACKAGE, LOCATION)
-                    .addDetection(LicenseParser.parse(LICENSE), 100, SAMPLE_FILE, START_LINE, END_LINE);
+            final var location = URI.create("vcs:some/path#test");
+            final var file = Path.of("resources").resolve(SAMPLE_FILE.toPath()).toFile();
+            final var scan = new Scan(PACKAGE, location)
+                    .addDetection(LicenseParser.parse(LICENSE), 100, file, START_LINE, END_LINE);
             when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
-            when(cache.obtain(LOCATION)).thenReturn(Path.of("src", "test", "resources"));
+            when(cache.obtain(location)).thenReturn(Path.of("src"));
 
             //noinspection OptionalGetWithoutIsPresent
             final var dto = interactor.sourceFragment(SCAN_ID, LICENSE, MARGIN).get();
 
-            assertThat(dto.filename).isEqualTo(SAMPLE_FILE.toString());
+            assertThat(dto.filename).isEqualTo(file.toString());
             int offset = START_LINE - MARGIN - 1;
             assertThat(dto.firstLine).isEqualTo(START_LINE - MARGIN);
             assertThat(dto.focusStart).isEqualTo(START_LINE - offset - 1);
@@ -277,7 +279,8 @@ class LicenseInteractorTest {
 
         @Test
         void contestsScanWithoutAlternative() {
-            final var scan = new Scan(PACKAGE, null);
+            final var scan = new Scan(PACKAGE, null)
+                    .addDetection(License.of(LICENSE), 100, FILE, 1, 2);
             when(store.getScan(SCAN_ID)).thenReturn(Optional.of(scan));
 
             interactor.contest(SCAN_ID, null);

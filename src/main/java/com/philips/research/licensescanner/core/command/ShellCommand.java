@@ -103,7 +103,7 @@ public class ShellCommand {
     private void assertSuccessStatus(Process process) {
         var status = process.exitValue();
         if (status != 0) {
-            throw new ShellException("Command failed with status " + status);
+            throw new ShellException("Command " + command + " failed with status " + status);
         }
     }
 }

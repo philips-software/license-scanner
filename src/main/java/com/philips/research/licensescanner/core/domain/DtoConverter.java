@@ -23,7 +23,7 @@ abstract class DtoConverter {
         dto.purl = scan.getPackage().getPurl();
         dto.license = scan.getLicense().toString();
         dto.error = scan.getError().orElse(null);
-        dto.isConfirmed = scan.isConfirmed();
+        dto.isConfirmed = scan.isOverride();
         dto.contesting = scan.getContesting().map(License::toString).orElse(null);
         dto.location = scan.getLocation().orElse(null);
         dto.detections = scan.getDetections().stream().map(DtoConverter::toDto).collect(Collectors.toList());

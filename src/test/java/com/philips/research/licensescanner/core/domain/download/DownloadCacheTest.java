@@ -19,9 +19,9 @@ class DownloadCacheTest {
     private static final int CACHE_SIZE = 2;
     private static final URI BASE_LOCATION = URI.create("https://www.example.com/download");
     private static final URI LOCATION = BASE_LOCATION.resolve("#directory/path");
+    private static final String DOWNLOAD = "download";
     @SuppressWarnings("NotNullFieldNotInitialized")
     private static Path TEMP_DIR;
-    private static final String DOWNLOAD = "download";
     private final Downloader downloader = mock(Downloader.class);
     private final ApplicationConfiguration configuration = new ApplicationConfiguration()
             .setTempDir(TEMP_DIR).setCacheSize(CACHE_SIZE);

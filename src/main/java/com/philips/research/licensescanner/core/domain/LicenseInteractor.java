@@ -102,10 +102,7 @@ public class LicenseInteractor implements LicenseService {
         final var purl = scan.getPackage().getPurl();
         try {
             path = cache.obtain(location);
-            final var fragment = location.getFragment();
-            if (fragment != null) {
-                path = path.resolve(fragment);
-            }
+            path = resolveFragment(path, location);
             detector.scan(path, scan, configuration.getThresholdPercent());
         } finally {
             cache.release(location);
@@ -168,11 +165,10 @@ public class LicenseInteractor implements LicenseService {
 
     private void ignoreDetection(UUID scanId, String license, boolean ignored) {
         final var lic = LicenseParser.parse(license);
-        getDetection(scanId, lic)
-                .ifPresent(d -> {
-                    d.setIgnored(ignored);
-                    LOG.info("Scan {}: license {} is now {}", scanId, license, ignored ? "ignored" : "included");
-                });
+        store.getScan(scanId).ifPresent(scan -> {
+            scan.ignore(lic, ignored);
+            LOG.info("Scan {}: license {} is now {}", scanId, license, ignored ? "ignored" : "included");
+        });
     }
 
     @Override
@@ -180,26 +176,37 @@ public class LicenseInteractor implements LicenseService {
         return store.getScan(scanId)
                 .flatMap(scan -> scan.getDetection(LicenseParser.parse(license))
                         .flatMap(det -> scan.getLocation()
-                                .flatMap(location -> {
-                                    final var dto = new FileFragmentDto();
-                                    dto.filename = det.getFilePath().toString();
-                                    final var offset = Math.max(0, det.getStartLine() - margin - 1);
-                                    dto.firstLine = offset + 1;
-                                    dto.focusStart = det.getStartLine() - offset - 1;
-                                    dto.focusEnd = det.getEndLine() - offset;
-                                    try {
-                                        final var path = cache.obtain(location).resolve(dto.filename);
-                                        dto.lines = Files.lines(path)
-                                                .skip(offset)
-                                                .limit(Math.min(margin, det.getStartLine() - 1) + det.getLineCount() + margin)
-                                                .collect(Collectors.toList());
-                                    } catch (IOException e) {
-                                        throw new IllegalStateException("Could not load detection file " + dto.filename + " from " + location, e);
-                                    }
-                                    return Optional.of(dto);
-                                })
+                                .flatMap(location -> fileFragmentDto(location, det, margin))
                         )
                 );
+    }
+
+    private Optional<FileFragmentDto> fileFragmentDto(URI location, Detection det, int margin) {
+        final var dto = new FileFragmentDto();
+        dto.filename = det.getFilePath().toString();
+        final var offset = Math.max(0, det.getStartLine() - margin - 1);
+        dto.firstLine = offset + 1;
+        dto.focusStart = det.getStartLine() - offset - 1;
+        dto.focusEnd = det.getEndLine() - offset;
+        try {
+            var path = cache.obtain(location);
+            path = resolveFragment(path, location).resolve(dto.filename);
+            dto.lines = Files.lines(path)
+                    .skip(offset)
+                    .limit(Math.min(margin, det.getStartLine() - 1) + det.getLineCount() + margin)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not load detection file " + dto.filename + " from " + location, e);
+        }
+        return Optional.of(dto);
+    }
+
+    private Path resolveFragment(Path path, URI location) {
+        final var fragment = location.getFragment();
+        if (fragment != null) {
+            path = path.resolve(fragment);
+        }
+        return path;
     }
 
     @Override
@@ -215,8 +222,4 @@ public class LicenseInteractor implements LicenseService {
         return store.getPackage(purl).orElseGet(() -> store.createPackage(purl));
     }
 
-    private Optional<Detection> getDetection(UUID scanId, License lic) {
-        return store.getScan(scanId)
-                .flatMap(s -> s.getDetection(lic));
-    }
 }

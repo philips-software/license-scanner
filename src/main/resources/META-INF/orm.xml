@@ -23,7 +23,7 @@
             <basic name="timestamp" access="FIELD" optional="false">
                 <column name="created"/>
             </basic>
-            <basic name="license" access="FIELD" optional="false">
+            <basic name="license" access="FIELD">
                 <lob/>
             </basic>
             <basic name="confirmed" access="FIELD" optional="false"/>

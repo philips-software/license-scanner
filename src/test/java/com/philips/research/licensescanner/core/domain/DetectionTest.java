@@ -32,7 +32,7 @@ class DetectionTest {
         assertThat(detection.getLicense()).isEqualTo(LICENSE);
         assertThat(detection.getFilePath()).isNotNull();
         assertThat(detection.getScore()).isZero();
-        assertThat(detection.isIgnored()).isFalse();
+        assertThat(detection.isIgnored()).isTrue();
     }
 
     @Test
@@ -45,6 +45,7 @@ class DetectionTest {
         assertThat(detection.getStartLine()).isEqualTo(START_LINE);
         assertThat(detection.getEndLine()).isEqualTo(END_LINE);
         assertThat(detection.getLineCount()).isEqualTo(END_LINE - START_LINE + 1);
+        assertThat(detection.isIgnored()).isFalse();
     }
 
     @Test
@@ -68,6 +69,21 @@ class DetectionTest {
         assertThat(detection.getStartLine()).isEqualTo(11);
         assertThat(detection.getEndLine()).isEqualTo(21);
         assertThat(detection.getConfirmations()).isEqualTo(2);
+    }
+
+    @Test
+    void ignoresSuspiciousPaths() {
+        detection.addEvidence(SCORE, new File("path/ToTests/blah.txt"), 1, 10);
+
+        assertThat(detection.isIgnored()).isTrue();
+    }
+
+    @Test
+    void recoversFromSuspiciousPaths() {
+        detection.addEvidence(100, new File("path/Sample/blah.txt"), 1, 10);
+        detection.addEvidence(1, new File("path/reliable/blah.txt"), 1, 10);
+
+        assertThat(detection.isIgnored()).isFalse();
     }
 
     @Test

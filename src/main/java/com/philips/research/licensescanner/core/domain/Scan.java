@@ -29,10 +29,9 @@ public class Scan {
     private final Map<License, Detection> detections = new HashMap<>();
 
     @SuppressWarnings("JpaAttributeTypeInspection")
-    private License license = License.NONE;
+    private @NullOr License license;
     private @NullOr String error;
     private @NullOr License contesting;
-    private boolean confirmed;
 
     public Scan(Package pkg, @NullOr URI location) {
         this.pkg = pkg;
@@ -52,15 +51,26 @@ public class Scan {
     }
 
     public License getLicense() {
-        return license;
+        if (license != null) {
+            return license;
+        }
+        if (detections.isEmpty()) {
+            return License.NONE;
+        }
+        return detections.entrySet().stream()
+                .filter(entry -> !entry.getValue().isIgnored())
+                .map(Map.Entry::getKey)
+                .reduce(License.NONE, License::and);
     }
 
     /**
      * Raises question about the validity of an unconfirmed the license.
      * If the license was already confirmed, nothing happens.
      */
-    public Scan contest(License license) {
-        if (!confirmed && (error == null) && isImprovingContestingLicense(license)) {
+    public Scan contest(@NullOr License license) {
+        if (license == null || license.equals(getLicense())) {
+            contesting = null;
+        } else if (!isOverride() && (error == null) && isImprovingContestingLicense(license)) {
             contesting = license;
         }
         return this;
@@ -76,14 +86,13 @@ public class Scan {
 
     public Scan confirm(License license) {
         this.license = license;
-        confirmed = true;
         contesting = null;
         error = null;
         return this;
     }
 
-    public boolean isConfirmed() {
-        return confirmed;
+    public boolean isOverride() {
+        return license != null;
     }
 
     public Optional<URI> getLocation() {
@@ -103,6 +112,11 @@ public class Scan {
         return new ArrayList<>(detections.values());
     }
 
+    public void ignore(License license, boolean ignore) {
+        getDetection(license).ifPresent(detection -> detection.setIgnored(ignore));
+        contest(contesting);
+    }
+
     public Optional<Detection> getDetection(License license) {
         return Optional.ofNullable(detections.get(license));
     }
@@ -112,10 +126,9 @@ public class Scan {
         if (detection == null) {
             detection = newDetection(license);
             detections.put(license, detection);
-            this.license = detections.keySet().stream()
-                    .reduce(license, License::and);
         }
         detection.addEvidence(score, file, startLine, endLine);
+        contest(contesting);
 
         return this;
     }

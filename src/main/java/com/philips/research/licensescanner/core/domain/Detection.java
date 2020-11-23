@@ -13,6 +13,7 @@ package com.philips.research.licensescanner.core.domain;
 import com.philips.research.licensescanner.core.domain.license.License;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -21,6 +22,7 @@ import java.util.Objects;
  */
 public class Detection {
     private static final File NO_FILE = new File("?");
+    private static final String[] UNLIKELY = {"test", "sample", "docs", "demo", "tutorial", "changelog"};
 
     private final License license;
 
@@ -29,7 +31,7 @@ public class Detection {
     private File filePath = NO_FILE;
     private int startLine;
     private int endLine;
-    private boolean ignored;
+    private boolean ignored = true;
 
     public Detection(License license) {
         this.license = license;
@@ -44,14 +46,21 @@ public class Detection {
      * @param endLine   ending line in the file
      */
     public void addEvidence(int score, File filePath, int startLine, int endLine) {
-        if (score > this.score ||
+        final var suspicious = isSuspicious(filePath);
+        if ((ignored && !suspicious) || score > this.score ||
                 (score == this.score && (endLine - startLine > this.endLine - this.startLine))) {
             this.score = score;
             this.filePath = filePath;
             this.startLine = startLine;
             this.endLine = endLine;
+            this.ignored &= suspicious;
         }
         confirmations++;
+    }
+
+    private boolean isSuspicious(File file) {
+        final var lowercase = file.toString().toLowerCase();
+        return Arrays.stream(UNLIKELY).anyMatch(lowercase::contains);
     }
 
     @SuppressWarnings("JpaAttributeTypeInspection")
