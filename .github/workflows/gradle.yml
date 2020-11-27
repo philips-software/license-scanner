@@ -7,15 +7,16 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
-
+    runs-on: [self-hosted, research] 
+    container: python:3.8
+    
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-java@v1.4.3
       with:
-        python-version: '3.6.11'
+        java-version: '11'
     - name: Install scancode 
-      run: pip install scancode-toolkit==3.2.0
+      run: pip install scancode-toolkit[full]
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build
