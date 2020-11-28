@@ -20,6 +20,8 @@ buildscript {
 plugins {
     id 'application'
     id 'com.adarshr.test-logger' version '2.1.1'
+    id "org.springframework.boot" version "2.3.1.RELEASE"
+
 }
 
 apply from: "${rootDir}/ci/forest/java/gradle/publish.gradle"
@@ -56,15 +58,6 @@ test {
 
 application {
     mainClass = 'com.philips.research.licensescanner.LicenseScannerService'
-}
-
-jar {
-    manifest {
-        attributes(
-                'Main-Class': 'com.philips.research.licensescanner.LicenseScannerService'
-        )
-    }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 java {
