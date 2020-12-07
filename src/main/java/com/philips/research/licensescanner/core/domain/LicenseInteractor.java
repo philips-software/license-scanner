@@ -100,7 +100,7 @@ public class LicenseInteractor implements LicenseService {
     private void scanPackage(URI location, Scan scan) {
         try {
             LOG.info("Scan {} from {}", scan.getPackage().getPurl(), location);
-            final var path = resolveFragment(cache.obtain(location), location);
+            final var path = resolveFragment(cache.obtain(location), location.getFragment());
             detector.scan(path, scan, configuration.getThresholdPercent());
         } finally {
             cache.release(location);
@@ -188,7 +188,7 @@ public class LicenseInteractor implements LicenseService {
         dto.focusEnd = det.getEndLine() - offset;
         try {
             var path = cache.obtain(location);
-            path = resolveFragment(path, location).resolve(dto.filename);
+            path = resolveFragment(path, location.getFragment()).resolve(dto.filename);
             dto.lines = Files.lines(path)
                     .skip(offset)
                     .limit(Math.min(margin, det.getStartLine() - 1) + det.getLineCount() + margin)
@@ -199,10 +199,12 @@ public class LicenseInteractor implements LicenseService {
         return Optional.of(dto);
     }
 
-    private Path resolveFragment(Path path, URI location) {
-        final var fragment = location.getFragment();
+    private Path resolveFragment(Path path, @NullOr String fragment) {
         if (fragment != null) {
             path = path.resolve(fragment);
+        }
+        if (!path.toFile().exists()) {
+            throw new LicenseException("Path '" + fragment + "' was not found in the source code");
         }
         return path;
     }

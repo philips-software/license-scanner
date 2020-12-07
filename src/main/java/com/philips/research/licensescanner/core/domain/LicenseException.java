@@ -8,7 +8,7 @@
  * All Rights Reserved
  */
 
-package com.philips.research.licensescanner.core.domain.license;
+package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.core.BusinessException;
 

@@ -43,7 +43,7 @@ class LicenseInteractorTest {
     private static final String OTHER = "Other";
     private static final String MESSAGE = "Test message";
     private static final String SUBDIRECTORY = "sub/directory";
-    private static final URI LOCATION = URI.create("git+git://example.com@1.2.3#" + SUBDIRECTORY);
+    private static final URI LOCATION = URI.create("git+git://example.com@1.2.3" );
     private static final File FILE = new File(".");
     private static final URI PURL = URI.create("pkg:package@version");
     private static final Package PACKAGE = new Package(PURL);
@@ -169,14 +169,27 @@ class LicenseInteractorTest {
         }
 
         @Test
-        void downloadsAndScansPackage() {
-            final var scanDir = workDirectory.resolve("download");
-            when(cache.obtain(LOCATION)).thenReturn(scanDir);
+        void downloadsAndScansFullPackage() {
+            when(cache.obtain(LOCATION)).thenReturn(workDirectory);
 
             interactor.scanLicense(PURL, LOCATION);
 
-            verify(detector).scan(scanDir.resolve(SUBDIRECTORY), scan, THRESHOLD);
+            verify(detector).scan(workDirectory, scan, THRESHOLD);
             verify(cache).release(LOCATION);
+        }
+
+        @Test
+        void downloadsAndScansPartOfPackage() {
+            final var subDir = workDirectory.resolve(SUBDIRECTORY);
+            assertThat(subDir.toFile().mkdirs()).isTrue();
+            final var subLocation = LOCATION.resolve("#" + SUBDIRECTORY);
+            when(cache.obtain(subLocation)).thenReturn(workDirectory);
+            when(store.createScan(PACKAGE, subLocation)).thenReturn(scan);
+
+            interactor.scanLicense(PURL, subLocation);
+
+            verify(detector).scan(workDirectory.resolve(SUBDIRECTORY), scan, THRESHOLD);
+            verify(cache).release(subLocation);
         }
 
         @Test
@@ -187,6 +200,20 @@ class LicenseInteractorTest {
 
             assertThat(scan.getError()).contains(MESSAGE);
             verify(cache).release(LOCATION);
+        }
+
+        @Test
+        void registersNonExistingSourceCodePath() {
+            when(cache.obtain(LOCATION)).thenReturn(workDirectory);
+            final var subLocation = LOCATION.resolve("#no/directory");
+            when(cache.obtain(subLocation)).thenReturn(workDirectory);
+            when(store.createScan(PACKAGE, subLocation)).thenReturn(scan);
+
+            interactor.scanLicense(PURL, subLocation);
+
+            //noinspection OptionalGetWithoutIsPresent
+            assertThat(scan.getError().get()).contains("not found in the source");
+            verify(cache).release(subLocation);
         }
 
         @Test

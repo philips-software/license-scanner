@@ -36,7 +36,7 @@ class ShellCommandTest {
     void throws_commandNotFound() {
         assertThatThrownBy(() -> new ShellCommand("not_found").execute())
                 .isInstanceOf(ShellException.class)
-                .hasMessageContaining("Command 'not_found' not found");
+                .hasMessageContaining("Command 'not_found' failed");
     }
 
     @Test
