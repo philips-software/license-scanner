@@ -14,7 +14,6 @@ import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.download.AnonymousVcsHandler;
 import com.philips.research.licensescanner.core.domain.license.Detector;
-import com.philips.research.licensescanner.core.domain.license.License;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -78,19 +78,19 @@ public class LicenseInteractor implements LicenseService {
     public void scanLicense(URI purl, @NullOr URI location) {
         @NullOr Scan scan = null;
         try {
-            LOG.info("Scan license for {} from {}", purl, (location != null) ? location : "(no location)");
             final var pkg = getOrCreatePackage(purl);
             if (store.latestScan(pkg).isEmpty()) {
                 scan = store.createScan(pkg, location);
-                if (location != null) {
+                if (location != null && location.getScheme() != null) {
                     scanPackage(location, scan);
                     LOG.info("Detected license for {} is '{}'", purl, scan.getLicense());
                 } else {
                     scan.setError("No location provided");
+                    LOG.info("No location provided for {}", purl);
                 }
             }
         } catch (Exception e) {
-            LOG.error("Scanning failed: " + e.toString());
+            LOG.error("Scanning failed: ", e);
             if (scan != null) {
                 scan.setError(e.getMessage());
             }
@@ -98,11 +98,9 @@ public class LicenseInteractor implements LicenseService {
     }
 
     private void scanPackage(URI location, Scan scan) {
-        @NullOr Path path = null;
-        final var purl = scan.getPackage().getPurl();
         try {
-            path = cache.obtain(location);
-            path = resolveFragment(path, location);
+            LOG.info("Scan {} from {}", scan.getPackage().getPurl(), location);
+            final var path = resolveFragment(cache.obtain(location), location);
             detector.scan(path, scan, configuration.getThresholdPercent());
         } finally {
             cache.release(location);

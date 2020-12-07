@@ -149,7 +149,20 @@ class LicenseInteractorTest {
             when(store.latestScan(PACKAGE)).thenReturn(Optional.empty());
             when(store.createScan(PACKAGE, null)).thenReturn(scan);
 
+
             interactor.scanLicense(PURL, null);
+
+            assertThat(scan.getError()).isNotEmpty();
+            verify(detector, never()).scan(any(Path.class), any(Scan.class), anyInt());
+        }
+
+        @Test
+        void skipsIfEmptyLocation() {
+            final var emptyLocation = URI.create("");
+            when(store.latestScan(PACKAGE)).thenReturn(Optional.empty());
+            when(store.createScan(PACKAGE, emptyLocation)).thenReturn(scan);
+
+            interactor.scanLicense(PURL, emptyLocation);
 
             assertThat(scan.getError()).isNotEmpty();
             verify(detector, never()).scan(any(Path.class), any(Scan.class), anyInt());
