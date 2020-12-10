@@ -33,6 +33,14 @@ class PackageRouteTest extends AbstractRouteTest {
     private static final String BASE_URL = "/packages";
     private static final String PACKAGE_URL = BASE_URL + "/{purl}";
 
+    @Test
+    void deletesPackage() throws Exception {
+        mockMvc.perform(delete(PACKAGE_URL, encoded(PURL)))
+                .andExpect(status().isOk());
+
+        verify(service).deletePackage(PURL);
+    }
+
     @Nested
     class FindPackages {
         @BeforeEach()
@@ -61,14 +69,6 @@ class PackageRouteTest extends AbstractRouteTest {
                     .andExpect(status().isOk())
                     .andExpect(content().json(response.toString()));
         }
-    }
-
-    @Test
-    void deletesPackage() throws Exception {
-       mockMvc.perform(delete(PACKAGE_URL, encoded(PURL)))
-               .andExpect(status().isOk());
-
-       verify(service).deletePackage(PURL);
     }
 
     @Nested
