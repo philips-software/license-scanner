@@ -62,26 +62,14 @@ public class DownloadCache {
      * @return root directory of the package source files
      */
     public Path obtain(URI location) {
-        CacheEntry entry;
-        URI baseLocation = stripDirectoryPath(location);
-
         synchronized (lock) {
+            URI baseLocation = stripDirectoryPath(location);
+
             cleanup();
-            entry = findOrCreateEntry(baseLocation);
+            final var entry = findOrCreateEntry(baseLocation);
             entry.claim();
+            return entry.getRoot();
         }
-
-        return entry.getRoot();
-    }
-
-    private CacheEntry findOrCreateEntry(URI location) {
-        final var entry = cache.stream()
-                .filter(e -> e.location.equals(location))
-                .findFirst()
-                .orElseGet(() -> new CacheEntry(location));
-        cache.remove(entry);
-        cache.add(entry);
-        return entry;
     }
 
     private void cleanup() {
@@ -93,6 +81,16 @@ public class DownloadCache {
             entry.dispose();
             cache.remove(entry);
         }
+    }
+
+    private CacheEntry findOrCreateEntry(URI location) {
+        final var entry = cache.stream()
+                .filter(e -> e.location.equals(location))
+                .findFirst()
+                .orElseGet(() -> new CacheEntry(location));
+        cache.remove(entry);
+        cache.add(entry);
+        return entry;
     }
 
     /**
@@ -124,7 +122,7 @@ public class DownloadCache {
             LOG.info("Cleaning up the cache directory");
             FileSystemUtils.deleteRecursively(workDirectory);
         } catch (IOException e) {
-            LOG.error("Failed to remove cache directory {}", workDirectory);
+            LOG.error("Failed to remove caches from {}", workDirectory);
         }
     }
 
@@ -135,7 +133,7 @@ public class DownloadCache {
         private @NullOr Path root;
 
         CacheEntry(URI location) {
-            LOG.info("Create cache entry for {}", location);
+            LOG.info("Create cache for {}", location);
             this.location = location;
             store = workDirectory.resolve(UUID.randomUUID().toString());
             if (!store.toFile().mkdir()) {
@@ -164,9 +162,11 @@ public class DownloadCache {
 
         synchronized void claim() {
             usage++;
+            LOG.info("Claim #{} of cache for {}", usage, location);
         }
 
         synchronized void release() {
+            LOG.info("Release #{} of cache for {}", usage, location);
             usage--;
         }
 
@@ -175,7 +175,7 @@ public class DownloadCache {
                 LOG.info("Dispose cache for {}", location);
                 FileSystemUtils.deleteRecursively(store);
             } catch (IOException e) {
-                LOG.error("Could not remove cache directory " + store);
+                LOG.warn("Could not remove cache directory " + store);
             }
         }
     }

@@ -38,9 +38,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-configuration-processor:2.3.1.RELEASE'
     implementation 'org.hibernate:hibernate-validator:6.0.16.Final'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.3.1.RELEASE'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'com.h2database:h2:1.4.200'
     implementation 'org.flywaydb:flyway-core:6.4.4'
-    //runtimeOnly 'org.springframework.boot:spring-boot-devtools:2.3.1.RELEASE'
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.3.1.RELEASE'
     testImplementation 'org.assertj:assertj-core:3.16.1'
     testImplementation 'org.mockito:mockito-core:3.3.3'
@@ -66,3 +66,5 @@ java {
         languageVersion = JavaLanguageVersion.of(11)
     }
 }
+
+version = '0.3.0'

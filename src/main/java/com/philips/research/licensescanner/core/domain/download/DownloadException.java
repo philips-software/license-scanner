@@ -10,10 +10,12 @@
 
 package com.philips.research.licensescanner.core.domain.download;
 
+import com.philips.research.licensescanner.core.BusinessException;
+
 /**
  * Exception thrown in case downloading of package sources failed.
  */
-public class DownloadException extends RuntimeException {
+public class DownloadException extends BusinessException {
     public DownloadException(String message) {
         super(message);
     }

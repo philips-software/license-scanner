@@ -1,8 +1,0 @@
-excludes:
-  scopes:
-    - pattern: "annotation*"
-      reason: "PROVIDED_DEPENDENCY_OF"
-      comment: "Annotations are not deliverable"
-    - pattern: "test*"
-      reason: "PROVIDED_DEPENDENCY_OF"
-      comment: "Test dependencies"

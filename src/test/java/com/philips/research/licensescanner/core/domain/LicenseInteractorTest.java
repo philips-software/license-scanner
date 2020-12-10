@@ -43,7 +43,7 @@ class LicenseInteractorTest {
     private static final String OTHER = "Other";
     private static final String MESSAGE = "Test message";
     private static final String SUBDIRECTORY = "sub/directory";
-    private static final URI LOCATION = URI.create("git+git://example.com@1.2.3" );
+    private static final URI LOCATION = URI.create("git+git://example.com@1.2.3");
     private static final File FILE = new File(".");
     private static final URI PURL = URI.create("pkg:package@version");
     private static final Package PACKAGE = new Package(PURL);
@@ -217,14 +217,25 @@ class LicenseInteractorTest {
         }
 
         @Test
-        void registersScanningFailure() {
+        void registersScanningProblem() {
             when(cache.obtain(LOCATION)).thenReturn(workDirectory);
-            doThrow(new DetectorException(MESSAGE, new IllegalArgumentException()))
+            doThrow(new DetectorException(MESSAGE, new Exception("Oops!")))
                     .when(detector).scan(any(), any(), anyInt());
 
             interactor.scanLicense(PURL, LOCATION);
 
             assertThat(scan.getError()).contains(MESSAGE);
+            verify(cache).release(LOCATION);
+        }
+
+        @Test
+        void registersScanningFailures() {
+            when(cache.obtain(LOCATION)).thenReturn(workDirectory);
+            doThrow(new IllegalArgumentException()).when(detector).scan(any(), any(), anyInt());
+
+            interactor.scanLicense(PURL, LOCATION);
+
+            assertThat(scan.getError()).contains("Server failure");
             verify(cache).release(LOCATION);
         }
     }

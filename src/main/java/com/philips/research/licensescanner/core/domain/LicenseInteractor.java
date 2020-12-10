@@ -11,6 +11,7 @@
 package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.ApplicationConfiguration;
+import com.philips.research.licensescanner.core.BusinessException;
 import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.PackageStore;
 import com.philips.research.licensescanner.core.domain.download.DownloadCache;
@@ -89,10 +90,15 @@ public class LicenseInteractor implements LicenseService {
                     LOG.info("No location provided for {}", purl);
                 }
             }
-        } catch (Exception e) {
-            LOG.error("Scanning failed: ", e);
+        } catch (BusinessException e) {
+            LOG.warn("Scanning failed: {}", e.getMessage());
             if (scan != null) {
                 scan.setError(e.getMessage());
+            }
+        } catch (Exception e) {
+            LOG.error("Scanning failed:", e);
+            if (scan != null) {
+                scan.setError("Server failure");
             }
         }
     }
@@ -100,7 +106,8 @@ public class LicenseInteractor implements LicenseService {
     private void scanPackage(URI location, Scan scan) {
         try {
             LOG.info("Scan {} from {}", scan.getPackage().getPurl(), location);
-            final var path = resolveFragment(cache.obtain(location), location.getFragment());
+            final var sourcePath = cache.obtain(location);
+            final var path = resolveFragment(sourcePath, location.getFragment());
             detector.scan(path, scan, configuration.getThresholdPercent());
         } finally {
             cache.release(location);
