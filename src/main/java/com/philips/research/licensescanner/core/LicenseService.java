@@ -82,9 +82,9 @@ public interface LicenseService {
     void curateLicense(UUID scanId, @NullOr String license);
 
     /**
-     * Clear any existing scans for the indicated package.
+     * Clears all data for the indicated package.
      */
-    void deleteScans(URI packageUrl);
+    void deletePackage(URI packageUrl);
 
     /**
      * Raise false-positive detection

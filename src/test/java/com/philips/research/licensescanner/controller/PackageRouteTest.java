@@ -22,8 +22,7 @@ import java.util.Optional;
 
 import static com.philips.research.licensescanner.core.LicenseService.StatisticsDto;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,6 +61,14 @@ class PackageRouteTest extends AbstractRouteTest {
                     .andExpect(status().isOk())
                     .andExpect(content().json(response.toString()));
         }
+    }
+
+    @Test
+    void deletesPackage() throws Exception {
+       mockMvc.perform(delete(PACKAGE_URL, encoded(PURL)))
+               .andExpect(status().isOk());
+
+       verify(service).deletePackage(PURL);
     }
 
     @Nested
@@ -131,7 +138,7 @@ class PackageRouteTest extends AbstractRouteTest {
                     .andExpect(status().isOk())
                     .andExpect(content().json(response.toString()));
 
-            verify(service).deleteScans(PURL);
+            verify(service).deletePackage(PURL);
             verify(service).scanLicense(PURL, LOCATION);
         }
     }

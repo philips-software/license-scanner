@@ -362,9 +362,9 @@ class LicenseInteractorTest {
 
         @Test
         void deletesScansForPackage() {
-            interactor.deleteScans(PURL);
+            interactor.deletePackage(PURL);
 
-            verify(store).deleteScans(PACKAGE);
+            verify(store).deletePackage(PACKAGE);
         }
 
         @Test

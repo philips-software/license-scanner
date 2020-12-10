@@ -46,7 +46,7 @@ public interface PackageStore {
     /**
      * Deletes all scans for the indicated package.
      */
-    void deleteScans(Package pkg);
+    void deletePackage(Package pkg);
 
     /**
      * Creates a new persistent scan registration.

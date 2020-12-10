@@ -135,10 +135,12 @@ class PackageDatabaseTest {
     }
 
     @Test
-    void deletesScansForPackage() {
-        database.createScan(pkg, LOCATION);
+    void deletesPackageWithScans() {
+        final var scan = database.createScan(pkg, LOCATION);
+        scan.addDetection(LICENSE, 100, FILE, START_LINE, END_LINE);
+        scanRepository.save((ScanEntity) scan);
 
-        database.deleteScans(pkg);
+        database.deletePackage(pkg);
 
         final var now = Instant.now();
         assertThat(database.findScans(now.minus(Duration.ofSeconds(1)), now)).isEmpty();

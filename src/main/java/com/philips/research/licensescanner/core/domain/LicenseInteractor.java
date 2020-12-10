@@ -153,9 +153,9 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public void deleteScans(URI purl) {
+    public void deletePackage(URI purl) {
         store.getPackage(purl)
-                .ifPresent(store::deleteScans);
+                .ifPresent(store::deletePackage);
     }
 
     @Override

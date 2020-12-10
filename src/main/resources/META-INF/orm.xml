@@ -39,6 +39,7 @@
             <many-to-one name="pkg" access="FIELD"
                          target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
                 <join-column name="package_id"/>
+                <cascade/>
             </many-to-one>
             <one-to-many name="detections" orphan-removal="true"
                          target-entity="com.philips.research.licensescanner.persistence.DetectionEntity">

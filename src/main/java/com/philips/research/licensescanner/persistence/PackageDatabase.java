@@ -70,8 +70,9 @@ public class PackageDatabase implements PackageStore {
     }
 
     @Override
-    public void deleteScans(Package pkg) {
+    public void deletePackage(Package pkg) {
         scanRepository.deleteByPkg(pkg);
+        packageRepository.delete((PackageEntity) pkg);
     }
 
     @Override

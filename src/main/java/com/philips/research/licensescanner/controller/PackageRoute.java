@@ -34,15 +34,6 @@ public class PackageRoute {
         this.service = service;
     }
 
-    private static URI decodePackageUrl(String purl) {
-        try {
-            final var decoded = URLDecoder.decode(purl, StandardCharsets.UTF_8);
-            return URI.create(decoded);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Could not decode package URL '" + purl + "'");
-        }
-    }
-
     /**
      * Gets scan results for a single package.
      *
@@ -88,7 +79,7 @@ public class PackageRoute {
         final URI uri = decodePackageUrl(purl);
 
         if (force) {
-            service.deleteScans(uri);
+            service.deletePackage(uri);
         } else {
             final var license = service.licenseFor(uri);
             if (license.isPresent()) {
@@ -98,6 +89,22 @@ public class PackageRoute {
         service.scanLicense(uri, body.location);
 
         return new ScanInfoJson(uri, body.location);
+    }
+
+    @DeleteMapping("{purl}")
+    void deletePackage(@PathVariable String purl) {
+        final URI uri = decodePackageUrl(purl);
+
+        service.deletePackage(uri);
+    }
+
+    private static URI decodePackageUrl(String purl) {
+        try {
+            final var decoded = URLDecoder.decode(purl, StandardCharsets.UTF_8);
+            return URI.create(decoded);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Could not decode package URL '" + purl + "'");
+        }
     }
 }
 
