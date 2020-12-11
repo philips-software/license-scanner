@@ -10,7 +10,6 @@
 
 package com.philips.research.licensescanner.core;
 
-import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
 import pl.tlinkowski.annotation.basic.NullOr;
 
@@ -18,62 +17,37 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Persistence API for packages.
  */
-public interface PackageStore {
+public interface ScanStore {
     /**
-     * @return a new package instance
+     * Creates a new persistent scan registration.
+     *
+     * @return scan instance
      */
-    Package createPackage(URI purl);
+    Scan createScan(URI purl, @NullOr URI location);
 
     /**
-     * Finds a single package.
+     * Finds the latest scan for a package.
      *
-     * @return the package (if any)
+     * @param purl the package of the scan
+     * @return the scan (if any)
      */
-    Optional<Package> getPackage(URI purl);
+    Optional<Scan> getScan(URI purl);
 
     /**
      * Finds all packages (partly) containing the indicated mask.
      *
      * @return all matching packages
      */
-    List<Package> findPackages(String namespace, String name, String version);
-
-    /**
-     * Deletes all scans for the indicated package.
-     */
-    void deletePackage(Package pkg);
-
-    /**
-     * Creates a new persistent scan registration.
-     *
-     * @return scan instance
-     */
-    Scan createScan(Package pkg, @NullOr URI location);
-
-    /**
-     * Finds the latest scan for a package.
-     *
-     * @param pkg the package of the scan
-     * @return the scan (if any)
-     */
-    Optional<Scan> latestScan(Package pkg);
+    List<Scan> findScans(String namespace, String name, String version);
 
     /**
      * Removes a scan registration.
      */
     void deleteScan(Scan scan);
-
-    /**
-     * Finds all scanning errors for a package.
-     *
-     * @return all scanning errors, sorted on descending timestamp
-     */
-    List<Scan> scanErrors(Package pkg);
 
     /**
      * @return all scanning errors
@@ -84,11 +58,6 @@ public interface PackageStore {
      * @return all contested scans
      */
     List<Scan> contested();
-
-    /**
-     * @return the requested scan
-     */
-    Optional<Scan> getScan(UUID scanId);
 
     /**
      * Finds all latest scans in a period.
@@ -109,5 +78,4 @@ public interface PackageStore {
      * @return total number of contested licenses
      */
     int countContested();
-
 }

@@ -16,7 +16,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * License related use-cases.
@@ -30,12 +29,12 @@ public interface LicenseService {
      * @param version   (optional) version mask
      * @return list of matching package URLs
      */
-    List<URI> findPackages(String namespace, String name, String version);
+    List<ScanDto> findScans(String namespace, String name, String version);
 
     /**
      * @return License information if the package is known.
      */
-    Optional<LicenseDto> licenseFor(URI packageUrl);
+    Optional<ScanDto> scanFor(URI purl);
 
     /**
      * Queues package for scanning.
@@ -47,66 +46,66 @@ public interface LicenseService {
     /**
      * @return the details for the indicated scan
      */
-    Optional<LicenseDto> getScan(UUID scanId);
+    Optional<ScanDto> getScan(URI purl);
 
     /**
      * Lists all latest scan results for the indicated period.
      *
      * @return scan results
      */
-    List<LicenseDto> findScans(Instant from, Instant until);
+    List<ScanDto> findScans(Instant from, Instant until);
 
     /**
      * @return List of scanning errors
      */
-    List<LicenseDto> findErrors();
+    List<ScanDto> findErrors();
 
     /**
      * @return List of contested licenses
      */
-    List<LicenseDto> findContested();
+    List<ScanDto> findContested();
 
     /**
      * Contests a scan
      *
-     * @param scanId  contested scan
+     * @param purl    contested scan
      * @param license suggested replacement
      */
-    void contest(UUID scanId, @NullOr String license);
+    void contest(URI purl, @NullOr String license);
 
     /**
      * Confirms or corrects the license of a scan.
      *
      * @param license Updated value or null to confirm existing
      */
-    void curateLicense(UUID scanId, @NullOr String license);
+    void curateLicense(URI purl, @NullOr String license);
 
     /**
      * Clears all data for the indicated package.
      */
-    void deletePackage(URI packageUrl);
+    void deleteScan(URI purl);
 
     /**
      * Raise false-positive detection
      *
      * @param license detection to ignore
      */
-    void ignore(UUID scanId, String license);
+    void ignore(URI purl, String license);
 
     /**
      * Restore false-positive detection
      *
      * @param license detection to restore
      */
-    void restore(UUID scanId, String license);
+    void restore(URI purl, String license);
 
     /**
-     * @param scanId  identifier of the scan containing the detection
+     * @param purl    identifier of the scan containing the detection
      * @param license identifier for the detecction
      * @param margin  number of lines around the proof fragment
      * @return file fragment for the detected license
      */
-    Optional<FileFragmentDto> sourceFragment(UUID scanId, String license, int margin);
+    Optional<FileFragmentDto> sourceFragment(URI purl, String license, int margin);
 
     /**
      * @return scanning statistics
@@ -117,10 +116,9 @@ public interface LicenseService {
      * Response model for license information.
      */
     @SuppressWarnings("NotNullFieldNotInitialized")
-    class LicenseDto {
-        public UUID uuid;
-        public Instant timestamp;
+    class ScanDto {
         public URI purl;
+        public Instant timestamp;
         public String license;
         public @NullOr URI location;
         public @NullOr String error;
@@ -151,6 +149,10 @@ public interface LicenseService {
         public int licenses;
     }
 
+    /**
+     * Response model for an annotated source file.
+     */
+    @SuppressWarnings("NotNullFieldNotInitialized")
     class FileFragmentDto {
         public String filename;
         public int firstLine;

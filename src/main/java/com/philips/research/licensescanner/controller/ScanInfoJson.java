@@ -16,15 +16,16 @@ import com.philips.research.licensescanner.core.LicenseService;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class ScanInfoJson {
-    final @NullOr UUID id;
+    final String id;
     final URI purl;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @NullOr Instant timestamp;
@@ -36,17 +37,13 @@ class ScanInfoJson {
     boolean confirmed;
 
     public ScanInfoJson(URI purl, @NullOr URI location) {
-        this(null, purl, location);
-    }
-
-    public ScanInfoJson(@NullOr UUID id, URI purl, @NullOr URI location) {
-        this.id = id;
+        this.id = encode(purl);
         this.purl = purl;
         this.location = location;
     }
 
-    public ScanInfoJson(LicenseService.LicenseDto info) {
-        this(info.uuid, info.purl, info.location);
+    public ScanInfoJson(LicenseService.ScanDto info) {
+        this(info.purl, info.location);
         timestamp = info.timestamp;
         license = info.license;
         error = info.error;
@@ -59,8 +56,12 @@ class ScanInfoJson {
         }
     }
 
-    static Stream<ScanInfoJson> toStream(List<LicenseService.LicenseDto> licenses) {
+    static Stream<ScanInfoJson> toStream(List<LicenseService.ScanDto> licenses) {
         return licenses.stream().map(ScanInfoJson::new);
+    }
+
+    private static String encode(URI purl) {
+        return URLEncoder.encode(URLEncoder.encode(purl.toString(), StandardCharsets.UTF_8), StandardCharsets.UTF_8);
     }
 }
 

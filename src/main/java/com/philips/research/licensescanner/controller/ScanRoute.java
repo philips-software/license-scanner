@@ -10,29 +10,24 @@
 
 package com.philips.research.licensescanner.controller;
 
-
 import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import pl.tlinkowski.annotation.basic.NullOr;
 
+import java.net.URI;
 import java.time.Instant;
-import java.util.UUID;
 
 /**
  * REST API for interacting with scan results.
  */
 @RestController
-@Validated
-@CrossOrigin(origins = "*")
 @RequestMapping("/scans")
-public class ScanRoute {
-    private final LicenseService service;
+public class ScanRoute extends AbstractRoute {
 
     @Autowired
     public ScanRoute(LicenseService service) {
-        this.service = service;
+        super(service);
     }
 
     /**
@@ -60,41 +55,53 @@ public class ScanRoute {
         return new SearchResultJson<>(stats, ScanInfoJson.toStream(scans));
     }
 
-    @GetMapping("{uuid}")
-    ScanInfoJson getScanById(@PathVariable UUID uuid) {
-        final var scan = service.getScan(uuid)
-                .orElseThrow(() -> new ResourceNotFoundException(uuid));
+    @GetMapping("{id}")
+    ScanInfoJson getScanById(@PathVariable String id) {
+        final var purl = decodePackageUrl(id);
+        final var scan = service.getScan(purl)
+                .orElseThrow(() -> new ResourceNotFoundException(id));
 
         return new ScanInfoJson(scan);
     }
 
-    @PutMapping("{uuid}")
-    void confirmLicense(@PathVariable UUID uuid, @RequestBody LicenseJson body) {
-        service.curateLicense(uuid, body.license);
+    @PutMapping("{id}")
+    void confirmLicense(@PathVariable String id, @RequestBody LicenseJson body) {
+        final var purl = decodePackageUrl(id);
+        service.curateLicense(purl, body.license);
     }
 
-    @PostMapping("{uuid}/contest")
-    void contestScan(@PathVariable UUID uuid, @RequestBody(required = false) @NullOr LicenseJson body) {
+    @DeleteMapping("{id}")
+    void deleteScan(@PathVariable String id) {
+        final var purl = decodePackageUrl(id);
+        service.deleteScan(purl);
+    }
+
+    @PostMapping("{id}/contest")
+    void contestScan(@PathVariable String id, @RequestBody(required = false) @NullOr LicenseJson body) {
+        final URI purl = decodePackageUrl(id);
         final @NullOr String license = (body != null) ? body.license : null;
 
-        service.contest(uuid, license);
+        service.contest(purl, license);
     }
 
-    @PostMapping("{uuid}/ignore/{license}")
-    void ignoreDetection(@PathVariable UUID uuid, @PathVariable String license,
+    @PostMapping("{id}/ignore/{license}")
+    void ignoreDetection(@PathVariable String id, @PathVariable String license,
                          @RequestParam(required = false) boolean revert) {
+        final URI purl = decodePackageUrl(id);
+
         if (!revert) {
-            service.ignore(uuid, license);
+            service.ignore(purl, license);
         } else {
-            service.restore(uuid, license);
+            service.restore(purl, license);
         }
     }
 
-    @GetMapping("{uuid}/source/{license}")
-    FragmentJson detectionSource(@PathVariable UUID uuid, @PathVariable String license,
+    @GetMapping("{id}/source/{license}")
+    FragmentJson detectionSource(@PathVariable String id, @PathVariable String license,
                                  @RequestParam(required = false, defaultValue = "5") int margin) {
-        final var dto = service.sourceFragment(uuid, license, margin)
-                .orElseThrow(() -> new ResourceNotFoundException("" + uuid + "/" + license));
+        final var purl = decodePackageUrl(id);
+        final var dto = service.sourceFragment(purl, license, margin)
+                .orElseThrow(() -> new ResourceNotFoundException("" + id + "/" + license));
         return new FragmentJson(dto);
     }
 }

@@ -12,6 +12,7 @@ package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.core.domain.license.License;
 import com.philips.research.licensescanner.core.domain.license.LicenseParser;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -22,7 +23,7 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ScanTest {
-    private static final Package PACKAGE = new Package(URI.create("pkg:package@version"));
+    private static final URI PURL = URI.create("pkg:package@version");
     private static final License LICENSE = License.of("License");
     private static final URI LOCATION = URI.create("git+ssh://example.come");
     private static final int START_LINE = 10;
@@ -31,14 +32,13 @@ class ScanTest {
     private static final File FILE = new File("path/to/file");
     private static final String MESSAGE = "Message";
 
-    private final Scan scan = new Scan(PACKAGE, LOCATION);
+    private final Scan scan = new Scan(PURL, LOCATION);
 
     @Test
     void createsInstance() {
         Instant now = Instant.now();
-        assertThat(scan.getUuid()).isNotNull();
+        assertThat(scan.getPurl()).isEqualTo(PURL);
         assertThat(scan.getTimestamp()).isBetween(now.minus(Duration.ofSeconds(1)), now);
-        assertThat(scan.getPackage()).isEqualTo(PACKAGE);
         assertThat(scan.getLicense()).isEqualTo(License.NONE);
         assertThat(scan.getLocation()).contains(LOCATION);
         assertThat(scan.getContesting()).isEmpty();
@@ -153,5 +153,13 @@ class ScanTest {
         scan.ignore(other, true);
 
         assertThat(scan.getContesting()).isEmpty();
+    }
+
+    @Test
+    void implementsEquals() {
+        EqualsVerifier.forClass(Scan.class)
+                .withOnlyTheseFields("purl")
+                .withNonnullFields("purl")
+                .verify();
     }
 }

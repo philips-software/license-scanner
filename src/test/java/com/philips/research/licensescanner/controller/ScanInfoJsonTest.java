@@ -21,7 +21,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 class ScanInfoJsonTest {
@@ -29,25 +28,24 @@ class ScanInfoJsonTest {
     private static final Instant TIMESTAMP = Instant.now();
     private static final String ERROR = "Error";
     private static final URI PURL = URI.create("pkg:package@version");
-    private static final UUID ID = UUID.randomUUID();
+    private static final String ID = "pkg%253Apackage%2540version";
     private static final String LICENSE = "License";
     private static final ObjectMapper MAPPER = new JacksonConfiguration().objectMapper();
 
     @Test
     void createsScanInfoJson() throws Exception {
-        final var dto = new LicenseService.LicenseDto();
-        dto.uuid = ID;
+        final var dto = new LicenseService.ScanDto();
+        dto.purl = PURL;
         dto.timestamp = TIMESTAMP;
         dto.location = LOCATION;
         dto.contesting = LICENSE;
         dto.isConfirmed = true;
         dto.error = ERROR;
         dto.detections = List.of();
-        dto.purl = PURL;
         dto.license = LICENSE;
 
         final var json = new JSONObject()
-                .put("id", ID.toString())
+                .put("id", ID)
                 .put("timestamp", DateTimeFormatter.ISO_INSTANT.format(TIMESTAMP))
                 .put("location", LOCATION.toString())
                 .put("contesting", LICENSE)
@@ -61,8 +59,7 @@ class ScanInfoJsonTest {
 
     @Test
     void createsListOfScanInfo() throws Exception {
-        final var dto = new LicenseService.LicenseDto();
-        dto.uuid = ID;
+        final var dto = new LicenseService.ScanDto();
         dto.purl = PURL;
 
         final var json = new JSONArray()

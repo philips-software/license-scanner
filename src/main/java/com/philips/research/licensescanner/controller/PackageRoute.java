@@ -12,50 +12,20 @@ package com.philips.research.licensescanner.controller;
 
 import com.philips.research.licensescanner.core.LicenseService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import javax.validation.Valid;
 
 /**
  * REST API for interacting with packages.
  */
 @RestController
-@Validated
-@CrossOrigin(origins = "*")
 @RequestMapping("/packages")
-public class PackageRoute {
-    private final LicenseService service;
+public class PackageRoute extends AbstractRoute {
 
     @Autowired
     public PackageRoute(LicenseService service) {
-        this.service = service;
-    }
-
-    private static URI decodePackageUrl(String purl) {
-        try {
-            final var decoded = URLDecoder.decode(purl, StandardCharsets.UTF_8);
-            return URI.create(decoded);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Could not decode package URL '" + purl + "'");
-        }
-    }
-
-    /**
-     * Gets scan results for a single package.
-     *
-     * @param purl URL-encoded package URL
-     * @return scan result
-     */
-    @GetMapping({"{purl}"})
-    ScanInfoJson getLatestScanForPackage(@PathVariable String purl) {
-        final URI uri = decodePackageUrl(purl);
-        final var license = service.licenseFor(uri)
-                .orElseThrow(() -> new ResourceNotFoundException(uri));
-
-        return new ScanInfoJson(license);
+        super(service);
     }
 
     /**
@@ -64,13 +34,13 @@ public class PackageRoute {
      * @return list of scanning results matching the query
      */
     @GetMapping
-    SearchResultJson<URI> findPackages(@RequestParam(required = false, defaultValue = "") String namespace,
-                                       @RequestParam(required = false, defaultValue = "") String name,
-                                       @RequestParam(required = false, defaultValue = "") String version) {
-        final var packages = service.findPackages(namespace, name, version);
+    SearchResultJson<ScanInfoJson> findPackages(@RequestParam(required = false, defaultValue = "") String namespace,
+                                                @RequestParam(required = false, defaultValue = "") String name,
+                                                @RequestParam(required = false, defaultValue = "") String version) {
+        final var scans = service.findScans(namespace, name, version);
         final var stats = service.statistics();
 
-        return new SearchResultJson<>(stats, packages.stream());
+        return new SearchResultJson<>(stats, ScanInfoJson.toStream(scans));
     }
 
     /**
@@ -81,30 +51,20 @@ public class PackageRoute {
      * @param force forces re-scanning despite an existing scan result
      * @return scan result
      */
-    @PostMapping("{purl}")
-    ScanInfoJson scanPackage(@PathVariable String purl,
-                             @RequestBody ScanRequestJson body,
+    @PostMapping
+    ScanInfoJson scanPackage(@RequestBody @Valid ScanRequestJson body,
                              @RequestParam(name = "force", required = false) boolean force) {
-        final URI uri = decodePackageUrl(purl);
-
         if (force) {
-            service.deletePackage(uri);
+            service.deleteScan(body.purl);
         } else {
-            final var license = service.licenseFor(uri);
-            if (license.isPresent()) {
-                return new ScanInfoJson(license.get());
+            final var scan = service.scanFor(body.purl);
+            if (scan.isPresent()) {
+                return new ScanInfoJson(scan.get());
             }
         }
-        service.scanLicense(uri, body.location);
+        service.scanLicense(body.purl, body.location);
 
-        return new ScanInfoJson(uri, body.location);
-    }
-
-    @DeleteMapping("{purl}")
-    void deletePackage(@PathVariable String purl) {
-        final URI uri = decodePackageUrl(purl);
-
-        service.deletePackage(uri);
+        return new ScanInfoJson(body.purl, body.location);
     }
 }
 

@@ -21,7 +21,7 @@ import java.net.URI;
  */
 @Converter(autoApply = true)
 @SuppressWarnings({"unused", "RedundantSuppression"})
-class UriConverter implements AttributeConverter<URI, String> {
+class PurlConverter implements AttributeConverter<URI, String> {
     @Override
     public @NullOr String convertToDatabaseColumn(@NullOr URI uri) {
         return (uri != null) ? uri.toString() : null;

@@ -36,6 +36,7 @@ import java.util.Arrays;
 public abstract class AbstractRouteTest {
     protected static final URI LOCATION = URI.create("git+ssh://example.com@1234");
     protected static final URI PURL = URI.create("pkg:package@version");
+    protected static final String SCAN_ID = encoded(PURL);
     protected static final String LICENSE = "MIT OR Apache-2.0";
     protected static final String FILE = "path/to/file";
     protected static final int START_LINE = 12;
@@ -57,15 +58,15 @@ public abstract class AbstractRouteTest {
         Mockito.reset(service);
     }
 
-    protected LicenseService.LicenseDto standardLicenseInfo() {
-        final var info = new LicenseService.LicenseDto();
+    protected LicenseService.ScanDto standardLicenseInfo() {
+        final var info = new LicenseService.ScanDto();
         info.purl = PURL;
         info.license = LICENSE;
         info.location = LOCATION;
         return info;
     }
 
-    protected LicenseService.LicenseDto standardLicenseInfoWithDetection() {
+    protected LicenseService.ScanDto standardLicenseInfoWithDetection() {
         final var info = standardLicenseInfo();
         info.detections = new ArrayList<>();
         final var detection = new LicenseService.DetectionDto();

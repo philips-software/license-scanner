@@ -12,8 +12,11 @@ package com.philips.research.licensescanner.controller;
 
 import pl.tlinkowski.annotation.basic.NullOr;
 
+import javax.validation.constraints.NotNull;
 import java.net.URI;
 
 class ScanRequestJson {
+    @NotNull
+    URI purl;
     @NullOr URI location;
 }

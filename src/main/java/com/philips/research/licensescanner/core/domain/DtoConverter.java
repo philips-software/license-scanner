@@ -16,11 +16,10 @@ import com.philips.research.licensescanner.core.domain.license.License;
 import java.util.stream.Collectors;
 
 abstract class DtoConverter {
-    static LicenseService.LicenseDto toDto(Scan scan) {
-        final var dto = new LicenseService.LicenseDto();
+    static LicenseService.ScanDto toDto(Scan scan) {
+        final var dto = new LicenseService.ScanDto();
         dto.timestamp = scan.getTimestamp();
-        dto.uuid = scan.getUuid();
-        dto.purl = scan.getPackage().getPurl();
+        dto.purl = scan.getPurl();
         dto.license = scan.getLicense().toString();
         dto.error = scan.getError().orElse(null);
         dto.isConfirmed = scan.isOverride();
