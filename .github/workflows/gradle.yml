@@ -1,7 +1,6 @@
 name: Java CI with Gradle
 
 on:
-  pull_request:
   push:
 
 jobs:
