@@ -131,6 +131,12 @@ table.)
 ### Docker
 After building the project, you can also run the application with Docker.
 
+Use image stored in Artifactory:
+
+```bash
+docker run -p 8080:8080 dl-innersource-docker.artifactory-ehv.ta.philips.com/license-scanner:latest
+```
+
 Build docker image:
 
 ```bash
