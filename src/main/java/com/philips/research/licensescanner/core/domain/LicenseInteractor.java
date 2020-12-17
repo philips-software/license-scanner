@@ -79,7 +79,7 @@ public class LicenseInteractor implements LicenseService {
         try {
             if (store.getScan(purl).isEmpty()) {
                 scan = store.createScan(purl, location);
-                if (location != null && location.getScheme() != null) {
+                if (location != null && !location.toString().isBlank()) {
                     scanPackage(location, scan);
                     LOG.info("Detected license for {} is '{}'", purl, scan.getLicense());
                 } else {

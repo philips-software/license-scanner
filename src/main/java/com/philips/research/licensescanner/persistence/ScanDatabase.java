@@ -60,7 +60,7 @@ public class ScanDatabase implements ScanStore {
 
     @Override
     public Optional<Scan> getScan(URI purl) {
-        return scanRepository.findByPurl(purl).map(scan -> scan);
+        return scanRepository.findFirstByPurlOrderByTimestampDesc(purl).map(scan -> scan);
     }
 
     @Override
