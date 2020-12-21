@@ -30,7 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-@SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 public abstract class AbstractRouteTest {

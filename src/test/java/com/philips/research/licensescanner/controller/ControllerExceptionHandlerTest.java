@@ -11,11 +11,13 @@
 package com.philips.research.licensescanner.controller;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(controllers = {ControllerExceptionHandler.class, ScanRoute.class, JacksonConfiguration.class})
 class ControllerExceptionHandlerTest extends AbstractRouteTest {
     private static final String SCAN_URL = "/scans/{uuid}";
 

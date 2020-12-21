@@ -14,6 +14,7 @@ import com.philips.research.licensescanner.core.LicenseService;
 import com.philips.research.licensescanner.core.LicenseService.StatisticsDto;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 
 import java.time.Duration;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@WebMvcTest(controllers = {ScanRoute.class, JacksonConfiguration.class})
 class ScanRouteTest extends AbstractRouteTest {
     private static final String SCANS_URL = "/scans";
     private static final String SCAN_URL = SCANS_URL + "/{id}";
