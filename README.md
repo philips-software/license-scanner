@@ -131,6 +131,12 @@ table.)
 ### Docker
 After building the project, you can also run the application with Docker.
 
+Use docker-compose:
+
+```bash
+docker-compose up -d
+```
+
 Use image stored in Artifactory:
 
 ```bash
