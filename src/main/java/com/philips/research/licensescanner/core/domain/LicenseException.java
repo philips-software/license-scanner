@@ -10,14 +10,10 @@
 
 package com.philips.research.licensescanner.core.domain;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.jupiter.api.Test;
+import com.philips.research.licensescanner.core.BusinessException;
 
-class PackageTest {
-    @Test
-    void implementsEquals() {
-        EqualsVerifier.forClass(Package.class)
-                .withNonnullFields("purl")
-                .verify();
+public class LicenseException extends BusinessException {
+    public LicenseException(String message) {
+        super(message);
     }
 }

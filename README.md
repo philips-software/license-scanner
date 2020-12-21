@@ -128,6 +128,33 @@ command line on Linux or Mac using:
 (Failed migrations can be manually fixed or removed in the "flyway_schema_history" 
 table.)
 
+### Docker
+After building the project, you can also run the application with Docker.
+
+Use docker-compose:
+
+```bash
+docker-compose up -d
+```
+
+Use image stored in Artifactory:
+
+```bash
+docker run -p 8080:8080 dl-innersource-docker.artifactory-ehv.ta.philips.com/license-scanner:latest
+```
+
+Build docker image:
+
+```bash
+  docker build -f docker/Dockerfile -t license-scanner .
+```
+
+Run application:
+
+```bash
+docker run -p 8080:8080 license-scanner 
+```
+
 ## How to test the software
 
 The unit test suite can be executed via Gradle:

@@ -15,10 +15,7 @@ import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.license.License;
 import pl.tlinkowski.annotation.basic.NullOr;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.net.URI;
 
 /**
@@ -32,20 +29,24 @@ class ScanEntity extends Scan {
     @GeneratedValue
     @SuppressWarnings({"unused", "RedundantSuppression"})
     private @NullOr Long id;
+    // Used for querying database on string match
+    @SuppressWarnings({"unused", "NotNullFieldNotInitialized"})
+    @Column(name = "purl", insertable = false, updatable = false)
+    private String search;
 
     public ScanEntity() {
         //noinspection ConstantConditions
         this(null, null);
     }
 
-    ScanEntity(PackageEntity pkg, @NullOr URI location) {
-        super(pkg, location);
+    ScanEntity(URI purl, @NullOr URI location) {
+        super(purl, location);
     }
 
     @Override
     protected Detection newDetection(License license) {
         final var detection = new DetectionEntity(license);
-        PackageDatabase.detectionRepository.save(detection);
+        ScanDatabase.detectionRepository.save(detection);
         return detection;
     }
 }

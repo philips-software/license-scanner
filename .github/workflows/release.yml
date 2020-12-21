@@ -35,8 +35,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./build/libs/license-scanner.jar
-          asset_name: license-scanner.jar
+          asset_path: ./build/libs/license-scanner-service.jar
+          asset_name: license-scanner-service.jar
           asset_content_type: application/java-archive
       - name: Push to artifactory
         run: ./gradlew artifactoryPublish

@@ -11,7 +11,6 @@
 package com.philips.research.licensescanner.core.domain.license.scancode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.philips.research.licensescanner.core.domain.Package;
 import com.philips.research.licensescanner.core.domain.Scan;
 import com.philips.research.licensescanner.core.domain.license.License;
 import com.philips.research.licensescanner.core.domain.license.LicenseParser;
@@ -24,13 +23,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ScanCodeJsonTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final Package PACKAGE = new Package(URI.create("pkg:package@version"));
+    private static final URI PURL = URI.create("pkg:package@version");
     private static final URI LOCATION = URI.create("http://example.com");
     private static final Path DIRECTORY = Path.of("src", "test", "resources", "scancode");
 
     private Scan processFile(String filename) throws java.io.IOException {
         final var scanResult = MAPPER.readValue(DIRECTORY.resolve(filename).toFile(), ScanCodeJson.class);
-        final var scan = new Scan(PACKAGE, LOCATION);
+        final var scan = new Scan(PURL, LOCATION);
 
         scanResult.addScanResultsTo(scan);
         return scan;

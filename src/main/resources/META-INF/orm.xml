@@ -9,17 +9,11 @@
   -->
 
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" version="2.0">
-    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Package">
-        <attributes>
-            <basic name="purl" access="FIELD">
-                <column insertable="false" updatable="false"/>
-                <lob/>
-            </basic>
-        </attributes>
-    </mapped-superclass>
     <mapped-superclass class="com.philips.research.licensescanner.core.domain.Scan">
         <attributes>
-            <basic name="uuid" access="FIELD" optional="false"/>
+            <basic name="purl" access="FIELD" optional="false">
+                <lob/>
+            </basic>
             <basic name="timestamp" access="FIELD" optional="false">
                 <column name="created"/>
             </basic>
@@ -36,10 +30,6 @@
             <basic name="error" access="FIELD">
                 <lob/>
             </basic>
-            <many-to-one name="pkg" access="FIELD"
-                         target-entity="com.philips.research.licensescanner.persistence.PackageEntity">
-                <join-column name="package_id"/>
-            </many-to-one>
             <one-to-many name="detections" orphan-removal="true"
                          target-entity="com.philips.research.licensescanner.persistence.DetectionEntity">
                 <map-key name="license"/>

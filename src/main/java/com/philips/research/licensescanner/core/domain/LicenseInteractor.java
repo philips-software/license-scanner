@@ -11,8 +11,9 @@
 package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.ApplicationConfiguration;
+import com.philips.research.licensescanner.core.BusinessException;
 import com.philips.research.licensescanner.core.LicenseService;
-import com.philips.research.licensescanner.core.PackageStore;
+import com.philips.research.licensescanner.core.ScanStore;
 import com.philips.research.licensescanner.core.domain.download.DownloadCache;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;
@@ -33,7 +34,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -44,13 +44,13 @@ import java.util.stream.Collectors;
 public class LicenseInteractor implements LicenseService {
     private static final Logger LOG = LoggerFactory.getLogger(LicenseInteractor.class);
 
-    private final PackageStore store;
+    private final ScanStore store;
     private final DownloadCache cache;
     private final Detector detector;
     private final ApplicationConfiguration configuration;
 
     @Autowired
-    public LicenseInteractor(PackageStore store, DownloadCache cache, Detector detector,
+    public LicenseInteractor(ScanStore store, DownloadCache cache, Detector detector,
                              ApplicationConfiguration configuration) {
         this.store = store;
         this.cache = cache;
@@ -59,16 +59,15 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public List<URI> findPackages(String namespace, String name, String version) {
-        return store.findPackages(namespace, name, version).stream()
-                .map(Package::getPurl)
+    public List<ScanDto> findScans(String namespace, String name, String version) {
+        return store.findScans(namespace, name, version).stream()
+                .map(DtoConverter::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<LicenseDto> licenseFor(URI purl) {
-        return store.getPackage(purl)
-                .flatMap(store::latestScan)
+    public Optional<ScanDto> scanFor(URI purl) {
+        return store.getScan(purl)
                 .map(DtoConverter::toDto);
     }
 
@@ -78,31 +77,34 @@ public class LicenseInteractor implements LicenseService {
     public void scanLicense(URI purl, @NullOr URI location) {
         @NullOr Scan scan = null;
         try {
-            LOG.info("Scan license for {} from {}", purl, (location != null) ? location : "(no location)");
-            final var pkg = getOrCreatePackage(purl);
-            if (store.latestScan(pkg).isEmpty()) {
-                scan = store.createScan(pkg, location);
-                if (location != null) {
+            if (store.getScan(purl).isEmpty()) {
+                scan = store.createScan(purl, location);
+                if (location != null && !location.toString().isBlank()) {
                     scanPackage(location, scan);
                     LOG.info("Detected license for {} is '{}'", purl, scan.getLicense());
                 } else {
                     scan.setError("No location provided");
+                    LOG.info("No location provided for {}", purl);
                 }
             }
-        } catch (Exception e) {
-            LOG.error("Scanning failed: " + e.toString());
+        } catch (BusinessException e) {
+            LOG.warn("Scanning failed: {}", e.getMessage());
             if (scan != null) {
                 scan.setError(e.getMessage());
+            }
+        } catch (Exception e) {
+            LOG.error("Scanning failed:", e);
+            if (scan != null) {
+                scan.setError("Server failure");
             }
         }
     }
 
     private void scanPackage(URI location, Scan scan) {
-        @NullOr Path path = null;
-        final var purl = scan.getPackage().getPurl();
         try {
-            path = cache.obtain(location);
-            path = resolveFragment(path, location);
+            LOG.info("Scan {} from {}", scan.getPurl(), location);
+            final var sourcePath = cache.obtain(location);
+            final var path = resolveFragment(sourcePath, location.getFragment());
             detector.scan(path, scan, configuration.getThresholdPercent());
         } finally {
             cache.release(location);
@@ -110,70 +112,79 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public Optional<LicenseDto> getScan(UUID scanId) {
-        return store.getScan(scanId).map(DtoConverter::toDto);
+    public Optional<ScanDto> getScan(URI purl) {
+        return store.getScan(purl).map(DtoConverter::toDto);
     }
 
     @Override
-    public List<LicenseDto> findScans(Instant from, Instant until) {
+    public List<ScanDto> findScans(Instant from, Instant until) {
         return store.findScans(from, until).stream()
                 .map(DtoConverter::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<LicenseDto> findErrors() {
+    public List<ScanDto> findErrors() {
         return store.scanErrors().stream()
                 .map(DtoConverter::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<LicenseDto> findContested() {
+    public List<ScanDto> findContested() {
         return store.contested().stream()
                 .map(DtoConverter::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void contest(UUID scanId, @NullOr String license) {
+    public void contest(URI purl, @NullOr String license) {
         final var contesting = (license != null) ? LicenseParser.parse(license) : License.NONE;
-        store.getScan(scanId).ifPresent(scan -> scan.contest(contesting));
-    }
-
-    @Override
-    public void curateLicense(UUID scanId, @NullOr String license) {
-        store.getScan(scanId)
-                .ifPresent(s -> s.confirm((license != null) ? License.of(license) : s.getLicense()));
-    }
-
-    @Override
-    public void deleteScans(URI purl) {
-        store.getPackage(purl)
-                .ifPresent(store::deleteScans);
-    }
-
-    @Override
-    public void ignore(UUID scanId, String license) {
-        ignoreDetection(scanId, license, true);
-    }
-
-    @Override
-    public void restore(UUID scanId, String license) {
-        ignoreDetection(scanId, license, false);
-    }
-
-    private void ignoreDetection(UUID scanId, String license, boolean ignored) {
-        final var lic = LicenseParser.parse(license);
-        store.getScan(scanId).ifPresent(scan -> {
-            scan.ignore(lic, ignored);
-            LOG.info("Scan {}: license {} is now {}", scanId, license, ignored ? "ignored" : "included");
+        store.getScan(purl).ifPresent(scan -> {
+            scan.contest(contesting);
+            LOG.info("Contested {} with license {}", scan, license);
         });
     }
 
     @Override
-    public Optional<FileFragmentDto> sourceFragment(UUID scanId, String license, int margin) {
-        return store.getScan(scanId)
+    public void curateLicense(URI purl, @NullOr String license) {
+        store.getScan(purl)
+                .ifPresent(scan -> {
+                    scan.confirm((license != null) ? License.of(license) : scan.getLicense());
+                    LOG.info("Curated {} to have license {}", scan, license);
+                });
+    }
+
+    @Override
+    public void deleteScan(URI purl) {
+        store.getScan(purl)
+                .ifPresent(scan -> {
+                    store.deleteScan(scan);
+                    LOG.info("Deleted {}", scan);
+                });
+    }
+
+    @Override
+    public void ignore(URI purl, String license) {
+        ignoreDetection(purl, license, true);
+    }
+
+    @Override
+    public void restore(URI purl, String license) {
+        ignoreDetection(purl, license, false);
+    }
+
+    private void ignoreDetection(URI purl, String license, boolean ignored) {
+        final var lic = LicenseParser.parse(license);
+        store.getScan(purl).ifPresent(scan -> {
+            scan.ignore(lic, ignored);
+            LOG.info("Scan {}: license {} is now {}", purl, license, ignored ? "ignored" : "included");
+        });
+    }
+
+    @Override
+    public Optional<FileFragmentDto> sourceFragment(URI purl, String license, int margin) {
+        return store.getScan(purl)
                 .flatMap(scan -> scan.getDetection(LicenseParser.parse(license))
                         .flatMap(det -> scan.getLocation()
                                 .flatMap(location -> fileFragmentDto(location, det, margin))
@@ -190,21 +201,25 @@ public class LicenseInteractor implements LicenseService {
         dto.focusEnd = det.getEndLine() - offset;
         try {
             var path = cache.obtain(location);
-            path = resolveFragment(path, location).resolve(dto.filename);
+            path = resolveFragment(path, location.getFragment()).resolve(dto.filename);
             dto.lines = Files.lines(path)
                     .skip(offset)
                     .limit(Math.min(margin, det.getStartLine() - 1) + det.getLineCount() + margin)
                     .collect(Collectors.toList());
         } catch (IOException e) {
             throw new IllegalStateException("Could not load detection file " + dto.filename + " from " + location, e);
+        } catch (Exception e) {
+            throw new LicenseException("Could not read file " + dto.filename);
         }
         return Optional.of(dto);
     }
 
-    private Path resolveFragment(Path path, URI location) {
-        final var fragment = location.getFragment();
+    private Path resolveFragment(Path path, @NullOr String fragment) {
         if (fragment != null) {
             path = path.resolve(fragment);
+        }
+        if (!path.toFile().exists()) {
+            throw new LicenseException("Path '" + fragment + "' was not found in the source code");
         }
         return path;
     }
@@ -217,9 +232,4 @@ public class LicenseInteractor implements LicenseService {
         dto.errors = store.countErrors();
         return dto;
     }
-
-    private Package getOrCreatePackage(URI purl) {
-        return store.getPackage(purl).orElseGet(() -> store.createPackage(purl));
-    }
-
 }

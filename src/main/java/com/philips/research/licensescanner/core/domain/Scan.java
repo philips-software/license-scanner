@@ -22,9 +22,8 @@ import java.util.*;
  * Result of a license scan for a package.
  */
 public class Scan {
-    private final UUID uuid = UUID.randomUUID();
     private final Instant timestamp = Instant.now();
-    private final Package pkg;
+    private final URI purl;
     private final @NullOr URI location;
     private final Map<License, Detection> detections = new HashMap<>();
 
@@ -33,21 +32,17 @@ public class Scan {
     private @NullOr String error;
     private @NullOr License contesting;
 
-    public Scan(Package pkg, @NullOr URI location) {
-        this.pkg = pkg;
+    public Scan(URI purl, @NullOr URI location) {
+        this.purl = purl;
         this.location = location;
-    }
-
-    public UUID getUuid() {
-        return uuid;
     }
 
     public Instant getTimestamp() {
         return timestamp;
     }
 
-    public Package getPackage() {
-        return pkg;
+    public URI getPurl() {
+        return purl;
     }
 
     public License getLicense() {
@@ -140,4 +135,21 @@ public class Scan {
         return new Detection(license);
     }
 
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Scan)) return false;
+        Scan scan = (Scan) o;
+        return purl.equals(scan.purl);
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hash(purl);
+    }
+
+    @Override
+    public String toString() {
+        return purl.toString();
+    }
 }

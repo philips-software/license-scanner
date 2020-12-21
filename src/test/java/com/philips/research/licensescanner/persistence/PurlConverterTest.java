@@ -16,10 +16,10 @@ import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class UriConverterTest {
+class PurlConverterTest {
     private static final String VALID = "http://example.com";
 
-    private final UriConverter converter = new UriConverter();
+    private final PurlConverter converter = new PurlConverter();
 
     @Test
     void convertsToString() {

@@ -1,3 +1,13 @@
+/*
+ * This software and associated documentation files are
+ *
+ * Copyright © 2020-2020 Koninklijke Philips N.V.
+ *
+ * and is made available for use within Philips and/or within Philips products.
+ *
+ * All Rights Reserved
+ */
+
 buildscript {
   repositories {
     jcenter()
@@ -10,6 +20,7 @@ buildscript {
 plugins {
     id 'application'
     id 'com.adarshr.test-logger' version '2.1.1'
+    id "org.springframework.boot" version "2.4.1"
 }
 
 apply from: "${rootDir}/ci/forest/java/gradle/publish.gradle"
@@ -21,19 +32,20 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.3.1.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.3.1.RELEASE'
-    implementation 'org.springframework.boot:spring-boot-configuration-processor:2.3.1.RELEASE'
-    implementation 'org.hibernate:hibernate-validator:6.0.16.Final'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.3.1.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.4.1'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.4.1'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor:2.4.1'
+    implementation 'org.hibernate:hibernate-validator:6.0.21.Final'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.4.1'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'com.h2database:h2:1.4.200'
     implementation 'org.flywaydb:flyway-core:6.4.4'
-//    runtimeOnly 'org.springframework.boot:spring-boot-devtools:2.3.1.RELEASE'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.3.1.RELEASE'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.4.1'
     testImplementation 'org.assertj:assertj-core:3.16.1'
     testImplementation 'org.mockito:mockito-core:3.3.3'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.9'
     compileOnly 'pl.tlinkowski.annotation:pl.tlinkowski.annotation.basic:0.2.0'
+    implementation "javax.xml.bind:jaxb-api:2.3.0"
 }
 
 testlogger {
@@ -48,17 +60,10 @@ application {
     mainClass = 'com.philips.research.licensescanner.LicenseScannerService'
 }
 
-jar {
-    manifest {
-        attributes(
-                'Main-Class': 'com.philips.research.licensescanner.LicenseScannerService'
-        )
-    }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-}
-
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
     }
 }
+
+version = '0.3.0'

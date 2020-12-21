@@ -10,6 +10,7 @@
 
 package com.philips.research.licensescanner.core.domain.license;
 
+import com.philips.research.licensescanner.core.domain.LicenseException;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 /**

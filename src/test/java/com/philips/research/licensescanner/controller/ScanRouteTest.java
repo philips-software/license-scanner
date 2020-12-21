@@ -20,7 +20,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -30,29 +29,33 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class ScanRouteTest extends AbstractRouteTest {
-    private static final UUID SCAN_ID = UUID.randomUUID();
-
     private static final String SCANS_URL = "/scans";
-    private static final String SCANS_ID_URL = SCANS_URL + "/{uuid}";
-    private static final String CONTEST_URL = SCANS_ID_URL + "/contest";
-    private static final String IGNORE_DETECTION_URL = SCANS_ID_URL + "/ignore/{license}";
-    private static final String DETECTION_SOURCE_URL = SCANS_ID_URL + "/source/{license}";
+    private static final String SCAN_URL = SCANS_URL + "/{id}";
+    private static final String CONTEST_URL = SCAN_URL + "/contest";
+    private static final String IGNORE_DETECTION_URL = SCAN_URL + "/ignore/{license}";
+    private static final String DETECTION_SOURCE_URL = SCAN_URL + "/source/{license}";
 
     @Test
     void findsScanById() throws Exception {
         final var response = new JSONObject().put("license", LICENSE);
-        when(service.getScan(SCAN_ID)).thenReturn(Optional.of(standardLicenseInfo()));
+        when(service.getScan(PURL)).thenReturn(Optional.of(standardLicenseInfo()));
 
-        mockMvc.perform(get(SCANS_ID_URL, SCAN_ID))
+        mockMvc.perform(get(SCAN_URL, SCAN_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json(response.toString()));
+    }
+
+    @Test
+    void badRequest_malformedScanId() throws Exception {
+        mockMvc.perform(get(SCAN_URL, "Not an id"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void notFound_scanIdDoesNotExist() throws Exception {
         when(service.getScan(any())).thenReturn(Optional.empty());
 
-        mockMvc.perform(get(SCANS_ID_URL, SCAN_ID))
+        mockMvc.perform(get(SCAN_URL, SCAN_ID))
                 .andExpect(status().isNotFound());
     }
 
@@ -84,8 +87,7 @@ class ScanRouteTest extends AbstractRouteTest {
 
     @Test
     void findsErrors() throws Exception {
-        final var dto = new LicenseService.LicenseDto();
-        dto.uuid = SCAN_ID;
+        final var dto = new LicenseService.ScanDto();
         dto.purl = PURL;
         when(service.statistics()).thenReturn(new StatisticsDto());
         when(service.findErrors()).thenReturn(List.of(dto));
@@ -97,8 +99,7 @@ class ScanRouteTest extends AbstractRouteTest {
 
     @Test
     void findsContested() throws Exception {
-        final var dto = new LicenseService.LicenseDto();
-        dto.uuid = SCAN_ID;
+        final var dto = new LicenseService.ScanDto();
         dto.purl = PURL;
         when(service.statistics()).thenReturn(new StatisticsDto());
         when(service.findContested()).thenReturn(List.of(dto));
@@ -113,7 +114,7 @@ class ScanRouteTest extends AbstractRouteTest {
         mockMvc.perform(post(CONTEST_URL, SCAN_ID))
                 .andExpect(status().isOk());
 
-        verify(service).contest(SCAN_ID, null);
+        verify(service).contest(PURL, null);
     }
 
     @Test
@@ -124,17 +125,17 @@ class ScanRouteTest extends AbstractRouteTest {
                 .content(json.toString()).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(service).contest(SCAN_ID, LICENSE);
+        verify(service).contest(PURL, LICENSE);
     }
 
     @Test
     void curatesLicense() throws Exception {
-        mockMvc.perform(put(SCANS_ID_URL, SCAN_ID)
+        mockMvc.perform(put(SCAN_URL, SCAN_ID)
                 .content(new JSONObject().put("license", LICENSE).toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(service).curateLicense(SCAN_ID, LICENSE);
+        verify(service).curateLicense(PURL, LICENSE);
     }
 
     @Test
@@ -142,7 +143,7 @@ class ScanRouteTest extends AbstractRouteTest {
         mockMvc.perform(post(IGNORE_DETECTION_URL, SCAN_ID, LICENSE))
                 .andExpect(status().isOk());
 
-        verify(service).ignore(SCAN_ID, LICENSE);
+        verify(service).ignore(PURL, LICENSE);
     }
 
     @Test
@@ -150,14 +151,14 @@ class ScanRouteTest extends AbstractRouteTest {
         mockMvc.perform(post(IGNORE_DETECTION_URL + "?revert=yes", SCAN_ID, LICENSE))
                 .andExpect(status().isOk());
 
-        verify(service).restore(SCAN_ID, LICENSE);
+        verify(service).restore(PURL, LICENSE);
     }
 
     @Test
     void readsDetectionSource() throws Exception {
         final var dto = new LicenseService.FileFragmentDto();
         dto.filename = FILE;
-        when(service.sourceFragment(SCAN_ID, LICENSE, 7)).thenReturn(Optional.of(dto));
+        when(service.sourceFragment(PURL, LICENSE, 7)).thenReturn(Optional.of(dto));
 
         mockMvc.perform(get(DETECTION_SOURCE_URL + "?margin=7", SCAN_ID, LICENSE))
                 .andExpect(status().isOk())
@@ -169,6 +170,14 @@ class ScanRouteTest extends AbstractRouteTest {
         mockMvc.perform(get(DETECTION_SOURCE_URL, SCAN_ID, LICENSE))
                 .andExpect(status().isNotFound());
 
-        verify(service).sourceFragment(SCAN_ID, LICENSE, 5);
+        verify(service).sourceFragment(PURL, LICENSE, 5);
+    }
+
+    @Test
+    void deletesScan() throws Exception {
+        mockMvc.perform(delete(SCAN_URL, SCAN_ID))
+                .andExpect(status().isOk());
+
+        verify(service).deleteScan(PURL);
     }
 }

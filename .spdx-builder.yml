@@ -1,0 +1,15 @@
+document:
+  title: "License Scanner service"
+  organization: "Philips Research"
+  comment:
+  key:
+  namespace: "https://research.philips.com/license-scanner"
+projects:
+  - id: "Gradle:com.philips.research.licenseScanner:license-scanner-service:"
+    purl: "pkg:maven/philips/licensescanner@v0.2.1"
+    excluded:
+      - "test*"
+      - "development*"
+      - "runtime*"
+      - "annotation*"
+      - "archives"

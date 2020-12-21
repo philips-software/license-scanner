@@ -73,7 +73,7 @@ public class ShellCommand {
             Process process = invoke(args);
             assertSuccessStatus(process);
         } catch (IOException e) {
-            throw new ShellException("Command '" + command + "' not found", e);
+            throw new ShellException("Command '" + command + "' failed", e);
         } catch (InterruptedException e) {
             throw new ShellException("Waiting for '" + command + "' was interrupted", e);
         }

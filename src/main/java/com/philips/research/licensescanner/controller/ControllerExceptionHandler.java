@@ -73,5 +73,4 @@ public class ControllerExceptionHandler {
         //noinspection ConstantConditions
         return Map.of(exception.getName(), exception.getValue().toString());
     }
-
 }

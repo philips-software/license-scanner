@@ -10,7 +10,9 @@
 
 package com.philips.research.licensescanner.core.domain.license;
 
-public class DetectorException extends RuntimeException {
+import com.philips.research.licensescanner.core.BusinessException;
+
+public class DetectorException extends BusinessException {
     public DetectorException(String message, Throwable cause) {
         super(message, cause);
     }

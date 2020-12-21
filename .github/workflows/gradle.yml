@@ -1,11 +1,11 @@
 name: Java CI with Gradle
 
 on:
-  pull_request:
   push:
 
 jobs:
   build:
+    name: Build gradle project 
 
     runs-on: [self-hosted, research] 
     container: python:3.8
@@ -23,6 +23,17 @@ jobs:
       run: ./gradlew build -x test
     - name: Tests
       run: ./gradlew test
+    - name: Build Docker Images
+      uses: philips-software/docker-ci-scripts@v3.1.0
+      with:
+        dockerfile: docker/Dockerfile
+        image-name: license-scanner 
+        tags: 0 0.2 0.2.0 latest
+      env:
+        DOCKER_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+        DOCKER_PASSWORD: '${{ secrets.ARTIFACTORY_TOKEN }}'
+        DOCKER_REGISTRY: dl-innersource-docker-local.artifactory-ehv.ta.philips.com
+        GITHUB_ORGANIZATION: philips-internal
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v1.3
       if: always()
