@@ -105,12 +105,12 @@ public class Detection {
         if (this == o) return true;
         if (!(o instanceof Detection)) return false;
         Detection detection = (Detection) o;
-        return Objects.equals(license, detection.license);
+        return Objects.equals(getLicense(), detection.getLicense());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(license);
+        return Objects.hash(getLicense());
     }
 
 }

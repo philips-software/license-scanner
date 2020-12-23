@@ -140,12 +140,12 @@ public class Scan {
         if (this == o) return true;
         if (!(o instanceof Scan)) return false;
         Scan scan = (Scan) o;
-        return purl.equals(scan.purl);
+        return getPurl().equals(scan.getPurl());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(purl);
+        return Objects.hash(getPurl());
     }
 
     @Override
