@@ -6,7 +6,7 @@ document:
   namespace: "https://research.philips.com/license-scanner"
 projects:
   - id: "Gradle:com.philips.research.licenseScanner:license-scanner-service:"
-    purl: "pkg:maven/philips/licensescanner@v0.2.1"
+    purl: "pkg:maven/philips/licensescanner@v0.3.0"
     excluded:
       - "test*"
       - "development*"
