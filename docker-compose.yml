@@ -2,7 +2,7 @@ version: '2'
 
 services:
   license-scanner-service:
-    image: 'dl-innersource-docker.artifactory-ehv.ta.philips.com/license-scanner:v0.2.1'
+    image: 'dl-innersource-docker.artifactory-ehv.ta.philips.com/license-scanner:v0.3.0'
     ports:
       - '8080:8080'
 
