@@ -61,7 +61,7 @@ class ScanDatabaseTest {
         assertThat(database.findScans("duh", "", "")).isEmpty();
         assertThat(database.findScans("", "", "oth")).containsExactly(scan3);
         assertThat(database.findScans("spa", "ilt", "")).containsExactlyInAnyOrder(scan1, scan3);
-        assertThat(database.findScans("spa", "", "")).containsExactlyInAnyOrder(scan1, scan2, scan3);
+        assertThat(database.findScans("SPA", "", "")).containsExactlyInAnyOrder(scan1, scan2, scan3);
         assertThat(database.findScans("", "", "")).hasSize(3);
     }
 

@@ -38,18 +38,21 @@ public class ScanDatabase implements ScanStore {
 
     @Override
     public List<Scan> findScans(String namespace, String name, String version) {
-        var mask = (name.isBlank()) ? "%" : wildcard(name);
+        var mask = (name.isBlank()) ? "%" : '%' + escape(name) + '%';
         if (!namespace.isBlank()) {
-            mask = wildcard(namespace) + "/" + mask;
+            mask = '%'+escape(namespace) + "%/" + mask;
         }
         if (!version.isBlank()) {
-            mask += "@" + wildcard(version);
+            mask += "@%" + escape(version) + '%';
         }
-        return new ArrayList<>(scanRepository.findTop50BySearchLikeOrderByPurlAsc(mask));
+        return new ArrayList<>(scanRepository.findTop50BySearchLikeIgnoreCaseOrderByPurlAsc(mask));
     }
 
-    private String wildcard(String name) {
-        return '%' + name + '%';
+    private String escape(String fragment) {
+        return  fragment
+                .replaceAll("\\\\|\\[|]", "")
+                .replaceAll("%", "\\\\%")
+                .replaceAll("_", "\\\\_") ;
     }
 
     @Override

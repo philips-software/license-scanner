@@ -23,7 +23,7 @@ import java.util.Optional;
 interface ScanRepository extends CrudRepository<ScanEntity, Long> {
     Optional<ScanEntity> findFirstByPurlOrderByTimestampDesc(URI purl);
 
-    List<ScanEntity> findTop50BySearchLikeOrderByPurlAsc(String mask);
+    List<ScanEntity> findTop50BySearchLikeIgnoreCaseOrderByPurlAsc(String mask);
 
     List<ScanEntity> findTop100ByTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(
             Instant from, Instant until);
