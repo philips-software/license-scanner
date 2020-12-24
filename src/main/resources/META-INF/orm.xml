@@ -12,23 +12,22 @@
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" version="2.0">
     <mapped-superclass class="com.philips.research.licensescanner.core.domain.Scan" access="FIELD">
         <attributes>
-            <basic name="purl"  optional="false">
+            <basic name="purl" optional="false">
                 <lob/>
             </basic>
-            <basic name="timestamp"  optional="false">
+            <basic name="timestamp" optional="false">
                 <column name="created"/>
             </basic>
-            <basic name="license" >
+            <basic name="license">
                 <lob/>
             </basic>
-            <basic name="confirmed"  optional="false"/>
-            <basic name="contesting" >
+            <basic name="contesting">
                 <lob/>
             </basic>
-            <basic name="location" >
+            <basic name="location">
                 <lob/>
             </basic>
-            <basic name="error" >
+            <basic name="error">
                 <lob/>
             </basic>
             <one-to-many name="detections" orphan-removal="true"

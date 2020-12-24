@@ -1,2 +1,0 @@
-ALTER TABLE detections
-    ADD COLUMN ignored BOOL DEFAULT FALSE;
