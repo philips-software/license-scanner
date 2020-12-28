@@ -48,11 +48,6 @@ jobs:
 
       - name: Tests
         run: ./gradlew test
-      
-      - name: Show output
-        run: |
-          ls -alh build/libs
-          ls -alh build/test-results/test
 
   create-docker-image:
     name: "Create docker image"
@@ -72,11 +67,6 @@ jobs:
             build/test-results/**/*.xml
             build/libs/*.jar
           key: license-scanner-${{ github.sha }}
-
-      - name: Show output
-        run: |
-          ls -alh build/libs
-          ls -alh build/test-results/test
 
       - name: Build Docker Images
         uses: philips-software/docker-ci-scripts@v3.1.0
@@ -105,11 +95,6 @@ jobs:
             build/test-results/**/*.xml
             build/libs/*.jar 
           key: license-scanner-${{ github.sha }}
-
-      - name: Show output
-        run: |
-          ls -alh build/libs
-          ls -alh build/test-results/test
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1.6
