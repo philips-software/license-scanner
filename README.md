@@ -3,6 +3,8 @@ Backend service to scan licenses from the source code of (open source) packages.
 
 **Status**: _Experimental research prototype_
 
+(See the [architecture document](docs/architecture.md) in the `docs` directory.)
+
 Typical usage is the integration with CI/CD build pipeline tools (like 
 [SPDX-Builder](https://github.com/philips-labs/spdx-builder)) to obtain validated
 license information. Prior scan results are provided if the package has been
