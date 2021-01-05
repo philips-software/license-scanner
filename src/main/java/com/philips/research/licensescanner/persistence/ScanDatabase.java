@@ -40,7 +40,7 @@ public class ScanDatabase implements ScanStore {
     public List<Scan> findScans(String namespace, String name, String version) {
         var mask = (name.isBlank()) ? "%" : '%' + escape(name) + '%';
         if (!namespace.isBlank()) {
-            mask = '%'+escape(namespace) + "%/" + mask;
+            mask = '%' + escape(namespace) + "%/" + mask;
         }
         if (!version.isBlank()) {
             mask += "@%" + escape(version) + '%';
@@ -49,10 +49,10 @@ public class ScanDatabase implements ScanStore {
     }
 
     private String escape(String fragment) {
-        return  fragment
+        return fragment
                 .replaceAll("\\\\|\\[|]", "")
                 .replaceAll("%", "\\\\%")
-                .replaceAll("_", "\\\\_") ;
+                .replaceAll("_", "\\\\_");
     }
 
     @Override
