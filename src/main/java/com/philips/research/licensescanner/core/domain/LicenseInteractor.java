@@ -106,6 +106,9 @@ public class LicenseInteractor implements LicenseService {
             final var sourcePath = cache.obtain(location);
             final var path = resolveFragment(sourcePath, location.getFragment());
             detector.scan(path, scan, configuration.getThresholdPercent());
+            if (scan.getLicense().equals(License.NONE)) {
+                scan.setError("Scan did not detect a license");
+            }
         } finally {
             cache.release(location);
         }

@@ -171,6 +171,16 @@ class LicenseInteractorTest {
         }
 
         @Test
+        void registersEmptyLicenseAsFailure() {
+            when(cache.obtain(LOCATION)).thenReturn(workDirectory);
+
+            interactor.scanLicense(PURL, LOCATION);
+
+            //noinspection OptionalGetWithoutIsPresent
+            assertThat(scan.getError().get()).contains("did not detect");
+        }
+
+        @Test
         void registersDownloadFailure() {
             when(cache.obtain(LOCATION)).thenThrow(new DownloadException(MESSAGE));
 
@@ -216,6 +226,7 @@ class LicenseInteractorTest {
             assertThat(scan.getError()).contains("Server failure");
             verify(cache).release(LOCATION);
         }
+
     }
 
     @Nested
