@@ -214,10 +214,10 @@ without polluting the domain with annotations or additional fields.
 Prior to scanning, the source code needs to be transferred to the server. This
 is handled by a caching downloader with the following class structure:
 
-![class diagram]download.png "Classes involved in downloading and caching of
+![class diagram](download.png "Classes involved in downloading and caching of
 source code")
 
-All reauests are passed through the `DownloadCache` by "obtaining" a source
+All requests are passed through the `DownloadCache` by "obtaining" a source
 code location before scanning, and "releasing" the location after the scan is
 finished. It internally caches the downloaded source code to recycle the
 content of monorepos and handle subsequent requests for source files from the
@@ -233,16 +233,19 @@ ScanCode and ExtractCode are invoked as external shell commands using an
 instance of the `ShellCommand` class, which provides a fluent programming model
 to define the context for the invocation. If the command does not finish within
 the predefined timeout, the shell command is aborted and all spawned
-sub-threads terminated.
+sub-threads are terminated.
+
+The result of the license scan is made available in a JSON file, which is
+parsed after the scanner finishes.
 
 ### Detections and licenses
-The license scan yields `Detection` instances that each represent aggregated
-proof for a package license. The information from the license scanner is
-combined per license to (heuristically) indicate the most relevant supporting
-proof, based on factors like the length of the file fragment and the name of
-the file. (E.g.: Filenames containing "license" have priority.) Unlikely
-sources for correct license information (E.g. filenames containing "changelog")
-are de-prioritized, and automatically ignored if no other proof is found.
+A license scan yields `Detection` objects that each represent aggregated proof
+for a package license. The information from the license scanner is combined per
+license to (heuristically) indicate the most relevant supporting proof, based
+on factors like the length of the file fragment and the name of the file.
+(E.g.: Filenames containing "license" have priority.) Unlikely sources for
+license information (E.g. filenames containing "changelog") are de-prioritized,
+and automatically ignored if no additional proof is found.
 
 ![license detection design](licenses.png "Classes involved in detected licenses")
 
