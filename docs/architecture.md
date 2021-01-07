@@ -41,7 +41,7 @@ The most significant requirements are:
 
 - License detection shall be based on industry best-practice.
 - Service shall run unsupervised with a (fairly) high availability.
-- Curation of scan results shall use a graphical user interface.
+- Human experts shall curate license scans via an interactive user interface.
 
 Design constraints are:
 
@@ -113,10 +113,29 @@ file to the open source [ScanCode
 Toolkit](https://github.com/nexB/scancode-toolkit) command-line tool. (This
 includes the "ExtractCode" tool to unpack a number of common archive formats.)
 
+### Matching licenses in source code
+Finding license references in source code consists of matching the content of
+(text) files to (quite) flexible templates. If a template matched is found, it
+is an indication of a _potential_ license reference. Each such match yields a
+license, a score expressing the (un)certaintly of the reference, and a source
+code fragment where the match occurred.
+
+License templates typically contain a mix of verbatim text, replaceable
+sections (where e.g. author names are inserted), and omitable (optional)
+fragments. The matcher typically ignores whitespace, bullets and section
+numbers, capitalization and punctuation. Typical matchers also normalize word
+spelling and e.g. the copyright symbol. As license indications in source code
+occur in comments, a scanner typically strips comment delimiters for specific
+file extensions from the source code before matching.
+
+_Note that the License Scanner service delegates license matching to ScanCode
+Toolkit, and only processes the results of the matching process._
+
 ### Package identification
 To unambiguously identify packages across multiple clients, the choice was made
 to identify packages using [Package
-URLs](https://github.com/package-url/purl-spec). Every package is identified by a URI that consists of the following elements:
+URLs](https://github.com/package-url/purl-spec). Every package is identified by
+a URI that consists of the following elements:
 
 ```
 pkg:<type>/[<namespace>/]<name>@<version>
