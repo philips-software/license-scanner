@@ -13,7 +13,7 @@ package com.philips.research.licensescanner.core.domain;
 import com.philips.research.licensescanner.ApplicationConfiguration;
 import com.philips.research.licensescanner.core.BusinessException;
 import com.philips.research.licensescanner.core.LicenseService;
-import com.philips.research.licensescanner.core.ScanStore;
+import com.philips.research.licensescanner.core.PersistentStore;
 import com.philips.research.licensescanner.core.domain.download.DownloadCache;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;
@@ -44,13 +44,13 @@ import java.util.stream.Collectors;
 public class LicenseInteractor implements LicenseService {
     private static final Logger LOG = LoggerFactory.getLogger(LicenseInteractor.class);
 
-    private final ScanStore store;
+    private final PersistentStore store;
     private final DownloadCache cache;
     private final Detector detector;
     private final ApplicationConfiguration configuration;
 
     @Autowired
-    public LicenseInteractor(ScanStore store, DownloadCache cache, Detector detector,
+    public LicenseInteractor(PersistentStore store, DownloadCache cache, Detector detector,
                              ApplicationConfiguration configuration) {
         this.store = store;
         this.cache = cache;

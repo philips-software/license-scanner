@@ -21,8 +21,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 @EnableAsync
 @EnableConfigurationProperties(ApplicationConfiguration.class)
-public class LicenseScannerService {
+public class Application {
     public static void main(String[] args) {
-        SpringApplication.run(LicenseScannerService.class, args);
+        SpringApplication.run(Application.class, args);
     }
 }

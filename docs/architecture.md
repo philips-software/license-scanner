@@ -1,4 +1,4 @@
-# License Scanner Service Architecture
+# License Scanner service Architecture
 
 ## Introduction
 
@@ -103,11 +103,11 @@ package license is still incorrect.
 ### Use-case realization
 The figure below shows how the use-cases map to the system interactions:
 
-![use-case realizations](interaction.png "Mapping of use-cases to system interactions")
+![UML sequence diagram](interaction.png "Mapping of use-cases to system interactions")
 
 ## Logical view
 ### Overview
-The license scanner is a stand-aloen service that persists its data in a
+The license scanner is a stand-alone service that persists its data in a
 relational database and delegates the actual scanning of licenses from source
 file to the open source [ScanCode
 Toolkit](https://github.com/nexB/scancode-toolkit) command-line tool. (This
@@ -197,18 +197,33 @@ web endpoint handling (using Spring MVC) and persistence of data (using JPA on
 Hibernate) to a database.
 
 ### Layers
-The figure below explains how the layers are repesented in the source code:
+The figure below explains how the layers are represented in the source code:
 
-![layer class design](layers.png "Implementation of logical layers and their dependencies")
+![UML class diagram](layers.png "Implementation of logical layers and their dependencies")
 
 The implication of this design is that external communication is completely
 decoupled from the domain, because the controller layer can only interact with
 the domain through a service facade using DTO POJO classes. Domain objects are
 never directly exposed to the controller layer.
 
+The "interactor" classes provide the implementation of the service definitions
+to retrieve relevant domain classes from persistent storage, invoke the
+appropriate methods on domain classes, and persist any state changes of domain
+objects.
+
 Persistence is isolated in the same way by providing specialized persistence
 instances for domain classes that allow storage and retrieval of domain objects
 without polluting the domain with annotations or additional fields.
+
+### REST API
+The REST API in the controller layer uses Spring Boot annotations to map routes
+to functions that handle the web requests:
+
+- `PackageRoute` handles requests that refer to (previously scanned) packages.
+- `ScanRoute` handles requests related to scans and their results.
+
+All JSON request and response bodies are automatically mapped to Java classes
+by a Jackson Object Mapper.
 
 ### Downloading of source code
 Prior to scanning, the source code needs to be transferred to the server. This

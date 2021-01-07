@@ -21,7 +21,7 @@ import java.util.Optional;
 /**
  * Persistence API for packages.
  */
-public interface ScanStore {
+public interface PersistentStore {
     /**
      * Creates a new persistent scan registration.
      *

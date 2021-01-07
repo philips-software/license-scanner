@@ -10,7 +10,7 @@
 
 package com.philips.research.licensescanner.persistence;
 
-import com.philips.research.licensescanner.core.ScanStore;
+import com.philips.research.licensescanner.core.PersistentStore;
 import com.philips.research.licensescanner.core.domain.Scan;
 import org.springframework.stereotype.Repository;
 import pl.tlinkowski.annotation.basic.NullOr;
@@ -25,15 +25,15 @@ import java.util.Optional;
  * Spring component implementing the persistence of packages.
  */
 @Repository
-public class ScanDatabase implements ScanStore {
+public class PersistentDatabase implements PersistentStore {
     @SuppressWarnings("NotNullFieldNotInitialized")
     static DetectionRepository detectionRepository;
 
     private final ScanRepository scanRepository;
 
-    public ScanDatabase(ScanRepository scanRepository, DetectionRepository detectionRepository) {
+    public PersistentDatabase(ScanRepository scanRepository, DetectionRepository detectionRepository) {
         this.scanRepository = scanRepository;
-        ScanDatabase.detectionRepository = detectionRepository;
+        PersistentDatabase.detectionRepository = detectionRepository;
     }
 
     @Override

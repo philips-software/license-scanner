@@ -12,7 +12,7 @@ package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.ApplicationConfiguration;
 import com.philips.research.licensescanner.core.LicenseService;
-import com.philips.research.licensescanner.core.ScanStore;
+import com.philips.research.licensescanner.core.PersistentStore;
 import com.philips.research.licensescanner.core.domain.download.DownloadCache;
 import com.philips.research.licensescanner.core.domain.download.DownloadException;
 import com.philips.research.licensescanner.core.domain.license.Detector;
@@ -56,7 +56,7 @@ class LicenseInteractorTest {
 
     private final DownloadCache cache = mock(DownloadCache.class);
     private final Detector detector = mock(Detector.class);
-    private final ScanStore store = mock(ScanStore.class);
+    private final PersistentStore store = mock(PersistentStore.class);
     private final ApplicationConfiguration configuration = new ApplicationConfiguration();
 
     private final LicenseService interactor = new LicenseInteractor(store, cache, detector, configuration);

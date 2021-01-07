@@ -25,9 +25,9 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
-@ComponentScan(basePackageClasses = {ScanDatabase.class})
+@ComponentScan(basePackageClasses = {PersistentDatabase.class})
 @DataJpaTest
-class ScanDatabaseTest {
+class PersistentDatabaseTest {
     private static final URI PURL = URI.create("pkg:package@version");
     private static final URI PURL2 = URI.create("pkg:package2@version");
     private static final URI PURL3 = URI.create("pkg:package3@version");
@@ -40,7 +40,7 @@ class ScanDatabaseTest {
     private static final File FILE = new File("test.txt");
 
     @Autowired
-    ScanDatabase database;
+    PersistentDatabase database;
 
     @Autowired
     ScanRepository scanRepository;

@@ -46,7 +46,7 @@ class ScanEntity extends Scan {
     @Override
     protected Detection newDetection(License license) {
         final var detection = new DetectionEntity(license);
-        ScanDatabase.detectionRepository.save(detection);
+        PersistentDatabase.detectionRepository.save(detection);
         return detection;
     }
 }
