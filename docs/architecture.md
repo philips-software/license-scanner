@@ -273,21 +273,21 @@ The result of the license scan is made available in a JSON file, which is
 parsed after the scanner finishes.
 
 ### Detections and licenses
-A license scan yields `Detection` objects that each represent aggregated proof
-for a package license. The information from the license scanner is combined per
-license to (heuristically) indicate the most relevant supporting proof, based
-on factors like the length of the file fragment and the name of the file.
+A license scan yields `Detection` objects that each represent a package license
+with its aggregated proof. The information from the license scanner is combined
+per license to (heuristically) indicate the most relevant supporting proof,
+based on factors like the length of the file fragment and the name of the file.
 (E.g.: Filenames containing "license" have priority.) Unlikely sources for
 license information (E.g. filenames containing "changelog") are de-prioritized,
-and automatically ignored if no additional proof is found.
+and automatically ignored if no additional proof was found.
 
 ![license detection design](licenses.png "Classes involved in detected licenses")
 
 The class diagram above shows the properties of a `Detection` and the logical
-structure of the `License` class to allow matching identical licenses
-independent of ordering of elements or the location of braces. (The
+structure of the `License` classes to allow matching identical licenses
+independent of ordering of elements or the location of braces. The
 `of(string)` method automatically parses a license string into the appropriate
-object structure.)
+object structure.
 
 ### Persistence of domain objects
 To avoid pollution of domain classes by (JPA) persistence annotations, a part

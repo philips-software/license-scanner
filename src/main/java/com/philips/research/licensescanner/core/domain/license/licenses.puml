@@ -26,6 +26,6 @@ class Detection {
     endLine:int
     ignored:boolean
 }
-Detection -> "1" License
+Detection -> "1" License:license
 
 @enduml
