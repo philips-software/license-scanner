@@ -25,10 +25,10 @@ jobs:
         with:
           java-version: '11.0.1'
       - name: Create spdx-file
-        id: license-scanner 
+        id: spdx-builder 
         uses: ./.forest/actions/reports/spdx
         with:
-          project: bom-bar 
+          project: license-scanner 
       - name: Show output filename
         run: |
           echo ${{ steps.spdx-builder.outputs.spdx-file }}
