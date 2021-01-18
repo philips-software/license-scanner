@@ -20,7 +20,7 @@ buildscript {
 plugins {
     id 'application'
     id 'com.adarshr.test-logger' version '2.1.1'
-    id "org.springframework.boot" version "2.4.2"
+    id "org.springframework.boot" version '2.4.2'
 }
 
 apply from: "${rootDir}/ci/forest/java/gradle/publish.gradle"
@@ -31,20 +31,24 @@ repositories {
     jcenter()
 }
 
+ext {
+    springBootVersion = '2.4.2'
+}
+
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.4.1'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator:2.4.1'
-    implementation 'org.springframework.boot:spring-boot-configuration-processor:2.4.2'
-    implementation 'org.hibernate:hibernate-validator:6.1.7.Final'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.4.2'
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    implementation 'com.h2database:h2:1.4.200'
-    implementation 'org.flywaydb:flyway-core:7.5.0'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.4.1'
-    testImplementation 'org.assertj:assertj-core:3.16.1'
-    testImplementation 'org.mockito:mockito-core:3.7.7'
-    testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.5.1'
-    compileOnly 'pl.tlinkowski.annotation:pl.tlinkowski.annotation.basic:0.2.0'
+    implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-configuration-processor:$springBootVersion"
+    implementation "org.hibernate:hibernate-validator:6.1.7.Final"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+    implementation "com.google.code.findbugs:jsr305:3.0.2"
+    implementation "com.h2database:h2:1.4.200"
+    implementation "org.flywaydb:flyway-core:7.5.0"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
+    testImplementation "org.assertj:assertj-core:3.16.1"
+    testImplementation "org.mockito:mockito-core:3.7.7"
+    testImplementation "nl.jqno.equalsverifier:equalsverifier:3.5.1"
+    compileOnly "pl.tlinkowski.annotation:pl.tlinkowski.annotation.basic:0.2.0"
     implementation "javax.xml.bind:jaxb-api:2.3.1"
 }
 
