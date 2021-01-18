@@ -8,7 +8,7 @@ jobs:
     name: Build gradle project 
 
     runs-on: [self-hosted, research] 
-    container: python:3.8
+    container: python:3.8.6
 
     steps:
       - name: Checkout
