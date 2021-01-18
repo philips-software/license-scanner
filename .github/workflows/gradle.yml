@@ -54,7 +54,7 @@ jobs:
     needs: build-and-test
     runs-on: [self-hosted, research]
     # Don't publish when build is skipped
-    if: success() || failure()
+    if: success()
 
     steps:
       - name: Checkout
