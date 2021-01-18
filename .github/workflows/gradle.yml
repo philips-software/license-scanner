@@ -40,7 +40,7 @@ jobs:
       - name: Install scancode 
         run: |
           pip install --upgrade pip
-          pip install scancode-toolkit
+          pip install scancode-toolkit[full]
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
