@@ -8,7 +8,7 @@ jobs:
     name: Build gradle project 
 
     runs-on: [self-hosted, research] 
-    container: python:3.9
+    container: python:3.8
 
     steps:
       - name: Checkout
@@ -35,7 +35,7 @@ jobs:
       - name: Setup java
         uses: actions/setup-java@v1.4.3
         with:
-          java-version: '11'
+          java-version: '11.0.1'
 
       - name: Install scancode 
         run: pip install scancode-toolkit[full]
