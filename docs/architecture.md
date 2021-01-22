@@ -4,7 +4,7 @@
 
 ### Purpose
 This document provides a comprehensive architectural overview of the system,
-using a number of different architectural views to depict differnt aspects of
+using a number of different architectural views to depict different aspects of
 the system. It is intended to convey the significant architectural decisions
 which have been made on the system.
 
@@ -167,7 +167,7 @@ Where:
 containing the source code.
 - **transport** is the transport protocol to be used, like `https` or `git`.
 - **host** is the host part of the resulting URL.
-- **path** is the path specifiation to the source code archive, like the
+- **path** is the path specification to the source code archive, like the
   project path in a version control system.
 - **version** is the branch or revision tag name within a version control
   system.

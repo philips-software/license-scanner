@@ -3,12 +3,17 @@ name: Java CI with Gradle
 on:
   push:
 
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  DOCKER_ORGANIZATION: philipssoftware
+  GITHUB_ORGANIZATION: philips-software
+
 jobs:
   build-and-test:
     name: Build gradle project 
 
-    runs-on: [self-hosted, research] 
-    container: python:3.8
+    runs-on: ubuntu-latest 
 
     steps:
       - name: Checkout
@@ -31,11 +36,16 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      
+
       - name: Setup java
         uses: actions/setup-java@v1.4.3
         with:
           java-version: '11'
+
+      - name: Setup python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.8' 
 
       - name: Install scancode 
         run: pip install scancode-toolkit[full]
@@ -52,7 +62,7 @@ jobs:
   create-docker-image:
     name: "Create docker image"
     needs: build-and-test
-    runs-on: [self-hosted, research]
+    runs-on: ubuntu-latest 
     # Don't publish when build is skipped
     if: success()
 
@@ -74,16 +84,11 @@ jobs:
           dockerfile: docker/Dockerfile
           image-name: license-scanner 
           tags: 0 0.3 0.3.0 v0.3.0 latest
-        env:
-          DOCKER_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
-          DOCKER_PASSWORD: '${{ secrets.ARTIFACTORY_TOKEN }}'
-          DOCKER_REGISTRY: dl-innersource-docker-local.artifactory-ehv.ta.philips.com
-          GITHUB_ORGANIZATION: philips-internal
 
   publish-test-results:
     name: "Publish Unit Tests Results"
     needs: build-and-test
-    runs-on: [self-hosted, research]
+    runs-on: ubuntu-latest 
     # Don't publish when build is skipped
     if: success() || failure()
 

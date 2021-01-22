@@ -6,10 +6,10 @@ Backend service to scan licenses from the source code of (open source) packages.
 (See the [architecture document](docs/architecture.md) in the `docs` directory.)
 
 Typical usage is the integration with CI/CD build pipeline tools (like 
-[SPDX-Builder](https://github.com/philips-labs/spdx-builder)) to obtain validated
+[SPDX-Builder](https://github.com/philips-software/spdx-builder)) to obtain validated
 license information. Prior scan results are provided if the package has been
 scanned before. Packages that were not yet scanned are automatically 
-scheduled for download and scanning. A [web user interface](https://github.com/philips-labs/license-scanner-ui)
+scheduled for download and scanning. A [web user interface](https://github.com/philips-software/license-scanner-ui)
 is provisioned by the the service for monitoring the scanning process and 
 manually curate scan results.
 
@@ -139,10 +139,10 @@ Use docker-compose:
 docker-compose up -d
 ```
 
-Use image stored in Artifactory:
+Use image stored on docker hub :
 
 ```bash
-docker run -p 8080:8080 dl-innersource-docker.artifactory-ehv.ta.philips.com/license-scanner:latest
+docker run -p 8080:8080 philipssoftware/license-scanner:latest
 ```
 
 Build docker image:
