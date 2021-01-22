@@ -1,22 +1,17 @@
-/*
- * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
- * SPDX-License-Identifier: MIT
- */
-
 'use strict';
 const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
   "version.json": "61225a67153a745d039912f30ef80dd3",
-"index.html": "9fea44f15d61268ca5b097541d228297",
-"/": "9fea44f15d61268ca5b097541d228297",
-"main.dart.js": "ca033c65afadfb068a6acfdc82109040",
+"index.html": "42bdc030684ff0c33a1ef422c0366729",
+"/": "42bdc030684ff0c33a1ef422c0366729",
+"main.dart.js": "c00141f99bd8ed0f1cee12016b91545d",
 "favicon.png": "10b1bff590c4dd88987bb6ec3da7951e",
 "icons/logo.png": "3d3e02d4e8b8700b8806778bed9fa412",
 "manifest.json": "8cfd56ea9f416981d91d89d29990bab6",
 "assets/AssetManifest.json": "2efbb41d7877d10aac9d091f58ccd7b9",
-"assets/NOTICES": "15fbddf922e1be60d80a888e682dd4e4",
+"assets/NOTICES": "31765c0195680931868e8a9f32b986e2",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "b14fcf3ee94e3ace300b192e9e7c8c5d",
 "assets/fonts/MaterialIcons-Regular.otf": "1288c9e28052e028aba623321f7826ac"
