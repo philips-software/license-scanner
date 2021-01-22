@@ -113,11 +113,11 @@ value between 0 and 100.
 The service can be started from the command line using the startup scripts in the
 `bin` directory of the distribution archive.
 
-After startup, the service exposes on port 8080:
+After starting up, the service exposes on port 8080:
 * An API to interact with the scanning service
 * A user interface on [localhost:8080/](http://localhost:80080) to monitor license 
 scanning errors and manually curate scanned licenses. (See the separate 
-[license-scanner-ui](https://github.com/philips-labs/license-scanner-ui) 
+[license-scanner-ui](https://github.com/philips-software/license-scanner-ui) 
 user interface project.)
 * A simple database management tool on [localhost:8080/h2](http://localhost:8080/h2)
 with credentials "user" and "password".
@@ -168,18 +168,12 @@ gradlew test
 (Checked items are under development.)
 
 Must-have
-- [ ] Production-grade database (e.g. Postgres).
-- [ ] Authentication of clients. (Not sure)
+- [ ] Authentication of clients.
 
 Should-have
-- [x] Caching downloads across (subdirectory) scans.
 - [ ] Download by commit hash instead of git clone, because this is much faster.
-- [ ] Verify checksum of downloaded artifact before scanning.
 - [ ] Detect and return copyright statements.
-
-Others
-- [ ] Multi-server scanning queue (like AMQP) that persists after restart of 
-  individual servers in a load-balanced configuration.
+- [ ] Production-grade database (e.g. Postgres).
 
 ## Contact / Getting help
 
