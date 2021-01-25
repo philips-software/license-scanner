@@ -6,10 +6,10 @@ Backend service to scan licenses from the source code of (open source) packages.
 (See the [architecture document](docs/architecture.md) in the `docs` directory.)
 
 Typical usage is the integration with CI/CD build pipeline tools (like 
-[SPDX-Builder](https://github.com/philips-labs/spdx-builder)) to obtain validated
+[SPDX-Builder](https://github.com/philips-software/spdx-builder)) to obtain validated
 license information. Prior scan results are provided if the package has been
 scanned before. Packages that were not yet scanned are automatically 
-scheduled for download and scanning. A [web user interface](https://github.com/philips-labs/license-scanner-ui)
+scheduled for download and scanning. A [web user interface](https://github.com/philips-software/license-scanner-ui)
 is provisioned by the the service for monitoring the scanning process and 
 manually curate scan results.
 
@@ -113,11 +113,11 @@ value between 0 and 100.
 The service can be started from the command line using the startup scripts in the
 `bin` directory of the distribution archive.
 
-After startup, the service exposes on port 8080:
+After starting up, the service exposes on port 8080:
 * An API to interact with the scanning service
 * A user interface on [localhost:8080/](http://localhost:80080) to monitor license 
 scanning errors and manually curate scanned licenses. (See the separate 
-[license-scanner-ui](https://github.com/philips-labs/license-scanner-ui) 
+[license-scanner-ui](https://github.com/philips-software/license-scanner-ui) 
 user interface project.)
 * A simple database management tool on [localhost:8080/h2](http://localhost:8080/h2)
 with credentials "user" and "password".
@@ -139,10 +139,10 @@ Use docker-compose:
 docker-compose up -d
 ```
 
-Use image stored in Artifactory:
+Use image stored on docker hub :
 
 ```bash
-docker run -p 8080:8080 dl-innersource-docker.artifactory-ehv.ta.philips.com/license-scanner:latest
+docker run -p 8080:8080 philipssoftware/license-scanner:latest
 ```
 
 Build docker image:
@@ -168,18 +168,12 @@ gradlew test
 (Checked items are under development.)
 
 Must-have
-- [ ] Production-grade database (e.g. Postgres).
-- [ ] Authentication of clients. (Not sure)
+- [ ] Authentication of clients.
 
 Should-have
-- [x] Caching downloads across (subdirectory) scans.
 - [ ] Download by commit hash instead of git clone, because this is much faster.
-- [ ] Verify checksum of downloaded artifact before scanning.
 - [ ] Detect and return copyright statements.
-
-Others
-- [ ] Multi-server scanning queue (like AMQP) that persists after restart of 
-  individual servers in a load-balanced configuration.
+- [ ] Production-grade database (e.g. Postgres).
 
 ## Contact / Getting help
 

@@ -54,5 +54,5 @@ git checkout master
 git push origin master --tags
 ```
 
-[github]: https://github.com/philips-internal/license-scanner/issues
+[github]: https://github.com/philips-software/license-scanner/issues
 
