@@ -43,7 +43,7 @@ jobs:
           java-version: '11'
 
       - name: Setup python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2.2.1
         with:
           python-version: '3.8' 
 
