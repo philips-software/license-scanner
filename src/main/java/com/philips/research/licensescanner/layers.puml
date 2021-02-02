@@ -15,32 +15,41 @@ package controller {
 }
 
 package core {
-    interface LicenseService
-    FooResource -l-> LicenseService
+    class DtoClass
+
+    interface FooService
+    FooResource -l-> FooService
+    FooService .l.> DtoClass
 
     package domain {
-        class LicenseInteractor
+        class FooInteractor
         note bottom
             Use Case implementations
         end note
-        LicenseService <|.. LicenseInteractor
+        FooService <|.. FooInteractor
 
         class DomainClass
-        LicenseInteractor ..> DomainClass
+        FooInteractor ..> DomainClass
     }
 
-    interface LicenseStore
-    LicenseInteractor -> LicenseStore
+    interface PersistentStore
+    FooInteractor -> PersistentStore
 }
 
 package persistence {
-    class LicenseDatabase
-    note right
-        Database
-        code
+    class DomainEntity
+    DomainEntity -|> DomainClass
+
+    interface CrudRepository<T>
+    CrudRepository .d.> DomainEntity:<T>
+
+    class PersistentDatabase
+    note top
+        Domain CRUD code
     end note
-    LicenseStore <|.u. LicenseDatabase
-    LicenseDatabase ..> DomainClass
+    PersistentStore <|.u. PersistentDatabase
+    PersistentDatabase ..> DomainEntity:<<persists>>
+    PersistentDatabase o-d-> "*" CrudRepository
 }
 
 @enduml

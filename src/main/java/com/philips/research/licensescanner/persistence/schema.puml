@@ -1,5 +1,7 @@
 @startuml
 
+left to right direction
+
 ' Config ERD diagram
 hide circle
 skinparam linetype ortho

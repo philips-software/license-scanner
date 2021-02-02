@@ -1,11 +1,6 @@
 /*
- * This software and associated documentation files are
- *
- * Copyright © 2020-2020 Koninklijke Philips N.V.
- *
- * and is made available for use within Philips and/or within Philips products.
- *
- * All Rights Reserved
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
  */
 
 package com.philips.research.licensescanner.core.domain;
@@ -13,7 +8,7 @@ package com.philips.research.licensescanner.core.domain;
 import com.philips.research.licensescanner.ApplicationConfiguration;
 import com.philips.research.licensescanner.core.BusinessException;
 import com.philips.research.licensescanner.core.LicenseService;
-import com.philips.research.licensescanner.core.ScanStore;
+import com.philips.research.licensescanner.core.PersistentStore;
 import com.philips.research.licensescanner.core.domain.download.DownloadCache;
 import com.philips.research.licensescanner.core.domain.license.Detector;
 import com.philips.research.licensescanner.core.domain.license.License;
@@ -44,13 +39,13 @@ import java.util.stream.Collectors;
 public class LicenseInteractor implements LicenseService {
     private static final Logger LOG = LoggerFactory.getLogger(LicenseInteractor.class);
 
-    private final ScanStore store;
+    private final PersistentStore store;
     private final DownloadCache cache;
     private final Detector detector;
     private final ApplicationConfiguration configuration;
 
     @Autowired
-    public LicenseInteractor(ScanStore store, DownloadCache cache, Detector detector,
+    public LicenseInteractor(PersistentStore store, DownloadCache cache, Detector detector,
                              ApplicationConfiguration configuration) {
         this.store = store;
         this.cache = cache;
@@ -106,6 +101,9 @@ public class LicenseInteractor implements LicenseService {
             final var sourcePath = cache.obtain(location);
             final var path = resolveFragment(sourcePath, location.getFragment());
             detector.scan(path, scan, configuration.getThresholdPercent());
+            if (scan.getLicense().equals(License.NONE)) {
+                scan.setError("Scan did not detect a license");
+            }
         } finally {
             cache.release(location);
         }

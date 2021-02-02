@@ -1,18 +1,13 @@
 /*
- * This software and associated documentation files are
- *
- * Copyright © 2020-2020 Koninklijke Philips N.V.
- *
- * and is made available for use within Philips and/or within Philips products.
- *
- * All Rights Reserved
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
  */
 
 package com.philips.research.licensescanner.core.domain;
 
 import com.philips.research.licensescanner.ApplicationConfiguration;
 import com.philips.research.licensescanner.core.LicenseService;
-import com.philips.research.licensescanner.core.ScanStore;
+import com.philips.research.licensescanner.core.PersistentStore;
 import com.philips.research.licensescanner.core.domain.download.DownloadCache;
 import com.philips.research.licensescanner.core.domain.download.DownloadException;
 import com.philips.research.licensescanner.core.domain.license.Detector;
@@ -56,7 +51,7 @@ class LicenseInteractorTest {
 
     private final DownloadCache cache = mock(DownloadCache.class);
     private final Detector detector = mock(Detector.class);
-    private final ScanStore store = mock(ScanStore.class);
+    private final PersistentStore store = mock(PersistentStore.class);
     private final ApplicationConfiguration configuration = new ApplicationConfiguration();
 
     private final LicenseService interactor = new LicenseInteractor(store, cache, detector, configuration);
@@ -171,6 +166,16 @@ class LicenseInteractorTest {
         }
 
         @Test
+        void registersEmptyLicenseAsFailure() {
+            when(cache.obtain(LOCATION)).thenReturn(workDirectory);
+
+            interactor.scanLicense(PURL, LOCATION);
+
+            //noinspection OptionalGetWithoutIsPresent
+            assertThat(scan.getError().get()).contains("did not detect");
+        }
+
+        @Test
         void registersDownloadFailure() {
             when(cache.obtain(LOCATION)).thenThrow(new DownloadException(MESSAGE));
 
@@ -216,6 +221,7 @@ class LicenseInteractorTest {
             assertThat(scan.getError()).contains("Server failure");
             verify(cache).release(LOCATION);
         }
+
     }
 
     @Nested

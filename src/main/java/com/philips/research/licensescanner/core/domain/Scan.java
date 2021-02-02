@@ -1,11 +1,6 @@
 /*
- * This software and associated documentation files are
- *
- * Copyright © 2020-2020 Koninklijke Philips N.V.
- *
- * and is made available for use within Philips and/or within Philips products.
- *
- * All Rights Reserved
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
  */
 
 package com.philips.research.licensescanner.core.domain;
@@ -140,12 +135,12 @@ public class Scan {
         if (this == o) return true;
         if (!(o instanceof Scan)) return false;
         Scan scan = (Scan) o;
-        return purl.equals(scan.purl);
+        return getPurl().equals(scan.getPurl());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(purl);
+        return Objects.hash(getPurl());
     }
 
     @Override

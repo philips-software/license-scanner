@@ -1,33 +1,28 @@
 <!--
-  ~ This software and associated documentation files are
-  ~
-  ~ Copyright © 2020-2020 Koninklijke Philips N.V.
-  ~
-  ~ and is made available for use within Philips and/or within Philips products.
-  ~
-  ~ All Rights Reserved
+  ~ Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+  ~ SPDX-License-Identifier: MIT
   -->
 
+<!--suppress JpaDataSourceORMDomInspection -->
 <entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm" version="2.0">
-    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Scan">
+    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Scan" access="FIELD">
         <attributes>
-            <basic name="purl" access="FIELD" optional="false">
+            <basic name="purl" optional="false">
                 <lob/>
             </basic>
-            <basic name="timestamp" access="FIELD" optional="false">
+            <basic name="timestamp" optional="false">
                 <column name="created"/>
             </basic>
-            <basic name="license" access="FIELD">
+            <basic name="license">
                 <lob/>
             </basic>
-            <basic name="confirmed" access="FIELD" optional="false"/>
-            <basic name="contesting" access="FIELD">
+            <basic name="contesting">
                 <lob/>
             </basic>
-            <basic name="location" access="FIELD">
+            <basic name="location">
                 <lob/>
             </basic>
-            <basic name="error" access="FIELD">
+            <basic name="error">
                 <lob/>
             </basic>
             <one-to-many name="detections" orphan-removal="true"
@@ -37,7 +32,8 @@
             </one-to-many>
         </attributes>
     </mapped-superclass>
-    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Detection">
+
+    <mapped-superclass class="com.philips.research.licensescanner.core.domain.Detection" access="FIELD">
         <attributes>
             <basic name="license">
                 <lob/>

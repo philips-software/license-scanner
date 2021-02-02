@@ -1,11 +1,6 @@
 /*
- * This software and associated documentation files are
- *
- * Copyright © 2020-2020 Koninklijke Philips N.V.
- *
- * and is made available for use within Philips and/or within Philips products.
- *
- * All Rights Reserved
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
  */
 
 package com.philips.research.licensescanner.persistence;
@@ -23,7 +18,7 @@ import java.util.Optional;
 interface ScanRepository extends CrudRepository<ScanEntity, Long> {
     Optional<ScanEntity> findFirstByPurlOrderByTimestampDesc(URI purl);
 
-    List<ScanEntity> findTop50BySearchLikeOrderByPurlAsc(String mask);
+    List<ScanEntity> findTop50BySearchLikeIgnoreCaseOrderByPurlAsc(String mask);
 
     List<ScanEntity> findTop100ByTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(
             Instant from, Instant until);

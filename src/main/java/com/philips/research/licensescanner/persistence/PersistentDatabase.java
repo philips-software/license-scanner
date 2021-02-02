@@ -1,16 +1,11 @@
 /*
- * This software and associated documentation files are
- *
- * Copyright © 2020-2020 Koninklijke Philips N.V.
- *
- * and is made available for use within Philips and/or within Philips products.
- *
- * All Rights Reserved
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
  */
 
 package com.philips.research.licensescanner.persistence;
 
-import com.philips.research.licensescanner.core.ScanStore;
+import com.philips.research.licensescanner.core.PersistentStore;
 import com.philips.research.licensescanner.core.domain.Scan;
 import org.springframework.stereotype.Repository;
 import pl.tlinkowski.annotation.basic.NullOr;
@@ -25,31 +20,34 @@ import java.util.Optional;
  * Spring component implementing the persistence of packages.
  */
 @Repository
-public class ScanDatabase implements ScanStore {
+public class PersistentDatabase implements PersistentStore {
     @SuppressWarnings("NotNullFieldNotInitialized")
     static DetectionRepository detectionRepository;
 
     private final ScanRepository scanRepository;
 
-    public ScanDatabase(ScanRepository scanRepository, DetectionRepository detectionRepository) {
+    public PersistentDatabase(ScanRepository scanRepository, DetectionRepository detectionRepository) {
         this.scanRepository = scanRepository;
-        ScanDatabase.detectionRepository = detectionRepository;
+        PersistentDatabase.detectionRepository = detectionRepository;
     }
 
     @Override
     public List<Scan> findScans(String namespace, String name, String version) {
-        var mask = (name.isBlank()) ? "%" : wildcard(name);
+        var mask = (name.isBlank()) ? "%" : '%' + escape(name) + '%';
         if (!namespace.isBlank()) {
-            mask = wildcard(namespace) + "/" + mask;
+            mask = '%' + escape(namespace) + "%/" + mask;
         }
         if (!version.isBlank()) {
-            mask += "@" + wildcard(version);
+            mask += "@%" + escape(version) + '%';
         }
-        return new ArrayList<>(scanRepository.findTop50BySearchLikeOrderByPurlAsc(mask));
+        return new ArrayList<>(scanRepository.findTop50BySearchLikeIgnoreCaseOrderByPurlAsc(mask));
     }
 
-    private String wildcard(String name) {
-        return '%' + name + '%';
+    private String escape(String fragment) {
+        return fragment
+                .replaceAll("\\\\|\\[|]", "")
+                .replaceAll("%", "\\\\%")
+                .replaceAll("_", "\\\\_");
     }
 
     @Override

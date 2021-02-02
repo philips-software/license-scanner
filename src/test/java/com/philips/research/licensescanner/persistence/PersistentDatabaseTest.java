@@ -1,11 +1,6 @@
 /*
- * This software and associated documentation files are
- *
- * Copyright © 2020-2020 Koninklijke Philips N.V.
- *
- * and is made available for use within Philips and/or within Philips products.
- *
- * All Rights Reserved
+ * Copyright (c) 2020-2021, Koninklijke Philips N.V., https://www.philips.com
+ * SPDX-License-Identifier: MIT
  */
 
 package com.philips.research.licensescanner.persistence;
@@ -25,9 +20,9 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
-@ComponentScan(basePackageClasses = {ScanDatabase.class})
+@ComponentScan(basePackageClasses = {PersistentDatabase.class})
 @DataJpaTest
-class ScanDatabaseTest {
+class PersistentDatabaseTest {
     private static final URI PURL = URI.create("pkg:package@version");
     private static final URI PURL2 = URI.create("pkg:package2@version");
     private static final URI PURL3 = URI.create("pkg:package3@version");
@@ -40,7 +35,7 @@ class ScanDatabaseTest {
     private static final File FILE = new File("test.txt");
 
     @Autowired
-    ScanDatabase database;
+    PersistentDatabase database;
 
     @Autowired
     ScanRepository scanRepository;
@@ -61,7 +56,7 @@ class ScanDatabaseTest {
         assertThat(database.findScans("duh", "", "")).isEmpty();
         assertThat(database.findScans("", "", "oth")).containsExactly(scan3);
         assertThat(database.findScans("spa", "ilt", "")).containsExactlyInAnyOrder(scan1, scan3);
-        assertThat(database.findScans("spa", "", "")).containsExactlyInAnyOrder(scan1, scan2, scan3);
+        assertThat(database.findScans("SPA", "", "")).containsExactlyInAnyOrder(scan1, scan2, scan3);
         assertThat(database.findScans("", "", "")).hasSize(3);
     }
 

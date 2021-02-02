@@ -1,4 +1,0 @@
-ALTER TABLE scans
-    ALTER COLUMN location CLOB NULL;
-ALTER TABLE detections
-    ALTER COLUMN scan_id BIGINT NULL;

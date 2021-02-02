@@ -1,0 +1,29 @@
+@startuml
+
+interface VcsHandler {
+    download(directory, location):directory
+}
+
+class GitVcsHandler
+VcsHandler <|.. GitVcsHandler
+
+class AnonymousVcsHandler
+VcsHandler <|.. AnonymousVcsHandler
+
+class Downloader {
+    download(directory, location):directory
+}
+Downloader .r.> VcsHandler
+
+class CacheEntry {
+}
+
+class DownloadCache {
+    obtain(location):directory
+    release(location)
+}
+DownloadCache *-> CacheEntry
+DownloadCache --> Downloader
+
+
+@enduml
