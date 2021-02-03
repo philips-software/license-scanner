@@ -11,6 +11,7 @@ plugins {
     id 'application'
     id 'com.adarshr.test-logger' version '2.1.1'
     id "org.springframework.boot" version '2.4.2'
+    id "org.flywaydb.flyway" version "7.5.2"
 }
 
 repositories {
@@ -57,5 +58,17 @@ java {
         languageVersion = JavaLanguageVersion.of(11)
     }
 }
+
+ext.ApplicationProps = new Properties()
+ApplicationProps.load(new FileInputStream("src/main/resources/application-db.properties"))
+
+flyway {
+    url = ApplicationProps['spring.datasource.url']
+    user = ApplicationProps['spring.datasource.username']
+    password = ApplicationProps['spring.datasource.password']
+}
+
+// we need to build classes before we can migrate
+flywayMigrate.dependsOn classes
 
 version = '0.4.0'
