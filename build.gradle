@@ -49,7 +49,7 @@ test {
 }
 
 application {
-    mainClass = 'com.philips.research.licensescanner.LicenseScannerService'
+    mainClass = 'com.philips.research.licensescanner.Application'
 }
 
 java {
@@ -58,4 +58,4 @@ java {
     }
 }
 
-version = '0.3.0'
+version = '0.4.0'
