@@ -38,6 +38,8 @@ This needs to be improved in the future, but for now:
 
 Change version into new version in file / linenumber:
 - `.spdx-builder.yml` : line 9.
+- `build.gradle` : line 61.
+- `.github/workflows/gradle.yml` : line 31. (docker tags)
 - `.github/workflows/gradle.yml` : line 31. (docker tags)
 - `docker-compose.yml` : line 5.
 
