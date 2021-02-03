@@ -3,7 +3,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.19.0"
+    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.20.0"
   }
 }
 
@@ -11,6 +11,7 @@ plugins {
     id 'application'
     id 'com.adarshr.test-logger' version '2.1.1'
     id "org.springframework.boot" version '2.4.2'
+    id "org.flywaydb.flyway" version "7.5.2"
 }
 
 repositories {
@@ -49,7 +50,7 @@ test {
 }
 
 application {
-    mainClass = 'com.philips.research.licensescanner.LicenseScannerService'
+    mainClass = 'com.philips.research.licensescanner.Application'
 }
 
 java {
@@ -58,4 +59,19 @@ java {
     }
 }
 
-version = '0.3.0'
+file("src/main/resources/application-db.properties").withReader {
+   Properties props = new Properties()
+   props.load(it)
+   project.ext.ApplicationProps = props
+}
+
+flyway {
+    url = project.ext.ApplicationProps['spring.datasource.url']
+    user = project.ext.ApplicationProps['spring.datasource.username']
+    password = project.ext.ApplicationProps['spring.datasource.password']
+}
+
+// we need to build classes before we can migrate
+flywayMigrate.dependsOn classes
+
+version = '0.4.1'
