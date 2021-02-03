@@ -59,13 +59,16 @@ java {
     }
 }
 
-ext.ApplicationProps = new Properties()
-ApplicationProps.load(new FileInputStream("src/main/resources/application-db.properties"))
+file("src/main/resources/application-db.properties").withReader {
+   Properties props = new Properties()
+   props.load(it)
+   project.ext.ApplicationProps = props
+}
 
 flyway {
-    url = ApplicationProps['spring.datasource.url']
-    user = ApplicationProps['spring.datasource.username']
-    password = ApplicationProps['spring.datasource.password']
+    url = project.ext.ApplicationProps['spring.datasource.url']
+    user = project.ext.ApplicationProps['spring.datasource.username']
+    password = project.ext.ApplicationProps['spring.datasource.password']
 }
 
 // we need to build classes before we can migrate
