@@ -1,7 +1,7 @@
 FROM philipssoftware/python:java
 
 RUN /usr/local/bin/python -m pip install --upgrade pip
-RUN pip install commoncode==20.10.20 scancode-toolkit extractcode pyicu
+RUN pip install scancode-toolkit[full]
 
 COPY build/libs/license-scanner-service*.jar /app/service.jar
 COPY docker/start.sh /app/start.sh
