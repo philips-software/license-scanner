@@ -136,12 +136,12 @@ public class LicenseInteractor implements LicenseService {
     }
 
     @Override
-    public void contest(URI purl, @NullOr String license) {
+    public void contest(URI purl, @SuppressWarnings("NullableProblems") @NullOr String license) {
         final var contesting = (license != null) ? LicenseParser.parse(license) : License.NONE;
-        store.getScan(purl).ifPresent(scan -> {
+        store.getScan(purl).ifPresentOrElse(scan -> {
             scan.contest(contesting);
-            LOG.info("Contested {} with license {}", scan, license);
-        });
+            LOG.info("Contested scan {} with license {}", scan, license);
+        }, () -> LOG.warn("Ignored contested license for {}", purl));
     }
 
     @Override
