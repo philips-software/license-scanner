@@ -36,7 +36,7 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testImplementation "org.assertj:assertj-core:3.19.0"
     testImplementation "org.mockito:mockito-core:3.7.7"
-    testImplementation "nl.jqno.equalsverifier:equalsverifier:3.5.2"
+    testImplementation "nl.jqno.equalsverifier:equalsverifier:3.5.3"
     compileOnly "pl.tlinkowski.annotation:pl.tlinkowski.annotation.basic:0.2.0"
     implementation "javax.xml.bind:jaxb-api:2.3.1"
 }
@@ -74,4 +74,4 @@ flyway {
 // we need to build classes before we can migrate
 flywayMigrate.dependsOn classes
 
-version = '0.4.1'
+version = '0.5.0'
