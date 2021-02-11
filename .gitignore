@@ -37,3 +37,7 @@ build/
 
 # Ignore Gradle build output directory
 build
+
+# docker build
+TAGS
+REPO

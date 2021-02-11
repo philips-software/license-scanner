@@ -50,5 +50,6 @@ if echo ${PROFILE} | grep -iqF hipaa; then
   source /app/retrieve_keystore.sh
 fi
 
+ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
 exec java -server ${JAVA_OPTS} -jar /app/service.jar
