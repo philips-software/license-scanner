@@ -83,7 +83,7 @@ jobs:
         with:
           dockerfile: docker/Dockerfile
           image-name: license-scanner 
-          tags: 0 0.5 0.5.0 v0.5.0 latest
+          tags: 0 0.6 0.6.0 v0.6.0 latest
 
   publish-test-results:
     name: "Publish Unit Tests Results"
