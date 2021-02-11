@@ -23,7 +23,7 @@ class ScanInfoJsonTest {
     private static final Instant TIMESTAMP = Instant.now();
     private static final String ERROR = "Error";
     private static final URI PURL = URI.create("pkg:package@version");
-    private static final String ID = "pkg%253Apackage%2540version";
+    private static final String ID = "pkg%3Apackage%40version";
     private static final String LICENSE = "License";
     private static final ObjectMapper MAPPER = new JacksonConfiguration().objectMapper();
 

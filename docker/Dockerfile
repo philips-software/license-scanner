@@ -13,4 +13,6 @@ EXPOSE 8080
 ADD REPO .
 ADD TAGS .
 
+RUN mkdir /root/.ssh
+
 ENTRYPOINT ["/app/start.sh"]

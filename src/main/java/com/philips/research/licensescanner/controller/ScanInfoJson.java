@@ -56,7 +56,7 @@ class ScanInfoJson {
     }
 
     private static String encode(URI purl) {
-        return URLEncoder.encode(URLEncoder.encode(purl.toString(), StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        return URLEncoder.encode(purl.toString(), StandardCharsets.UTF_8);
     }
 }
 
