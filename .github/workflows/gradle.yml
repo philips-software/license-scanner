@@ -79,7 +79,7 @@ jobs:
           key: license-scanner-${{ github.sha }}
 
       - name: Build Docker Images
-        uses: philips-software/docker-ci-scripts@v3.1.0
+        uses: philips-software/docker-ci-scripts@v3.2.1
         with:
           dockerfile: docker/Dockerfile
           image-name: license-scanner 
