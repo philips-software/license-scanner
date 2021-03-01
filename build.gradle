@@ -3,7 +3,7 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.20.0"
+    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.21.0"
   }
 }
 
@@ -32,11 +32,11 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
     implementation "com.google.code.findbugs:jsr305:3.0.2"
     implementation "com.h2database:h2:1.4.200"
-    implementation "org.flywaydb:flyway-core:7.5.3"
+    implementation "org.flywaydb:flyway-core:7.5.4"
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testImplementation "org.assertj:assertj-core:3.19.0"
-    testImplementation "org.mockito:mockito-core:3.7.7"
     testImplementation "nl.jqno.equalsverifier:equalsverifier:3.5.5"
+    testImplementation "org.mockito:mockito-core:3.8.0"
     compileOnly "pl.tlinkowski.annotation:pl.tlinkowski.annotation.basic:0.2.0"
     implementation "javax.xml.bind:jaxb-api:2.3.1"
 }
