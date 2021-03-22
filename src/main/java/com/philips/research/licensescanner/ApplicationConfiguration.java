@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.nio.file.Path;
 
 /**
@@ -35,11 +36,11 @@ public class ApplicationConfiguration {
     /**
      * @param directory An existing directory on this system.
      */
-    public ApplicationConfiguration setTempDir(Path directory) {
-        if (!directory.toFile().isDirectory()) {
+    public ApplicationConfiguration setTempDir(File directory) {
+        if (!directory.isDirectory()) {
             throw new ValidationException(directory + " is not a valid working directory");
         }
-        this.tempDir = directory;
+        this.tempDir = directory.toPath();
         return this;
     }
 

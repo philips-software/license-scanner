@@ -29,7 +29,7 @@ class DownloadCacheTest {
     private static Path TEMP_DIR;
     private final Downloader downloader = mock(Downloader.class);
     private final ApplicationConfiguration configuration = new ApplicationConfiguration()
-            .setTempDir(TEMP_DIR).setCacheSize(CACHE_SIZE);
+            .setTempDir(TEMP_DIR.toFile()).setCacheSize(CACHE_SIZE);
     private final DownloadCache cache = new DownloadCache(downloader, configuration);
 
     @BeforeAll
