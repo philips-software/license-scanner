@@ -85,30 +85,3 @@ jobs:
           image-name: license-scanner 
           tags: 0 0.6 0.6.0 v0.6.0 latest
 
-  publish-test-results:
-    name: "Publish Unit Tests Results"
-    needs: build-and-test
-    runs-on: ubuntu-latest 
-    # Don't publish when build is skipped
-    if: success() || failure()
-
-    steps:
-      - name: Cache build artifacts
-        uses: actions/cache@v2.1.4
-        with:
-          path: | 
-            build/test-results/**/*.xml
-            build/libs/*.jar 
-          key: license-scanner-${{ github.sha }}
-
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1.9
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          check_name: Unit Test Results
-          comment_title: Unit Test Statistics
-          hide_comments: all but latest
-          comment_on_pr: true
-          files: build/test-results/**/*.xml
-          report_individual_runs: true
-          deduplicate_classes_by_file_name: false
