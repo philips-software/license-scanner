@@ -59,6 +59,10 @@ java {
     }
 }
 
+jar {
+    enabled = false
+}
+
 file("src/main/resources/application-db.properties").withReader {
    Properties props = new Properties()
    props.load(it)
