@@ -21,7 +21,7 @@ repositories {
 }
 
 ext {
-    springBootVersion = '2.4.5'
+    springBootVersion = '2.5.0'
 }
 
 dependencies {
@@ -57,6 +57,10 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
     }
+}
+
+jar {
+    enabled = false
 }
 
 file("src/main/resources/application-db.properties").withReader {
