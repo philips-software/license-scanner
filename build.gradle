@@ -3,14 +3,14 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.23.4"
+    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.24.1"
   }
 }
 
 plugins {
     id 'application'
     id 'com.adarshr.test-logger' version '3.0.0'
-    id "org.springframework.boot" version '2.4.5'
+    id "org.springframework.boot" version '2.5.0'
     id "org.flywaydb.flyway" version "7.9.1"
 }
 
@@ -35,7 +35,7 @@ dependencies {
     implementation "org.flywaydb:flyway-core:7.9.0"
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testImplementation "org.assertj:assertj-core:3.19.0"
-    testImplementation "nl.jqno.equalsverifier:equalsverifier:3.6"
+    testImplementation "nl.jqno.equalsverifier:equalsverifier:3.6.1"
     testImplementation "org.mockito:mockito-core:3.10.0"
     compileOnly "pl.tlinkowski.annotation:pl.tlinkowski.annotation.basic:0.2.0"
     implementation "javax.xml.bind:jaxb-api:2.3.1"
