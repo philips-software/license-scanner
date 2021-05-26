@@ -67,7 +67,7 @@ toml==0.10.2
 tqdm==4.56.1
 typecode==21.1.21
 typecode-libmagic==5.39.210122
-urllib3==1.26.3
+urllib3==1.26.4
 urlpy==0.5
 wcwidth==0.2.5
 webencodings==0.5.1
