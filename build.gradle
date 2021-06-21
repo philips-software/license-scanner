@@ -21,7 +21,7 @@ repositories {
 }
 
 ext {
-    springBootVersion = '2.5.0'
+    springBootVersion = '2.5.1'
 }
 
 dependencies {
@@ -34,9 +34,9 @@ dependencies {
     implementation "com.h2database:h2:1.4.200"
     implementation "org.flywaydb:flyway-core:7.9.1"
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
-    testImplementation "org.assertj:assertj-core:3.19.0"
+    testImplementation "org.assertj:assertj-core:3.20.2"
     testImplementation "nl.jqno.equalsverifier:equalsverifier:3.6.1"
-    testImplementation "org.mockito:mockito-core:3.10.0"
+    testImplementation "org.mockito:mockito-core:3.11.1"
     compileOnly "pl.tlinkowski.annotation:pl.tlinkowski.annotation.basic:0.2.0"
     implementation "javax.xml.bind:jaxb-api:2.3.1"
 }
