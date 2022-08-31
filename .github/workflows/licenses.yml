@@ -17,7 +17,7 @@ jobs:
       uses: philips-software/spdx-action@v0.8.0
       with:
         project: license-scanner 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: licenses
         path: ${{ steps.spdx-builder.outputs.spdx-file }}
