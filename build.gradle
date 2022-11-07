@@ -78,4 +78,4 @@ flyway {
 // we need to build classes before we can migrate
 flywayMigrate.dependsOn classes
 
-version = '0.6.0'
+version = '0.6.1'
