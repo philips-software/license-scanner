@@ -22,8 +22,8 @@ git flow init
 
 ### Make sure your local environment is correct
 ```
-git checkout master
-git pull origin master
+git checkout main
+git pull origin main
 git checkout develop
 git pull origin develop
 ```
@@ -38,8 +38,8 @@ This needs to be improved in the future, but for now:
 
 Change version into new version in file / linenumber:
 - `.spdx-builder.yml` : line 9.
-- `build.gradle` : line 71.
-- `.github/workflows/gradle.yml` : line 31. (docker tags)
+- `build.gradle` : line 81.
+- `.github/workflows/gradle.yml` : line 94. (docker tags)
 - `docker-compose.yml` : line 5.
 
 Commit changes:
@@ -51,8 +51,8 @@ git commit -m "Prepare for release vx.x.x"
 ```
 git flow release finish vx.x.x
 git push origin develop
-git checkout master
-git push origin master --tags
+git checkout main
+git push origin main --tags
 ```
 
 [github]: https://github.com/philips-software/license-scanner/issues

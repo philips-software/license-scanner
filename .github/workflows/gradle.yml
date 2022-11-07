@@ -4,10 +4,11 @@ on:
   push:
 
 env:
-  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  REGISTRY_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  REGISTRY_TOKEN: ${{ secrets.DOCKER_PASSWORD }}
   DOCKER_ORGANIZATION: philipssoftware
   GITHUB_ORGANIZATION: philips-software
+  KEYLESS: true
 
 jobs:
   build-and-test:
@@ -17,10 +18,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Cache build artifacts
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v3.0.11
         with:
           path: | 
             build/test-results/**/*.xml
@@ -28,7 +29,7 @@ jobs:
           key: license-scanner-${{ github.sha }}
 
       - name: Gradle cache
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v3.0.11
         with:
           path: |
             ~/.gradle/caches
@@ -37,19 +38,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Setup java
-        uses: actions/setup-java@v1.4.3
+      - uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '15'
+          distribution: 'zulu'
 
       - name: Setup python
-        uses: actions/setup-python@v2.2.1
+        uses: actions/setup-python@v4.3.0
         with:
-          python-version: '3.8' 
+          python-version: '3.9' 
 
       - name: Install scancode 
-        run: pip install commoncode==20.10.20 scancode-toolkit extractcode pyicu
-
+        run: |
+          pip install -r docker/requirements.txt
+          scancode --version
+          extractcode --version
+          
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
@@ -63,15 +67,19 @@ jobs:
     name: "Create docker image"
     needs: build-and-test
     runs-on: ubuntu-latest 
+
+    permissions:
+      id-token: write
+
     # Don't publish when build is skipped
     if: success()
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Cache build artifacts
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v3.0.11
         with:
           path: | 
             build/test-results/**/*.xml
@@ -79,36 +87,12 @@ jobs:
           key: license-scanner-${{ github.sha }}
 
       - name: Build Docker Images
-        uses: philips-software/docker-ci-scripts@v3.1.0
+        uses: philips-software/docker-ci-scripts@v5.0.0
         with:
           dockerfile: docker/Dockerfile
           image-name: license-scanner 
-          tags: 0 0.6 0.6.0 v0.6.0 latest
+          tags: 0 0.6 0.6.1 v0.6.1 latest
+          slsa-provenance: true
+          sbom: true
+          sign: true
 
-  publish-test-results:
-    name: "Publish Unit Tests Results"
-    needs: build-and-test
-    runs-on: ubuntu-latest 
-    # Don't publish when build is skipped
-    if: success() || failure()
-
-    steps:
-      - name: Cache build artifacts
-        uses: actions/cache@v2.1.4
-        with:
-          path: | 
-            build/test-results/**/*.xml
-            build/libs/*.jar 
-          key: license-scanner-${{ github.sha }}
-
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1.8
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          check_name: Unit Test Results
-          comment_title: Unit Test Statistics
-          hide_comments: all but latest
-          comment_on_pr: true
-          files: build/test-results/**/*.xml
-          report_individual_runs: true
-          deduplicate_classes_by_file_name: false

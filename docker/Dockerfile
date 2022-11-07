@@ -1,6 +1,6 @@
 FROM philipssoftware/python:java
 
-RUN /usr/local/bin/python -m pip install --upgrade pip
+RUN python -m pip install --upgrade pip
 
 COPY docker/requirements.txt /app/requirements.txt
 RUN pip install scancode-toolkit[full] -c /app/requirements.txt

@@ -106,7 +106,7 @@ class LicenseInteractorTest {
         @BeforeEach
         void beforeEach() {
             when(store.createScan(PURL, LOCATION)).thenReturn(scan);
-            configuration.setTempDir(workDirectory);
+            configuration.setTempDir(workDirectory.toFile());
             configuration.setThresholdPercent(THRESHOLD);
         }
 
