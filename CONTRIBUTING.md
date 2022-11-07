@@ -22,8 +22,8 @@ git flow init
 
 ### Make sure your local environment is correct
 ```
-git checkout master
-git pull origin master
+git checkout main
+git pull origin main
 git checkout develop
 git pull origin develop
 ```
@@ -51,8 +51,8 @@ git commit -m "Prepare for release vx.x.x"
 ```
 git flow release finish vx.x.x
 git push origin develop
-git checkout master
-git push origin master --tags
+git checkout main
+git push origin main --tags
 ```
 
 [github]: https://github.com/philips-software/license-scanner/issues
