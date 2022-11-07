@@ -8,6 +8,7 @@ env:
   REGISTRY_TOKEN: ${{ secrets.DOCKER_PASSWORD }}
   DOCKER_ORGANIZATION: philipssoftware
   GITHUB_ORGANIZATION: philips-software
+  KEYLESS: true
 
 jobs:
   build-and-test:
@@ -66,6 +67,10 @@ jobs:
     name: "Create docker image"
     needs: build-and-test
     runs-on: ubuntu-latest 
+
+    premissions:
+      id-token: write
+
     # Don't publish when build is skipped
     if: success()
 
@@ -87,4 +92,7 @@ jobs:
           dockerfile: docker/Dockerfile
           image-name: license-scanner 
           tags: 0 0.6 0.6.0 v0.6.0 latest
+          slsa-provenance: true
+          sbom: true
+          sign: true
 
