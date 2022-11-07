@@ -68,7 +68,7 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest 
 
-    premissions:
+    permissions:
       id-token: write
 
     # Don't publish when build is skipped
