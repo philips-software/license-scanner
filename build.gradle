@@ -35,7 +35,7 @@ dependencies {
     implementation "org.flywaydb:flyway-core:9.10.0"
     testImplementation "org.springframework.boot:spring-boot-starter-test:$springBootVersion"
     testImplementation "org.assertj:assertj-core:3.23.1"
-    testImplementation "nl.jqno.equalsverifier:equalsverifier:3.10.1"
+    testImplementation "nl.jqno.equalsverifier:equalsverifier:3.12.3"
     testImplementation "org.mockito:mockito-core:4.10.0"
     compileOnly "pl.tlinkowski.annotation:pl.tlinkowski.annotation.basic:0.2.0"
     implementation "javax.xml.bind:jaxb-api:2.3.1"
